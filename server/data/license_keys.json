@@ -8,15 +8,17 @@
   {
     "key": "AYNX-PLUS-PLAN-2026",
     "plan": "Plus",
-    "expires_at": null,
-    "activated_by": null
+    "expires_at": "2026-07-30T14:28:37.393Z",
+    "activated_by": "22702340-ee7c-406d-a756-54ca04b108d7",
+    "activated_at": "2026-06-30T14:28:37.393Z",
+    "updated_at": "2026-06-30T14:28:37.393Z"
   },
   {
     "key": "AYNX-PRO-PLAN-2026",
     "plan": "Pro",
     "expires_at": "2026-07-30T09:50:00.271Z",
     "activated_by": "AYNX-I65UPXKZW",
-    "activated_at": "2026-06-30T09:50:00.271Z",
-    "updated_at": "2026-06-30T09:50:00.272Z"
+    "activated_at": "2026-06-30T14:25:49.787Z",
+    "updated_at": "2026-06-30T14:25:49.789Z"
   }
 ]

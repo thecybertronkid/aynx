@@ -7,7 +7,7 @@ const { signToken, signRefreshToken } = require('../middleware/auth');
 // Helper to resolve exact callback URL matching the request host
 function getCallbackUrl(req) {
   if (process.env.GOOGLE_CALLBACK_URL && process.env.NODE_ENV !== 'development') {
-    return process.env.GOOGLE_CALLBACK_URL;
+    return process.env.GOOGLE_CALLBACK_URL.trim();
   }
   const protocol = (req.headers['x-forwarded-proto'] || req.protocol) === 'https' ? 'https' : 'http';
   return `${protocol}://${req.headers.host}/auth/google/callback`;
