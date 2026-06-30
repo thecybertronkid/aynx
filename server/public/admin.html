@@ -331,17 +331,19 @@
 
           // Render summary stats
           document.getElementById('stat-users').innerText = users.length;
-          document.getElementById('stat-downloads').innerText = telemetry.length;
+          
+          const downloads = telemetry.filter(t => t.event === 'download' || t.event === 'download_completed');
+          document.getElementById('stat-downloads').innerText = downloads.length;
           
           const activeUsers = users.filter(u => {
-            const lastSeen = new Date(u.lastSeen).getTime();
+            const lastSeen = new Date(u.updated_at).getTime();
             const now = Date.now();
-            return (now - lastSeen) < 30000; // active in last 30s
+            return (now - lastSeen) < 5 * 60 * 1000; // active in last 5 min
           });
           document.getElementById('stat-active').innerText = activeUsers.length;
           
-          document.getElementById('stat-plus').innerText = licenses.filter(l => l.plan === 'Plus' && l.activated).length;
-          document.getElementById('stat-pro').innerText = licenses.filter(l => l.plan === 'Pro' && l.activated).length;
+          document.getElementById('stat-plus').innerText = users.filter(u => u.plan === 'Plus').length;
+          document.getElementById('stat-pro').innerText = users.filter(u => u.plan === 'Pro').length;
 
           // Render Updater inputs
           if (settings) {
@@ -359,9 +361,9 @@
               <td class="py-2.5">
                 <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${l.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : 'bg-teal-400/10 border border-teal-400/30 text-teal-400'}">${l.plan}</span>
               </td>
-              <td class="py-2.5 font-semibold ${l.activated ? 'text-[#23a55a]' : 'text-gray-400'}">${l.activated ? 'Activated' : 'Available'}</td>
-              <td class="py-2.5 text-gray-400 font-mono text-[10px]">${l.machineId || '—'}</td>
-              <td class="py-2.5 text-gray-400">${l.activatedAt ? new Date(l.activatedAt).toLocaleString() : '—'}</td>
+              <td class="py-2.5 font-semibold ${l.activated_by ? 'text-[#23a55a]' : 'text-gray-400'}">${l.activated_by ? 'Activated' : 'Available'}</td>
+              <td class="py-2.5 text-gray-400 font-mono text-[10px]">${l.activated_by ? l.activated_by.slice(0, 8) + '...' : '—'}</td>
+              <td class="py-2.5 text-gray-400">${l.activated_at ? new Date(l.activated_at).toLocaleString() : '—'}</td>
             </tr>
           `).join('');
 
@@ -369,15 +371,15 @@
           const tableUsers = document.getElementById('table-users');
           tableUsers.innerHTML = users.map(u => `
             <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${u.machineId}</td>
-              <td class="py-2.5 font-bold text-white">${u.displayName}</td>
+              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${u.id.slice(0, 8)}...</td>
+              <td class="py-2.5 font-bold text-white">${u.name || u.email}</td>
               <td class="py-2.5">
                 <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan}</span>
               </td>
-              <td class="py-2.5 font-semibold text-yellow-400">${u.activeDownloads > 0 ? `Downloading (${u.activeDownloads})` : 'Idle'}</td>
-              <td class="py-2.5 text-gray-400">${new Date(u.lastSeen).toLocaleString()}</td>
+              <td class="py-2.5 font-semibold text-yellow-400">${u.trial_used ? 'Trial Active' : 'Subscribed'}</td>
+              <td class="py-2.5 text-gray-400">${new Date(u.updated_at).toLocaleString()}</td>
               <td class="py-2.5 text-right">
-                <select onchange="updateUserPlan('${u.machineId}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
+                <select onchange="updateUserPlan('${u.id}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
                   <option value="Free" ${u.plan === 'Free' ? 'selected' : ''}>Free Tier</option>
                   <option value="Plus" ${u.plan === 'Plus' ? 'selected' : ''}>Plus Tier</option>
                   <option value="Pro" ${u.plan === 'Pro' ? 'selected' : ''}>Pro Tier</option>
@@ -388,20 +390,28 @@
 
           document.getElementById('count-logs').innerText = `${telemetry.length} Logs`;
           const tableLogs = document.getElementById('table-logs');
-          tableLogs.innerHTML = telemetry.slice().reverse().map(log => `
-            <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono text-gray-400 text-[10px]">${log.id}</td>
-              <td class="py-2.5 font-mono text-[10px] text-gray-400">${log.machineId.slice(0,8)}...</td>
-              <td class="py-2.5 font-bold">${log.platform}</td>
-              <td class="py-2.5 text-gray-400">${log.contentType}</td>
-              <td class="py-2.5 text-white max-w-[200px] truncate" title="${log.title}">${log.title}</td>
-              <td class="py-2.5">
-                <span class="font-bold uppercase text-[9px] px-1.5 py-0.5 rounded ${log.status === 'completed' ? 'text-[#23a55a] bg-[#23a55a]/10' : 'text-[#f23f43] bg-[#f23f43]/10'}">${log.status}</span>
-              </td>
-              <td class="py-2.5 text-gray-400 font-semibold">${log.sizeBytes ? (log.sizeBytes / (1024*1024)).toFixed(1) + ' MB' : '—'}</td>
-              <td class="py-2.5 text-gray-400">${new Date(log.timestamp).toLocaleTimeString()}</td>
-            </tr>
-          `).join('');
+          tableLogs.innerHTML = telemetry.map(log => {
+            const meta = log.metadata || {};
+            const title = meta.title || log.event || 'System Event';
+            const status = meta.status || 'completed';
+            const sizeStr = meta.sizeBytes ? (meta.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '—';
+            const client = log.user_id ? log.user_id.slice(0, 8) + '...' : log.machine_id ? log.machine_id.slice(0, 8) : '—';
+            
+            return `
+              <tr class="hover:bg-[#2b2d31]/30">
+                <td class="py-2.5 font-mono text-gray-400 text-[10px]">${log.id.slice(0, 8)}...</td>
+                <td class="py-2.5 font-mono text-[10px] text-gray-400">${client}</td>
+                <td class="py-2.5 font-bold">${meta.platform || 'System'}</td>
+                <td class="py-2.5 text-gray-400">${meta.contentType || 'Event'}</td>
+                <td class="py-2.5 text-white max-w-[200px] truncate" title="${title}">${title}</td>
+                <td class="py-2.5">
+                  <span class="font-bold uppercase text-[9px] px-1.5 py-0.5 rounded ${status === 'completed' ? 'text-[#23a55a] bg-[#23a55a]/10' : 'text-[#f23f43] bg-[#f23f43]/10'}">${status}</span>
+                </td>
+                <td class="py-2.5 text-gray-400 font-semibold">${sizeStr}</td>
+                <td class="py-2.5 text-gray-400">${new Date(log.created_at).toLocaleTimeString()}</td>
+              </tr>
+            `;
+          }).join('');
 
           // Update Charts
           renderCharts(users, telemetry);
@@ -438,7 +448,10 @@
 
       // 2. Download Platforms Breakdown
       const platforms = {};
-      telemetry.forEach(log => platforms[log.platform] = (platforms[log.platform] || 0) + 1);
+      telemetry.forEach(log => {
+        const plat = log.metadata?.platform || 'System';
+        platforms[plat] = (platforms[plat] || 0) + 1;
+      });
 
       if (platformChartObj) platformChartObj.destroy();
       const ctx2 = document.getElementById('platformChart').getContext('2d');
@@ -540,11 +553,11 @@
         });
     });
 
-    function updateUserPlan(machineId, plan) {
+    function updateUserPlan(userId, plan) {
       adminFetch('/api/admin/update-user-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ machineId, plan })
+        body: JSON.stringify({ userId, plan })
       })
       .then(res => {
         if (res.ok) {
