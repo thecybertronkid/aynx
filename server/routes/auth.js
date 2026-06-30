@@ -20,6 +20,7 @@ router.get('/google', (req, res, next) => {
     scope: ['profile', 'email'],
     session: false,
     callbackURL: getCallbackUrl(req),
+    prompt: 'select_account',
     state
   })(req, res, next);
 });
