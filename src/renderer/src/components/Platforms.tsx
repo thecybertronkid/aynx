@@ -20,6 +20,75 @@ const Platforms: React.FC = () => {
   const currentPlan = user?.plan || settings.plan || 'Free';
   const [activeTab, setActiveTab] = useState<'platforms' | 'plans'>('platforms');
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const { isOnline } = useAuthStore();
+
+  const handleUpgrade = async (plan: 'Plus' | 'Pro') => {
+    if (!isOnline) {
+      setErrorMsg('You must be online to purchase a subscription.');
+      return;
+    }
+    if (!user) {
+      setErrorMsg('Please sign in with Google first in the Welcome/Accounts center.');
+      return;
+    }
+
+    const planId = `${plan.toLowerCase()}_${billingPeriod}`;
+    setLoadingPlan(planId);
+    setErrorMsg('');
+
+    try {
+      // 1. Create Razorpay order on our backend via IPC
+      const order = await (window.api as any).createPaymentOrder({ planId });
+      if (!order || order.error) {
+        setErrorMsg(order?.error || 'Failed to initialize payment order.');
+        setLoadingPlan(null);
+        return;
+      }
+
+      // 2. Open Electron Razorpay Checkout window
+      const paymentResult = await (window.api as any).openPaymentCheckout({
+        ...order,
+        planId
+      });
+
+      if (!paymentResult || !paymentResult.success) {
+        setErrorMsg(paymentResult?.error || 'Payment cancelled or failed.');
+        setLoadingPlan(null);
+        return;
+      }
+
+      // 3. Verify payment signature on backend
+      const verification = await (window.api as any).verifyPayment(paymentResult);
+      if (verification && verification.success) {
+        alert(`Success! You have been upgraded to AYNX ${plan} plan.`);
+      } else {
+        setErrorMsg(verification?.error || 'Payment verification failed.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Payment processor failed to load.');
+    }
+    setLoadingPlan(null);
+  };
+
+  const pricing = {
+    Plus: billingPeriod === 'monthly' ? { price: '299', raw: 29900 } : { price: '2,499', raw: 249900 },
+    Pro: billingPeriod === 'monthly' ? { price: '499', raw: 49900 } : { price: '3,999', raw: 399900 }
+  };
+
+  const featureComparisonList = [
+    { name: 'Supported Platforms', free: 'Basic (YouTube, Soundcloud)', plus: 'All Platforms (Spotify, etc.)', pro: 'All Platforms + Session assistance' },
+    { name: 'Max Downloads Speed', free: 'Limited (Throttled)', plus: 'High Speed (No throttle)', pro: 'Unlimited Speed' },
+    { name: 'Parallel Limit', free: '1 Active Download', plus: '3 Parallel Downloads', pro: 'Unlimited Parallel' },
+    { name: 'Batch Downloader', free: '❌ Not Available', plus: '✅ Available', pro: '✅ Premium Batch + Playlist imports' },
+    { name: 'Audio Formats Extractor', free: 'MP3 (128kbps)', plus: 'High Quality MP3 / M4A (320kbps)', pro: 'Lossless Audio (FLAC/WAV support)' },
+    { name: 'Video Resolution', free: 'up to 720p', plus: 'up to 1080p Full HD', pro: 'up to 4K / 8K Ultra HD' },
+    { name: 'Scheduler Engine', free: '❌ Not Available', plus: '✅ Basic Scheduler', pro: '✅ Advanced Scheduler + Post actions' },
+    { name: 'Cross-Device Settings Sync', free: '❌ Local Only', plus: '✅ Cloud Settings Sync', pro: '✅ Full Settings + Favorites Sync' }
+  ];
 
   const platformsList: PlatformInfo[] = [
     {
@@ -232,132 +301,112 @@ const Platforms: React.FC = () => {
 
       {/* TAB 2: Plans & Pricing */}
       {activeTab === 'plans' && (
-        <div className="overflow-y-auto h-full pr-2 space-y-6 animate-fadeIn">
-          {/* Plan header cards */}
-          <div className="grid grid-cols-3 gap-4">
-            {[
-              {
-                name: 'Free', price: '$0', period: 'forever',
-                badge: null,
-                gradient: 'from-discord-secondary to-discord-card',
-                border: currentPlan === 'Free' ? 'border-discord-accent' : 'border-discord-border',
-                accent: 'text-discord-textMuted',
-                desc: 'Essential downloading for personal use.',
-                features: ['YouTube downloads', '1080p video cap', '192kbps audio cap', 'Basic themes only']
-              },
-              {
-                name: 'Plus', price: '$4.99', period: '/mo',
-                badge: 'Popular',
-                gradient: 'from-emerald-900/40 to-discord-card',
-                border: currentPlan === 'Plus' ? 'border-emerald-500' : 'border-emerald-500/20',
-                accent: 'text-emerald-400',
-                desc: 'Everything you need for power users.',
-                features: ['YouTube + Spotify + Instagram', '4K video quality', '320kbps audio', 'Accent color styling', 'Built-in Browser', 'Favorites library']
-              },
-              {
-                name: 'Pro', price: '$9.99', period: '/mo',
-                badge: 'All Features',
-                gradient: 'from-purple-900/40 to-discord-card',
-                border: currentPlan === 'Pro' ? 'border-purple-500' : 'border-purple-500/20',
-                accent: 'text-purple-400',
-                desc: 'Complete media ecosystem unlocked.',
-                features: ['All 8 platforms', 'All themes + customizations', 'Download Scheduler', 'Advanced Engine', 'Dashboard widgets', 'Platform Status & Analytics']
-              }
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`bg-gradient-to-br ${plan.gradient} border-2 ${plan.border} rounded-2xl p-5 flex flex-col space-y-4 shadow-md relative overflow-hidden`}
+        <div className="overflow-y-auto h-full pr-2 space-y-6 animate-fadeIn pb-6 select-none">
+          {/* Toggle billing period */}
+          <div className="flex justify-center select-none shrink-0">
+            <div className="bg-discord-secondary border border-discord-border p-1 rounded-xl flex space-x-1">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${billingPeriod === 'monthly' ? 'bg-discord-accent text-white shadow-md' : 'text-discord-textMuted hover:text-discord-textNormal'}`}
               >
-                {plan.badge && (
-                  <span className={`absolute top-3 right-3 text-[8px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
-                    plan.name === 'Plus' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-                  }`}>{plan.badge}</span>
-                )}
-                {currentPlan === plan.name && (
-                  <span className="absolute top-3 left-3 text-[8px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-discord-accent/20 text-discord-accent border border-discord-accent/30">
-                    Current Plan
-                  </span>
-                )}
-
-                <div className="pt-3">
-                  <h3 className={`text-lg font-extrabold ${plan.accent}`}>{plan.name}</h3>
-                  <div className="flex items-baseline space-x-1 mt-1">
-                    <span className="text-2xl font-black text-discord-textNormal">{plan.price}</span>
-                    <span className="text-xs text-discord-textMuted font-semibold">{plan.period}</span>
-                  </div>
-                  <p className="text-[10px] text-discord-textMuted font-semibold mt-1.5 leading-relaxed">{plan.desc}</p>
-                </div>
-
-                <div className="space-y-1.5 border-t border-discord-border/50 pt-3 flex-1">
-                  {plan.features.map((f, i) => (
-                    <div key={i} className="flex items-center space-x-2 text-[10px] text-discord-textNormal font-semibold">
-                      <Check className={`w-3.5 h-3.5 shrink-0 ${plan.accent}`} />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  disabled={currentPlan === plan.name}
-                  className={`w-full py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all ${
-                    currentPlan === plan.name
-                      ? 'bg-discord-secondary/50 text-discord-textMuted cursor-default'
-                      : plan.name === 'Plus'
-                      ? 'bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30'
-                      : plan.name === 'Pro'
-                      ? 'bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30'
-                      : 'bg-discord-secondary/50 text-discord-textMuted cursor-default'
-                  }`}
-                  onClick={() => {
-                    if (plan.name !== 'Free' && currentPlan !== plan.name) {
-                      setUpgradeModalOpen(true);
-                    }
-                  }}
-                >
-                  {currentPlan === plan.name ? '✓ Active Plan' : `Upgrade to ${plan.name}`}
-                </button>
-              </div>
-            ))}
+                Monthly Plan
+              </button>
+              <button
+                onClick={() => setBillingPeriod('yearly')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${billingPeriod === 'yearly' ? 'bg-discord-accent text-white shadow-md' : 'text-discord-textMuted hover:text-discord-textNormal'}`}
+              >
+                <span>Yearly Plan</span>
+                <span className="text-[9px] bg-discord-success text-white font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider scale-95">Save 20%</span>
+              </button>
+            </div>
           </div>
 
-          {/* Full feature comparison table */}
+          {/* Pricing cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* FREE PLAN */}
+            <div className="bg-discord-card border border-discord-border rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-md relative overflow-hidden">
+              <div className="space-y-2">
+                <span className="text-[9px] font-black text-discord-textMuted uppercase tracking-widest">Base plan</span>
+                <h3 className="text-lg font-black text-discord-textNormal">Free Plan</h3>
+                <div className="flex items-baseline">
+                  <span className="text-3xl font-black text-discord-textNormal">₹0</span>
+                  <span className="text-[10px] font-semibold text-discord-textMuted ml-1">/ forever</span>
+                </div>
+                <p className="text-xs text-discord-textMuted leading-relaxed">Basic downloader with speed limits and parallel restrictions.</p>
+              </div>
+              <button
+                disabled={true}
+                className="w-full text-center text-xs font-bold py-2.5 rounded-xl border border-discord-border text-discord-textMuted bg-transparent"
+              >
+                Current plan
+              </button>
+            </div>
+
+            {/* PLUS PLAN */}
+            <div className="bg-discord-card border border-emerald-500/60 shadow-lg shadow-emerald-500/5 rounded-2xl p-5 flex flex-col justify-between space-y-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-emerald-600 text-white text-[8px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-wider">Popular</div>
+              <div className="space-y-2">
+                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest flex items-center">Premium Power</span>
+                <h3 className="text-lg font-black text-discord-textNormal">Plus Plan</h3>
+                <div className="flex items-baseline">
+                  <span className="text-3xl font-black text-discord-textNormal">₹{pricing.Plus.price}</span>
+                  <span className="text-[10px] font-semibold text-discord-textMuted ml-1">/ {billingPeriod === 'monthly' ? 'month' : 'year'}</span>
+                </div>
+                <p className="text-xs text-discord-textMuted leading-relaxed">Supercharged speeds, scheduler engines, and multiplatform extraction.</p>
+              </div>
+              <button
+                onClick={() => handleUpgrade('Plus')}
+                disabled={loadingPlan !== null || currentPlan === 'Plus'}
+                className="w-full text-center text-xs font-bold py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-1.5 disabled:opacity-60 disabled:cursor-default"
+              >
+                {currentPlan === 'Plus' ? '✓ Active Plan' : loadingPlan === `plus_${billingPeriod}` ? 'Checkout...' : 'Upgrade to Plus'}
+              </button>
+            </div>
+
+            {/* PRO PLAN */}
+            <div className="bg-discord-card border border-purple-500/60 shadow-lg shadow-purple-500/5 rounded-2xl p-5 flex flex-col justify-between space-y-4 relative overflow-hidden">
+              <div className="space-y-2">
+                <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest flex items-center">Enterprise Level</span>
+                <h3 className="text-lg font-black text-discord-textNormal">Pro Plan</h3>
+                <div className="flex items-baseline">
+                  <span className="text-3xl font-black text-discord-textNormal">₹{pricing.Pro.price}</span>
+                  <span className="text-[10px] font-semibold text-discord-textMuted ml-1">/ {billingPeriod === 'monthly' ? 'month' : 'year'}</span>
+                </div>
+                <p className="text-xs text-discord-textMuted leading-relaxed">Lossless audio outputs, maximum 4K/8K resolutions, and premium automation tools.</p>
+              </div>
+              <button
+                onClick={() => handleUpgrade('Pro')}
+                disabled={loadingPlan !== null || currentPlan === 'Pro'}
+                className="w-full text-center text-xs font-bold py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-colors cursor-pointer shadow-md shadow-purple-600/20 flex items-center justify-center space-x-1.5 disabled:opacity-60 disabled:cursor-default"
+              >
+                {currentPlan === 'Pro' ? '✓ Active Plan' : loadingPlan === `pro_${billingPeriod}` ? 'Checkout...' : 'Upgrade to Pro'}
+              </button>
+            </div>
+          </div>
+
+          {/* Feature Matrix Table */}
           <div className="bg-discord-card border border-discord-border rounded-2xl overflow-hidden shadow-md">
             <div className="px-5 py-3 border-b border-discord-border bg-discord-secondary/30">
-              <h3 className="text-xs font-extrabold text-discord-textNormal uppercase tracking-wider">Full Feature Comparison</h3>
+              <h3 className="text-xs font-extrabold text-discord-textNormal uppercase tracking-wider">Plan Feature Comparison</h3>
             </div>
-
-            {/* Table header */}
-            <div className="grid grid-cols-[1fr_80px_80px_80px] text-center text-[10px] font-extrabold uppercase tracking-wider border-b border-discord-border bg-discord-secondary/20">
-              <div className="px-4 py-2.5 text-left text-discord-textMuted">Feature</div>
-              <div className="py-2.5 text-discord-textMuted">Free</div>
-              <div className="py-2.5 text-emerald-400">Plus</div>
-              <div className="py-2.5 text-purple-400">Pro</div>
-            </div>
-
-            {categories.map((cat) => (
-              <div key={cat}>
-                {/* Category header row */}
-                <div className="grid grid-cols-[1fr_80px_80px_80px] bg-discord-secondary/10 border-b border-discord-border/50">
-                  <div className="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-discord-accent col-span-4">
-                    {cat}
-                  </div>
+            <div className="divide-y divide-discord-border/50 text-xs">
+              {featureComparisonList.map((f) => (
+                <div key={f.name} className="grid grid-cols-12 p-3 gap-2 hover:bg-discord-secondary/15 transition-colors">
+                  <div className="col-span-4 font-bold text-discord-textNormal">{f.name}</div>
+                  <div className="col-span-2 text-discord-textMuted font-semibold">{f.free}</div>
+                  <div className="col-span-3 text-emerald-400 font-bold">{f.plus}</div>
+                  <div className="col-span-3 text-purple-400 font-black">{f.pro}</div>
                 </div>
-                {planFeatures
-                  .filter(f => f.category === cat)
-                  .map((f, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-[1fr_80px_80px_80px] text-center border-b border-discord-border/20 hover:bg-discord-secondary/15 transition-colors"
-                    >
-                      <div className="px-4 py-2 text-left text-[10px] font-semibold text-discord-textNormal">{f.feature}</div>
-                      <div className="py-2 flex items-center justify-center"><FeatureCell value={f.free} /></div>
-                      <div className="py-2 flex items-center justify-center"><FeatureCell value={f.plus} /></div>
-                      <div className="py-2 flex items-center justify-center"><FeatureCell value={f.pro} /></div>
-                    </div>
-                  ))}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Footer Billing Details */}
+          {errorMsg && (
+            <div className="text-[10px] text-discord-danger font-bold text-center bg-discord-danger/10 py-2 rounded-lg border border-discord-danger/20">
+              {errorMsg}
+            </div>
+          )}
         </div>
       )}
 

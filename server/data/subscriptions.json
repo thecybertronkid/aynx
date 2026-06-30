@@ -1,0 +1,24 @@
+[
+  {
+    "user_id": "AYNX-I65UPXKZW",
+    "plan": "Plus",
+    "billing_period": null,
+    "starts_at": "2026-06-30T08:26:10.729Z",
+    "expires_at": "2026-07-30T08:26:10.706Z",
+    "status": "active",
+    "amount_paise": 0,
+    "id": "rdnz8jui6",
+    "created_at": "2026-06-30T08:26:10.729Z"
+  },
+  {
+    "user_id": "AYNX-I65UPXKZW",
+    "plan": "Pro",
+    "billing_period": "monthly",
+    "razorpay_order_id": "order_T7mBh5SqQ6rLu0",
+    "status": "pending",
+    "amount_paise": 49900,
+    "expires_at": "2026-07-30T08:26:31.000Z",
+    "id": "4750uckgn",
+    "created_at": "2026-06-30T08:26:31.001Z"
+  }
+]
