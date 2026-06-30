@@ -8,7 +8,7 @@ const { signToken } = require('../middleware/auth');
 router.post('/activate', optionalAuth, async (req, res) => {
   try {
     let { key, machineId, email, displayName } = req.body;
-    key = (key || '').trim().toUpperCase();
+    key = (key || '').trim().toUpperCase().replace(/\s+/g, '-');
 
     if (!email && !req.user) {
       return res.status(400).json({ error: 'Email or authentication token required.' });

@@ -164,7 +164,7 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
               ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             },
             body: JSON.stringify({
-              key: inputKey.trim(),
+              key: inputKey.trim().toUpperCase().replace(/\s+/g, '-'),
               machineId,
               email,
               displayName
