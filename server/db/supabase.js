@@ -32,6 +32,13 @@ class MockQueryBuilder {
     this.orderByField = null;
     this.orderAscending = true;
     this.limitVal = null;
+    this.isSingle = false;
+    
+    // Actions queue
+    this.insertRecord = null;
+    this.upsertRecord = null;
+    this.upsertOptions = null;
+    this.updateRecord = null;
   }
 
   select(fields) {
@@ -54,6 +61,27 @@ class MockQueryBuilder {
     return this;
   }
 
+  single() {
+    this.isSingle = true;
+    return this;
+  }
+
+  insert(record) {
+    this.insertRecord = record;
+    return this;
+  }
+
+  upsert(record, options = {}) {
+    this.upsertRecord = record;
+    this.upsertOptions = options;
+    return this;
+  }
+
+  update(record) {
+    this.updateRecord = record;
+    return this;
+  }
+
   _getData() {
     const file = path.join(DATA_DIR, `${this.table}.json`);
     if (!fs.existsSync(file)) return [];
@@ -71,7 +99,56 @@ class MockQueryBuilder {
     } catch (_) {}
   }
 
-  async single() {
+  async execute() {
+    if (this.insertRecord) {
+      const data = this._getData();
+      const records = Array.isArray(this.insertRecord) ? this.insertRecord : [this.insertRecord];
+      records.forEach(r => {
+        if (!r.id) r.id = Math.random().toString(36).substring(2, 11);
+        r.created_at = new Date().toISOString();
+        data.push(r);
+      });
+      this._writeData(data);
+      return { data: this.insertRecord, error: null };
+    }
+
+    if (this.upsertRecord) {
+      const data = this._getData();
+      const conflictField = this.upsertOptions?.onConflict || 'id';
+      const record = this.upsertRecord;
+      const existingIndex = data.findIndex(item => item[conflictField] === record[conflictField]);
+      let finalRecord = record;
+      
+      if (existingIndex !== -1) {
+        data[existingIndex] = { ...data[existingIndex], ...record, updated_at: new Date().toISOString() };
+        finalRecord = data[existingIndex];
+      } else {
+        if (!record.id) {
+          record.id = 'AYNX-' + Math.random().toString(36).substring(2, 11).toUpperCase();
+        }
+        record.created_at = new Date().toISOString();
+        record.updated_at = new Date().toISOString();
+        data.push(record);
+      }
+      this._writeData(data);
+      return { data: finalRecord, error: null };
+    }
+
+    if (this.updateRecord) {
+      const data = this._getData();
+      let updated = [];
+      data.forEach((item, index) => {
+        const match = this.filters.every(f => item[f.field] === f.value);
+        if (match) {
+          data[index] = { ...item, ...this.updateRecord, updated_at: new Date().toISOString() };
+          updated.push(data[index]);
+        }
+      });
+      this._writeData(data);
+      return { data: updated, error: null };
+    }
+
+    // Select query
     const data = this._getData();
     let filtered = data.filter(item => {
       return this.filters.every(f => item[f.field] === f.value);
@@ -87,79 +164,20 @@ class MockQueryBuilder {
       });
     }
 
-    const item = filtered[0] || null;
-    return { data: item, error: item ? null : new Error('Record not found') };
-  }
+    if (this.limitVal) {
+      filtered = filtered.slice(0, this.limitVal);
+    }
 
-  async selectAll() {
-    const data = this._getData();
-    let filtered = data.filter(item => {
-      return this.filters.every(f => item[f.field] === f.value);
-    });
+    if (this.isSingle) {
+      const item = filtered[0] || null;
+      return { data: item, error: item ? null : new Error('Record not found') };
+    }
+
     return { data: filtered, error: null };
   }
 
   then(onfulfilled, onrejected) {
-    return this.selectAll().then(onfulfilled, onrejected);
-  }
-
-  async insert(record) {
-    const data = this._getData();
-    if (Array.isArray(record)) {
-      record.forEach(r => {
-        if (!r.id) r.id = Math.random().toString(36).substring(2, 11);
-        r.created_at = new Date().toISOString();
-        data.push(r);
-      });
-    } else {
-      if (!record.id) record.id = Math.random().toString(36).substring(2, 11);
-      record.created_at = new Date().toISOString();
-      data.push(record);
-    }
-    this._writeData(data);
-    return { data: record, error: null };
-  }
-
-  async upsert(record, options = {}) {
-    const data = this._getData();
-    const conflictField = options.onConflict || 'id';
-    
-    const existingIndex = data.findIndex(item => item[conflictField] === record[conflictField]);
-    if (existingIndex !== -1) {
-      data[existingIndex] = { ...data[existingIndex], ...record, updated_at: new Date().toISOString() };
-      record = data[existingIndex];
-    } else {
-      if (!record.id) {
-        record.id = 'AYNX-USER-' + Math.random().toString(36).substring(2, 11).toUpperCase();
-      }
-      record.created_at = new Date().toISOString();
-      record.updated_at = new Date().toISOString();
-      data.push(record);
-    }
-    this._writeData(data);
-    
-    // Return compatible format with select().single()
-    return {
-      data: record,
-      error: null,
-      select: () => ({
-        single: () => ({ data: record, error: null })
-      })
-    };
-  }
-
-  async update(record) {
-    const data = this._getData();
-    let updated = [];
-    data.forEach((item, index) => {
-      const match = this.filters.every(f => item[f.field] === f.value);
-      if (match) {
-        data[index] = { ...item, ...record, updated_at: new Date().toISOString() };
-        updated.push(data[index]);
-      }
-    });
-    this._writeData(data);
-    return { data: updated, error: null };
+    return this.execute().then(onfulfilled, onrejected);
   }
 }
 

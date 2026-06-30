@@ -1,0 +1,10 @@
+[
+  {
+    "version": "2.5.1",
+    "download_url": "file:///e:/SABLE 2.0/release/AYNX Setup 2.5.1.exe",
+    "changelog": "v2.5.1 Release Notes:\n- Silent in-app background updater: click Download Update and the app installs & restarts itself.\n- Automatic release publishing: running 'pnpm run package' now auto-registers the build on the backend.\n- Admin Portal: upgrade/downgrade user plans with a dropdown in the Live Users table.\n- Real-time sync: backend plan changes reflect in the client within 5 seconds via heartbeat.\n- Fixed trial activation and registry ordering bugs.",
+    "is_latest": true,
+    "id": "0jd5vraqp",
+    "created_at": "2026-06-30T08:21:13.649Z"
+  }
+]
