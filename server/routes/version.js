@@ -23,9 +23,9 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.5.4', downloadUrl: '', changelog: '' });
+    res.json({ latestVersion: '2.5.4', downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.5.4', downloadUrl: '', changelog: '' });
+    res.json({ latestVersion: '2.5.4', downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing', changelog: '' });
   }
 });
 

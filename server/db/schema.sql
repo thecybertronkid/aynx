@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS announcements (
 INSERT INTO app_versions (version, download_url, changelog, is_latest)
 VALUES (
   '2.5.4',
-  'https://github.com/aynx-app/aynx/releases/download/v2.5.4/AYNX-Setup-2.5.4.exe',
+  'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing',
   'v2.5.4 - Clean non-elevated NSIS setup (no Defender flags), Razorpay payment diagnostics, Supabase cloud architecture.',
   true
 )
