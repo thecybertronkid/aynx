@@ -46,7 +46,7 @@
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="container">
+    <div class="container fade-in">
       <div class="version-badge">
         <span class="dot"></span>
         <span id="version-label">Version v2.5.1 is now live</span>
@@ -69,33 +69,113 @@
       </div>
       
       <!-- App Showcase Preview mockup -->
-      <div class="mockup-wrapper">
+      <div class="mockup-wrapper fade-in">
         <div class="mockup-header">
           <div class="mockup-dot red"></div>
           <div class="mockup-dot yellow"></div>
           <div class="mockup-dot green"></div>
         </div>
         <!-- Built-in preview vector placeholder to represent the dashboard -->
-        <svg viewBox="0 0 1000 500" class="mockup-img" style="background:#1e1f22;">
-          <rect x="0" y="0" width="220" height="500" fill="#111214"/>
-          <circle cx="40" cy="40" r="16" fill="#5865f2"/>
-          <rect x="70" y="32" width="80" height="16" rx="4" fill="#dbdee1" opacity="0.8"/>
-          <rect x="25" y="100" width="170" height="32" rx="8" fill="#2b2d31"/>
-          <rect x="25" y="145" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
-          <rect x="25" y="190" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
-          <rect x="25" y="235" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
+        <!-- Built-in preview vector placeholder to represent the dashboard -->
+        <svg viewBox="0 0 1000 600" class="mockup-img" style="background:#1e1f22; font-family:var(--font-sans);">
+          <!-- Left Sidebar -->
+          <rect x="0" y="0" width="220" height="600" fill="#111214"/>
+          <!-- Logo -->
+          <text x="30" y="45" fill="#ffffff" font-size="18" font-family="var(--font-heading)" font-weight="900" letter-spacing="1">AYNX<tspan fill="#5865f2">.</tspan></text>
+          <!-- Nav Items -->
+          <!-- Item 1: Dashboard (Selected) -->
+          <rect x="15" y="80" width="190" height="36" rx="8" fill="rgba(88, 101, 242, 0.15)"/>
+          <rect x="15" y="80" width="4" height="36" rx="2" fill="#5865f2"/>
+          <text x="50" y="103" fill="#ffffff" font-size="12" font-weight="700">Dashboard</text>
           
-          <rect x="250" y="30" width="300" height="120" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
-          <rect x="250" y="170" width="300" height="120" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
-          <rect x="570" y="30" width="400" height="260" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+          <!-- Item 2: Queue Manager -->
+          <text x="50" y="153" fill="#949ba4" font-size="12" font-weight="600">Queue Manager</text>
           
-          <rect x="270" y="55" width="100" height="12" rx="3" fill="#949ba4" opacity="0.5"/>
-          <rect x="270" y="75" width="150" height="24" rx="6" fill="#fff" opacity="0.9"/>
+          <!-- Item 3: Media Library -->
+          <text x="50" y="203" fill="#949ba4" font-size="12" font-weight="600">Media Library</text>
           
-          <rect x="590" y="55" width="120" height="12" rx="3" fill="#949ba4" opacity="0.5"/>
-          <rect x="590" y="90" width="360" height="32" rx="8" fill="#1e1f22"/>
-          <rect x="590" y="130" width="360" height="32" rx="8" fill="#1e1f22"/>
-          <rect x="590" y="170" width="360" height="32" rx="8" fill="#1e1f22"/>
+          <!-- Item 4: Platforms -->
+          <text x="50" y="253" fill="#949ba4" font-size="12" font-weight="600">Platforms & Plans</text>
+          
+          <!-- Item 5: Settings -->
+          <text x="50" y="303" fill="#949ba4" font-size="12" font-weight="600">Settings</text>
+
+          <!-- Sidebar Profile Card -->
+          <rect x="15" y="520" width="190" height="60" rx="12" fill="#1e1f22" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <circle cx="45" cy="550" r="16" fill="#5865f2"/>
+          <text x="75" y="546" fill="#ffffff" font-size="11" font-weight="700">Local User</text>
+          <text x="75" y="562" fill="#23a55a" font-size="9" font-weight="800" letter-spacing="1">PRO UPGRADE</text>
+
+          <!-- Main Dashboard Area -->
+          <!-- Top Link Bar / Input Search -->
+          <rect x="250" y="25" width="720" height="44" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <text x="275" y="51" fill="#949ba4" font-size="12" font-weight="500">https://www.youtube.com/watch?v=dQw4w9WgXcQ</text>
+          <!-- Download Button inside input bar -->
+          <rect x="850" y="31" width="110" height="32" rx="8" fill="#5865f2"/>
+          <text x="877" y="51" fill="#ffffff" font-size="11" font-weight="700">Download</text>
+
+          <!-- Active Downloads Section -->
+          <text x="250" y="105" fill="#ffffff" font-size="14" font-family="var(--font-heading)" font-weight="900">Active Downloads</text>
+
+          <!-- Download Item 1 (YouTube Video - Progressing) -->
+          <rect x="250" y="125" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <!-- Thumbnail placeholder -->
+          <rect x="265" y="140" width="90" height="50" rx="6" fill="#1e1f22"/>
+          <circle cx="310" cy="165" r="10" fill="#f23f43" opacity="0.8"/>
+          <!-- Info -->
+          <text x="370" y="156" fill="#ffffff" font-size="12" font-weight="700">Taylor Swift - Fortnight (feat. Post Malone) [Official Video]</text>
+          <text x="370" y="172" fill="#f23f43" font-size="9" font-weight="800" letter-spacing="0.5">YOUTUBE 4K</text>
+          <text x="890" y="156" fill="#ffffff" font-size="11" font-weight="700">74%</text>
+          <text x="890" y="172" fill="#949ba4" font-size="9" font-weight="600">12.4 MB/s</text>
+          <!-- Progress bar track -->
+          <rect x="370" y="184" width="580" height="6" rx="3" fill="#111214"/>
+          <!-- Progress bar fill -->
+          <rect x="370" y="184" width="429" height="6" rx="3" fill="#23a55a"/>
+
+          <!-- Download Item 2 (Spotify Track - Completed) -->
+          <rect x="250" y="220" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <!-- Artwork placeholder -->
+          <rect x="265" y="235" width="90" height="50" rx="6" fill="#1e1f22"/>
+          <rect x="302" y="252" width="16" height="16" rx="4" fill="#23a55a" opacity="0.8"/>
+          <!-- Info -->
+          <text x="370" y="251" fill="#ffffff" font-size="12" font-weight="700">Billie Eilish - CHIHIRO</text>
+          <text x="370" y="267" fill="#23a55a" font-size="9" font-weight="800" letter-spacing="0.5">SPOTIFY AUDIO 320KBPS</text>
+          <text x="915" y="262" fill="#23a55a" font-size="11" font-weight="800">COMPLETED</text>
+          <!-- Progress bar track -->
+          <rect x="370" y="279" width="580" height="6" rx="3" fill="#111214"/>
+          <!-- Progress bar fill -->
+          <rect x="370" y="279" width="580" height="6" rx="3" fill="#23a55a"/>
+
+          <!-- Two Column Widgets Row -->
+          <!-- Widget 1: Disk Usage Gauge -->
+          <rect x="250" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <text x="275" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Disk Storage Usage</text>
+          <!-- Circle Chart -->
+          <circle cx="422" cy="455" r="55" fill="none" stroke="#111214" stroke-width="12"/>
+          <circle cx="422" cy="455" r="55" fill="none" stroke="#a458f2" stroke-width="12" stroke-dasharray="345" stroke-dashoffset="110"/>
+          <text x="422" y="460" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="900">68%</text>
+          <text x="422" y="540" text-anchor="middle" fill="#949ba4" font-size="10" font-weight="600">342.5 GB / 500 GB Used</text>
+
+          <!-- Widget 2: Platform Download Distribution Stats -->
+          <rect x="625" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+          <text x="650" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Downloads per Platform</text>
+          <!-- Bar charts -->
+          <!-- YouTube -->
+          <text x="650" y="395" fill="#dbdee1" font-size="10" font-weight="700">YouTube</text>
+          <rect x="730" y="386" width="180" height="10" rx="5" fill="#111214"/>
+          <rect x="730" y="386" width="145" height="10" rx="5" fill="#f23f43"/>
+          <!-- Spotify -->
+          <text x="650" y="435" fill="#dbdee1" font-size="10" font-weight="700">Spotify</text>
+          <rect x="730" y="426" width="180" height="10" rx="5" fill="#111214"/>
+          <rect x="730" y="426" width="110" height="10" rx="5" fill="#23a55a"/>
+          <!-- Instagram -->
+          <text x="650" y="475" fill="#dbdee1" font-size="10" font-weight="700">Instagram</text>
+          <rect x="730" y="466" width="180" height="10" rx="5" fill="#111214"/>
+          <rect x="730" y="466" width="60" height="10" rx="5" fill="#e1306c"/>
+          <!-- Other -->
+          <text x="650" y="515" fill="#dbdee1" font-size="10" font-weight="700">SoundCloud</text>
+          <rect x="730" y="506" width="180" height="10" rx="5" fill="#111214"/>
+          <rect x="730" y="506" width="35" height="10" rx="5" fill="#ff5500"/>
         </svg>
       </div>
     </div>
@@ -110,7 +190,7 @@
       </div>
       
       <div class="pain-grid">
-        <div class="compare-card">
+        <div class="compare-card fade-in">
           <!-- Traditional Problems -->
           <div class="compare-column left">
             <h3 class="column-header red">
@@ -175,7 +255,7 @@
         <h2 class="section-title">Built-in Features for Media Enthusiasts</h2>
       </div>
       
-      <div class="features-grid">
+      <div class="features-grid fade-in">
         <!-- 1. All Platforms -->
         <div class="feature-card">
           <div class="feature-icon-wrapper">
@@ -231,7 +311,7 @@
         </div>
       </div>
       
-      <div class="pricing-grid">
+      <div class="pricing-grid fade-in">
         <!-- FREE PLAN -->
         <div class="pricing-card">
           <div>
@@ -405,6 +485,17 @@
       // 4. Hook Billing Upgrades
       document.getElementById('btn-upgrade-plus').addEventListener('click', () => handleUpgrade('Plus'));
       document.getElementById('btn-upgrade-pro').addEventListener('click', () => handleUpgrade('Pro'));
+
+      // 5. Scroll Visibility Observer for Animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.05 });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     });
 
     function updateAuthState() {

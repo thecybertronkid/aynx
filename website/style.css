@@ -643,6 +643,46 @@ body {
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(88, 101, 242, 0); }
 }
 
+@keyframes float-glow {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-40px) rotate(180deg) scale(1.15); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+
+.glow-1 { animation: float-glow 25s infinite ease-in-out; }
+.glow-2 { animation: float-glow 30s infinite ease-in-out alternate; }
+
+/* Scroll-based Animations */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px) scale(0.97);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Mouse Hover Enhancements */
+.mockup-wrapper {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s;
+}
+
+.mockup-wrapper:hover {
+  transform: scale(1.015) translateY(-5px);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 40px rgba(88, 101, 242, 0.1);
+}
+
+.compare-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.compare-card:hover {
+  transform: translateY(-4px);
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
   .hero-title {
