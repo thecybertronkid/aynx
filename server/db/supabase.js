@@ -2,9 +2,9 @@ const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
+const supabaseServiceKey = (process.env.SUPABASE_SERVICE_KEY || '').trim();
+const supabaseAnonKey = (process.env.SUPABASE_ANON_KEY || '').trim();
 
 const isPlaceholder = !supabaseUrl || 
                       supabaseUrl.includes('YOUR_PROJECT_ID') || 
