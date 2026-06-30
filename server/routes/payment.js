@@ -13,10 +13,10 @@ const razorpay = new Razorpay({
 
 // Pricing map (in paise)
 const PLANS = {
-  plus_monthly:  { amount: parseInt(process.env.PLUS_MONTHLY_PRICE)  || 29900,  plan: 'Plus', period: 'monthly' },
-  plus_yearly:   { amount: parseInt(process.env.PLUS_YEARLY_PRICE)   || 249900, plan: 'Plus', period: 'yearly'  },
-  pro_monthly:   { amount: parseInt(process.env.PRO_MONTHLY_PRICE)   || 49900,  plan: 'Pro',  period: 'monthly' },
-  pro_yearly:    { amount: parseInt(process.env.PRO_YEARLY_PRICE)    || 399900, plan: 'Pro',  period: 'yearly'  }
+  plus_monthly:  { amount: parseInt(process.env.PLUS_MONTHLY_PRICE)  || 7900,   plan: 'Plus', period: 'monthly' },
+  plus_yearly:   { amount: parseInt(process.env.PLUS_YEARLY_PRICE)   || 69900,  plan: 'Plus', period: 'yearly'  },
+  pro_monthly:   { amount: parseInt(process.env.PRO_MONTHLY_PRICE)   || 9900,   plan: 'Pro',  period: 'monthly' },
+  pro_yearly:    { amount: parseInt(process.env.PRO_YEARLY_PRICE)    || 89900,  plan: 'Pro',  period: 'yearly'  }
 };
 
 // GET /payment/plans — return pricing
