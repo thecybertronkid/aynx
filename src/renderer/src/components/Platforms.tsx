@@ -360,11 +360,11 @@ const Platforms: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
 
-    {upgradeModalOpen && (
-      <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
-    )}
+      {upgradeModalOpen && (
+        <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
+      )}
+    </div>
   );
 };
 
