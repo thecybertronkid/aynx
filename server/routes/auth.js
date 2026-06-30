@@ -6,12 +6,16 @@ const { signToken, signRefreshToken } = require('../middleware/auth');
 
 // ─── Google OAuth ─────────────────────────────────────────────────────────────
 // Step 1: Redirect to Google
-router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email'],
-  session: false
-}));
+router.get('/google', (req, res, next) => {
+  const state = req.query.redirect ? Buffer.from(req.query.redirect).toString('base64') : '';
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+    state
+  })(req, res, next);
+});
 
-// Step 2: Google callback → issue JWT → redirect to Electron deep link
+// Step 2: Google callback → issue JWT → redirect to Electron deep link or Web site
 router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: '/auth/failure' }),
   (req, res) => {
@@ -19,8 +23,14 @@ router.get('/google/callback',
     const token = signToken(user);
     const refreshToken = signRefreshToken(user);
 
-    // Redirect to Electron via custom protocol
-    // aynx://oauth?token=JWT&refresh=REFRESH&name=NAME&email=EMAIL&avatar=AVATAR&plan=PLAN&trial=BOOL&trialExpiry=DATE
+    const state = req.query.state;
+    let redirectUrl = null;
+    if (state) {
+      try {
+        redirectUrl = Buffer.from(state, 'base64').toString('utf8');
+      } catch (_) {}
+    }
+
     const params = new URLSearchParams({
       token,
       refresh: refreshToken,
@@ -32,7 +42,11 @@ router.get('/google/callback',
       trialExpiry: user.trial_expires_at || ''
     });
 
-    res.redirect(`aynx://oauth?${params.toString()}`);
+    if (redirectUrl && redirectUrl.startsWith('http')) {
+      res.redirect(`${redirectUrl}?${params.toString()}`);
+    } else {
+      res.redirect(`aynx://oauth?${params.toString()}`);
+    }
   }
 );
 

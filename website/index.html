@@ -8,9 +8,12 @@
   <meta name="description" content="Download videos and audio up to 4K/8K resolution across 8 platforms. Features Spotify matching, download scheduler, and built-in browser.">
   
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235865f2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='7 10 12 15 17 10'/><line x1='12' y1='15' x2='12' y2='3'/></svg>">
   
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 </head>
 <body>
 
@@ -30,6 +33,7 @@
         <a href="#features">Features</a>
         <a href="#pain-points">Compare</a>
         <a href="#pricing">Pricing</a>
+        <span id="user-nav" style="margin-left: 10px; display: inline-flex; align-items: center;"></span>
       </nav>
       <div>
         <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" id="nav-download-btn" class="btn btn-primary">
@@ -267,7 +271,7 @@
               <li><i data-lucide="check" style="color:#23a55a;"></i><span>Accent color custom stylings</span></li>
             </ul>
           </div>
-          <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" class="btn btn-primary" style="background:var(--plus-color);">Get Plus</a>
+          <button id="btn-upgrade-plus" class="btn btn-primary" style="background:var(--plus-color); width: 100%;">Get Plus</button>
         </div>
         
         <!-- PRO PLAN -->
@@ -289,7 +293,7 @@
               <li><i data-lucide="check" style="color:#23a55a;"></i><span>Download scheduler engine</span></li>
             </ul>
           </div>
-          <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" class="btn btn-primary" style="background:var(--pro-color);">Get Pro</a>
+          <button id="btn-upgrade-pro" class="btn btn-primary" style="background:var(--pro-color); width: 100%;">Get Pro</button>
         </div>
       </div>
     </div>
@@ -316,8 +320,12 @@
     // Initialize Lucide Icons
     lucide.createIcons();
 
+    // Global billing state tracker
+    let currentBillingPeriod = 'monthly';
+
     // Pricing toggle logic
     function setBilling(period) {
+      currentBillingPeriod = period;
       const toggleMonthly = document.getElementById('toggle-monthly');
       const toggleYearly = document.getElementById('toggle-yearly');
       
@@ -350,26 +358,160 @@
 
     // Dynamic Version and Download Link Loader
     window.addEventListener('load', () => {
+      // 1. Process URL redirect callback parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      if (token) {
+        localStorage.setItem('aynx_token', token);
+        localStorage.setItem('aynx_user_name', urlParams.get('name') || '');
+        localStorage.setItem('aynx_user_email', urlParams.get('email') || '');
+        localStorage.setItem('aynx_user_avatar', urlParams.get('avatar') || '');
+        localStorage.setItem('aynx_user_plan', urlParams.get('plan') || 'Free');
+        
+        // Clean URL params from bar
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      // 2. Load Auth state in Navbar
+      updateAuthState();
+
+      // 3. Load latest version installer links
       fetch('https://aynx-api.onrender.com/api/version/check')
         .then(res => res.json())
         .then(data => {
           if (data && data.latestVersion) {
-            // Update labels
             document.getElementById('version-label').innerText = `Version v${data.latestVersion} is now live`;
             
             const dlBtnNav = document.getElementById('nav-download-btn');
             const dlBtnHero = document.getElementById('hero-download-btn');
             
             if (data.downloadUrl) {
-              dlBtnNav.href = data.downloadUrl;
-              dlBtnHero.href = data.downloadUrl;
+              let url = data.downloadUrl;
+              // Convert file:/// paths to relative/Render http fallback
+              if (url.startsWith('file:///')) {
+                const parts = url.split('/');
+                const filename = parts[parts.length - 1];
+                url = `https://aynx-api.onrender.com/uploads/${filename}`;
+              }
+              dlBtnNav.href = url;
+              dlBtnHero.href = url;
             }
           }
         })
         .catch(err => {
           console.warn('[AYNX Website] Backend check offline — using offline local compiled fallback path.');
         });
+
+      // 4. Hook Billing Upgrades
+      document.getElementById('btn-upgrade-plus').addEventListener('click', () => handleUpgrade('Plus'));
+      document.getElementById('btn-upgrade-pro').addEventListener('click', () => handleUpgrade('Pro'));
     });
+
+    function updateAuthState() {
+      const token = localStorage.getItem('aynx_token');
+      const userNav = document.getElementById('user-nav');
+      if (!userNav) return;
+
+      if (token) {
+        const name = localStorage.getItem('aynx_user_name') || 'User';
+        const plan = localStorage.getItem('aynx_user_plan') || 'Free';
+        const avatar = localStorage.getItem('aynx_user_avatar') || '';
+        
+        userNav.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); padding: 0.3rem 0.8rem; border-radius: 50px; background: var(--bg-secondary);">
+            ${avatar ? `<img src="${avatar}" style="width: 20px; height: 20px; border-radius: 50%;" />` : ''}
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-white);">${name}</span>
+            <span style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; background: var(--accent); color: #fff; padding: 0.1rem 0.4rem; border-radius: 4px; scale: 0.95;">${plan}</span>
+            <button onclick="handleLogout()" style="background: none; border: none; font-size: 0.75rem; color: var(--text-muted); hover: color: var(--text-white); font-weight: 700; cursor: pointer; margin-left: 10px; transition: color 0.2s;">Log Out</button>
+          </div>
+        `;
+      } else {
+        const redirectTarget = window.location.href;
+        const loginUrl = `https://aynx-api.onrender.com/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
+        userNav.innerHTML = `<a href="${loginUrl}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; hover: color: var(--text-white);">Sign In</a>`;
+      }
+    }
+
+    function handleLogout() {
+      localStorage.clear();
+      window.location.reload();
+    }
+
+    function handleUpgrade(plan) {
+      const token = localStorage.getItem('aynx_token');
+      if (!token) {
+        // Redirect to Google login
+        const redirectTarget = window.location.href;
+        window.location.href = `https://aynx-api.onrender.com/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
+        return;
+      }
+
+      const planId = `${plan.toLowerCase()}_${currentBillingPeriod}`;
+      
+      // Load order details
+      fetch('https://aynx-api.onrender.com/payment/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ planId })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to create payment order.');
+        return res.json();
+      })
+      .then(orderData => {
+        // Open Razorpay Checkout Form
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "AYNX Premium Upgrade",
+          description: `${plan} Subscription - ${currentBillingPeriod}`,
+          order_id: orderData.orderId,
+          prefill: {
+            name: orderData.userName,
+            email: orderData.userEmail
+          },
+          theme: {
+            color: plan === 'Plus' ? '#23a55a' : '#5865f2'
+          },
+          handler: function(response) {
+            // Verify payment
+            fetch('https://aynx-api.onrender.com/payment/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+              },
+              body: JSON.stringify({
+                orderId: orderData.orderId,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                planId
+              })
+            })
+            .then(res => res.json())
+            .then(verifyData => {
+              if (verifyData.success) {
+                alert(`Congratulations! You have upgraded to AYNX ${plan}.`);
+                // Update local storage plan cache and reload
+                localStorage.setItem('aynx_user_plan', plan);
+                window.location.reload();
+              } else {
+                alert('Payment verification failed: ' + (verifyData.error || 'Unknown error'));
+              }
+            });
+          }
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+      })
+      .catch(err => {
+        alert(err.message || 'Payment processor failed to initialize. Try again.');
+      });
+    }
   </script>
 </body>
 </html>
