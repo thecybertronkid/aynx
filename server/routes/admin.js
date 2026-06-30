@@ -96,7 +96,11 @@ router.post('/generate-key', requireAdmin, async (req, res) => {
     const key = `AYNX-${plan.toUpperCase()}-${randHex()}-${randHex()}`;
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    await supabase.from('license_keys').insert({ key, plan, expires_at: expiresAt, notes: notes || null });
+    const { error } = await supabase.from('license_keys').insert({ key, plan, expires_at: expiresAt, notes: notes || null });
+    if (error) {
+      console.error('[Admin Generate Key Error]', error);
+      return res.status(500).json({ error: 'Database Insert Failed: ' + error.message });
+    }
     res.json({ success: true, key, plan, expiresAt });
   } catch (err) {
     res.status(500).json({ error: err.message });

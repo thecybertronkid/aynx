@@ -502,6 +502,8 @@
             document.getElementById('new-key').innerText = data.key;
             document.getElementById('gen-result').classList.remove('hidden');
             loadStats();
+          } else {
+            alert('Error generating key: ' + (data.error || 'Unknown database error'));
           }
         });
     });

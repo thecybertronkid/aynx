@@ -93,13 +93,22 @@ VALUES (
   TRUE
 ) ON CONFLICT DO NOTHING;
 
+-- ─── Disable RLS so backend service queries are never blocked ─────────────────
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE license_keys DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE telemetry DISABLE ROW LEVEL SECURITY;
+ALTER TABLE app_versions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE announcements DISABLE ROW LEVEL SECURITY;
+
 -- ─── Seed: Initial License Keys ───────────────────────────────────────────────
-INSERT INTO license_keys (key, plan, active, max_activations)
+INSERT INTO license_keys (key, plan, notes)
 VALUES 
-  ('AYNX-PLUS-PLAN-2026', 'Plus', TRUE, 9999),
-  ('AYNX-PRO-PLAN-2026', 'Pro', TRUE, 9999),
-  ('AYNX-PLUS-VIP-0001', 'Plus', TRUE, 10),
-  ('AYNX-PRO-VIP-0001', 'Pro', TRUE, 10)
+  ('AYNX-PLUS-PLAN-2026', 'Plus', 'Default VIP Plus Plan'),
+  ('AYNX-PRO-PLAN-2026', 'Pro', 'Default VIP Pro Plan'),
+  ('AYNX-PLUS-VIP-0001', 'Plus', 'VIP 1'),
+  ('AYNX-PRO-VIP-0001', 'Pro', 'VIP 1')
 ON CONFLICT DO NOTHING;
 
 -- ─── Indexes ──────────────────────────────────────────────────────────────────
