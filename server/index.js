@@ -141,6 +141,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', version: '3.0.0', timestamp: new Date().toISOString() });
 });
 
+// ─── Static Uploads serving ───────────────────────────────────────────────────
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
 // ─── Admin Portal Static Files ────────────────────────────────────────────────
 app.use('/admin-portal', express.static(path.join(__dirname, 'public')));
 app.get('/admin-portal*', (req, res) => {

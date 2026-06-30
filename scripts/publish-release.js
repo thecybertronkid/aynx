@@ -37,7 +37,7 @@ const payload = {
 
 console.log(`[AYNX Publisher] Registering build v${version} on backend...`);
 
-const adminSecret = process.env.ADMIN_SECRET || 'aynx_admin_secret_key_2026';
+const adminSecret = process.env.ADMIN_SECRET || '12345';
 const req = require('http').request(
   {
     hostname: 'localhost',

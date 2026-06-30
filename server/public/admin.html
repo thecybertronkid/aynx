@@ -147,7 +147,13 @@
             </div>
             <div>
               <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Installer Download Link</label>
-              <input type="text" id="downloadUrl" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Installer setup URL link">
+              <input type="text" id="downloadUrl" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] mb-2" placeholder="Installer setup URL link">
+              <label class="text-[9px] font-bold text-cyan-400 cursor-pointer flex items-center space-x-1 hover:underline">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <span>Or Upload Installer Executable (.exe)</span>
+                <input type="file" id="uploadFile" accept=".exe" class="hidden">
+              </label>
+              <span id="upload-status" class="text-[9px] font-medium text-gray-500 block mt-1"></span>
             </div>
             <div>
               <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Release Changelog Notes</label>
@@ -498,6 +504,39 @@
             alert('App update rollout config saved successfully online!');
             loadStats();
           }
+        });
+    });
+
+    // Upload File handler
+    document.getElementById('uploadFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('upload-status');
+      statusEl.innerText = 'Uploading setup file...';
+      statusEl.className = 'text-[9px] font-medium text-amber-400 block mt-1';
+
+      const formData = new FormData();
+      formData.append('setupFile', file);
+
+      adminFetch('/api/version/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('downloadUrl').value = data.downloadUrl;
+            statusEl.innerText = '✅ Upload complete! Installer URL auto-filled.';
+            statusEl.className = 'text-[9px] font-bold text-emerald-400 block mt-1';
+          } else {
+            statusEl.innerText = '❌ Upload failed: ' + (data.error || 'Server error');
+            statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
+          }
+        })
+        .catch(err => {
+          statusEl.innerText = '❌ Upload error: ' + err.message;
+          statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
         });
     });
 
