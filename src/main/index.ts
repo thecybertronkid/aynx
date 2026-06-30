@@ -68,43 +68,6 @@ app.whenReady().then(async () => {
     return net.fetch(`file://${decodedPath}`);
   });
 
-  // Read installer registry values (legacy support)
-  if (process.platform === 'win32') {
-    try {
-      const { execSync } = await import('child_process');
-      const { saveSetting, getSettings } = await import('./database');
-      const currentSettings = await getSettings();
-
-      try {
-        const regName = execSync('reg query "HKCU\\Software\\AYNX" /v DisplayName', { encoding: 'utf8', timeout: 2000 });
-        const matchName = regName.match(/DisplayName\s+REG_SZ\s+(.+)/);
-        if (matchName?.[1]) {
-          const installerName = matchName[1].trim();
-          if (installerName && installerName !== 'Local Service') {
-            if (!currentSettings.displayName || currentSettings.displayName === 'Local Service') {
-              await saveSetting('displayName', installerName);
-            }
-          }
-        }
-      } catch (_) {}
-
-      try {
-        const regEmail = execSync('reg query "HKCU\\Software\\AYNX" /v Email', { encoding: 'utf8', timeout: 2000 });
-        const matchEmail = regEmail.match(/Email\s+REG_SZ\s+(.+)/);
-        if (matchEmail?.[1]) {
-          await saveSetting('email', matchEmail[1].trim());
-        }
-      } catch (_) {}
-
-      try {
-        const regKey = execSync('reg query "HKCU\\Software\\AYNX" /v LicenseKey', { encoding: 'utf8', timeout: 2000 });
-        const matchKey = regKey.match(/LicenseKey\s+REG_SZ\s+(.+)/);
-        if (matchKey?.[1]) {
-          await saveSetting('licenseKey', matchKey[1].trim());
-        }
-      } catch (_) {}
-    } catch (_) {}
-  }
 
   const userDataPath = app.getPath('userData');
   await initDatabase(userDataPath);

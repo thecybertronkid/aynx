@@ -61,11 +61,17 @@
     "asar": true,
     "win": {
       "target": [
-        "nsis"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "publisherName": "Ayan Kashyap",
       "executableName": "AYNX",
-      "icon": "resources/icon.png"
+      "icon": "resources/icon.png",
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
@@ -74,7 +80,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "AYNX",
-      "include": "resources/installer.nsh"
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "AYNX-Setup-${version}.exe"
     }
   }
 }
