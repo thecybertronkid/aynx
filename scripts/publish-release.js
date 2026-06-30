@@ -9,20 +9,22 @@ const packageJsonPath = path.join(__dirname, '..', 'package.json');
 const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = pkg.version;
 
-const sourcePath = path.join(__dirname, '..', 'release-build', `AYNX Setup ${version}.exe`);
+const sourcePath = path.join(__dirname, '..', 'release-build', `AYNX ${version}.stable.exe`);
 const destDir = path.join(__dirname, '..', 'release');
-const destPath = path.join(destDir, `AYNX Setup ${version}.exe`);
+const destPath = path.join(destDir, `AYNX ${version}.stable.exe`);
+const legacyDestPath = path.join(destDir, `AYNX Setup ${version}.exe`);
 
 // Copy installer from release-build -> release so users always find it in /release
 if (fs.existsSync(sourcePath)) {
   if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
   fs.copyFileSync(sourcePath, destPath);
-  console.log(`[AYNX Publisher] Copied installer to release/AYNX Setup ${version}.exe`);
+  fs.copyFileSync(sourcePath, legacyDestPath);
+  console.log(`[AYNX Publisher] Copied installer to release/AYNX ${version}.stable.exe`);
 } else {
   console.warn(`[AYNX Publisher] WARNING: Built installer not found at: ${sourcePath}`);
 }
 
-const downloadUrl = `file:///e:/SABLE 2.0/release/AYNX Setup ${version}.exe`;
+const downloadUrl = `file:///e:/SABLE 2.0/release/AYNX ${version}.stable.exe`;
 
 const payload = {
   latestVersion: version,

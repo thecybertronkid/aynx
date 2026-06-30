@@ -82,7 +82,7 @@
       "shortcutName": "AYNX",
       "runAfterFinish": true,
       "deleteAppDataOnUninstall": false,
-      "artifactName": "AYNX-Setup-${version}.exe"
+      "artifactName": "AYNX ${version}.stable.exe"
     }
   }
 }
