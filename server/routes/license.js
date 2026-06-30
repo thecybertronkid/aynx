@@ -7,7 +7,8 @@ const { signToken } = require('../middleware/auth');
 // POST /license/activate (and legacy /api/license/activate)
 router.post('/activate', optionalAuth, async (req, res) => {
   try {
-    const { key, machineId, email, displayName } = req.body;
+    let { key, machineId, email, displayName } = req.body;
+    key = (key || '').trim().toUpperCase();
 
     if (!email && !req.user) {
       return res.status(400).json({ error: 'Email or authentication token required.' });
