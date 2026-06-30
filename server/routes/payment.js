@@ -47,7 +47,7 @@ router.post('/create-order', requireAuth, async (req, res) => {
     const order = await rzp.orders.create({
       amount: planInfo.amount,
       currency: 'INR',
-      receipt: `aynx_${req.user.id}_${Date.now()}`,
+      receipt: `rcpt_${String(req.user.id || 'usr').replace(/-/g, '').slice(0, 8)}_${Date.now()}`,
       notes: {
         userId: req.user.id,
         email: req.user.email,
