@@ -4,7 +4,7 @@
 import { BrowserWindow, shell, ipcMain, app } from 'electron';
 import * as path from 'path';
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
 
 let authWindow: BrowserWindow | null = null;
 let _store: any = null;

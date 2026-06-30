@@ -64,7 +64,7 @@ export async function verifyLicenseOnline(key: string, machineId: string, email?
   const store = await getStore();
   const settings = store.get('settings') as Record<string, string>;
   const token = settings.authToken;
-  const apiBase = process.env.API_BASE_URL || 'http://localhost:5000';
+  const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
 
   try {
     const res = await fetch(`${apiBase}/license/verify`, {
@@ -87,7 +87,7 @@ export async function verifyLicenseOnline(key: string, machineId: string, email?
 export async function initDatabase(_userDataPath: string) {
   const store = await getStore();
   const settings = store.get('settings') as Record<string, string>;
-  const apiBase = process.env.API_BASE_URL || 'http://localhost:5000';
+  const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
   
   // Ensure unique machine ID
   if (!settings.machineId) {
