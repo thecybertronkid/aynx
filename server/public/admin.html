@@ -53,7 +53,7 @@
   <main class="max-w-7xl mx-auto px-8 mt-8 space-y-8">
 
     <!-- Overview Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Card 1 -->
       <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div class="flex justify-between items-start">
@@ -85,28 +85,6 @@
         <div class="mt-4">
           <h3 id="stat-active" class="text-3xl font-extrabold text-white">0</h3>
           <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Clients Downloading</p>
-        </div>
-      </div>
-      <!-- Card 4 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Plus Licenses</span>
-          <i data-lucide="sparkles" class="w-5 h-5 text-teal-400"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-plus" class="text-3xl font-extrabold text-teal-400">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Active Keys</p>
-        </div>
-      </div>
-      <!-- Card 5 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pro Licenses</span>
-          <i data-lucide="shield-check" class="w-5 h-5 text-[#5865f2]"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-pro" class="text-3xl font-extrabold text-[#5865f2]">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Premium Tiers</p>
         </div>
       </div>
     </div>
@@ -164,63 +142,6 @@
               <span>Publish Release Details</span>
             </button>
           </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Active License Key Generator and Table -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Key Generator Card -->
-      <div class="glass-card rounded-2xl p-6 space-y-5">
-        <div class="border-b border-[#2b2d31] pb-4">
-          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-            <i data-lucide="key" class="w-4 h-4 text-yellow-400"></i>
-            <span>License Key Generator</span>
-          </h2>
-        </div>
-        <div class="space-y-4">
-          <div>
-            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Select Subscription Plan</label>
-            <select id="gen-plan" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
-              <option value="Plus">Plus Subscription</option>
-              <option value="Pro">Pro Subscription</option>
-            </select>
-          </div>
-          <button id="btn-generate" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>Generate New Key</span>
-          </button>
-          <div id="gen-result" class="hidden bg-[#23a55a]/10 border border-[#23a55a]/30 p-3 rounded-lg flex items-center justify-between">
-            <span id="new-key" class="font-mono text-xs font-extrabold text-[#23a55a]"></span>
-            <button onclick="copyGeneratedKey()" class="text-[10px] font-bold text-white bg-[#2b2d31] px-2.5 py-1 rounded hover:bg-gray-700">Copy</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- License Registry Table -->
-      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
-        <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
-          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-            <i data-lucide="lock" class="w-4 h-4 text-[#5865f2]"></i>
-            <span>Global Licenses Database</span>
-          </h2>
-          <span id="count-keys" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Keys</span>
-        </div>
-        <div class="overflow-x-auto max-h-64 overflow-y-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
-                <th class="pb-2">License Key</th>
-                <th class="pb-2">Plan</th>
-                <th class="pb-2">Status</th>
-                <th class="pb-2">Device ID</th>
-                <th class="pb-2">Activated At</th>
-              </tr>
-            </thead>
-            <tbody id="table-licenses" class="divide-y divide-[#2b2d31]/50 text-gray-300">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -286,14 +207,6 @@
   </main>
 
   <script>
-    // Copy generated key function
-    function copyGeneratedKey() {
-      const keyText = document.getElementById('new-key').innerText;
-      navigator.clipboard.writeText(keyText).then(() => {
-        alert('License Key copied successfully!');
-      });
-    }
-
     // Chart variables
     let planChartObj = null;
     let platformChartObj = null;
@@ -342,30 +255,12 @@
           });
           document.getElementById('stat-active').innerText = activeUsers.length;
           
-          document.getElementById('stat-plus').innerText = users.filter(u => u.plan === 'Plus').length;
-          document.getElementById('stat-pro').innerText = users.filter(u => u.plan === 'Pro').length;
-
           // Render Updater inputs
           if (settings) {
             document.getElementById('latestVersion').value = settings.latestVersion || '';
             document.getElementById('downloadUrl').value = settings.downloadUrl || '';
             document.getElementById('changelog').value = settings.changelog || '';
           }
-
-          // Populate tables
-          document.getElementById('count-keys').innerText = `${licenses.length} Keys`;
-          const tableLicenses = document.getElementById('table-licenses');
-          tableLicenses.innerHTML = licenses.map(l => `
-            <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono font-bold text-white">${l.key}</td>
-              <td class="py-2.5">
-                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${l.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : 'bg-teal-400/10 border border-teal-400/30 text-teal-400'}">${l.plan}</span>
-              </td>
-              <td class="py-2.5 font-semibold ${l.activated_by ? 'text-[#23a55a]' : 'text-gray-400'}">${l.activated_by ? 'Activated' : 'Available'}</td>
-              <td class="py-2.5 text-gray-400 font-mono text-[10px]">${l.activated_by ? l.activated_by.slice(0, 8) + '...' : '—'}</td>
-              <td class="py-2.5 text-gray-400">${l.activated_at ? new Date(l.activated_at).toLocaleString() : '—'}</td>
-            </tr>
-          `).join('');
 
           document.getElementById('count-users').innerText = `${users.length} Users`;
           const tableUsers = document.getElementById('table-users');

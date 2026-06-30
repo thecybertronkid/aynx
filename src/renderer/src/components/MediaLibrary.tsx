@@ -82,7 +82,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ favoriteOnly = false, onPla
     // Play with built-in viewer if type matches
     if (item.contentType === 'video' || item.contentType === 'audio' || item.contentType === 'image') {
       if (plan === 'Free') {
-        alert('Preview Player is locked on the Free Plan. Please upgrade to a Plus or Pro license to preview downloaded media directly inside AYNX.');
+        alert('Preview Player is locked on the Free Plan. Please upgrade to a Plus or Pro plan to preview downloaded media directly inside AYNX.');
         return;
       }
       onPlay({
