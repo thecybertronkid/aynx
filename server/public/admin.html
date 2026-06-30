@@ -369,24 +369,28 @@
 
           document.getElementById('count-users').innerText = `${users.length} Users`;
           const tableUsers = document.getElementById('table-users');
-          tableUsers.innerHTML = users.map(u => `
+          tableUsers.innerHTML = users.map(u => {
+            const userId = u.id || u.machineId || u.google_id || 'UNKNOWN';
+            const shortId = typeof userId === 'string' ? userId.slice(0, 8) + '...' : userId;
+            const lastUpdated = u.updated_at || u.lastSeen || u.created_at || Date.now();
+            return `
             <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${u.id.slice(0, 8)}...</td>
-              <td class="py-2.5 font-bold text-white">${u.name || u.email}</td>
+              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${shortId}</td>
+              <td class="py-2.5 font-bold text-white">${u.name || u.displayName || u.email || 'Anonymous'}</td>
               <td class="py-2.5">
-                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan || 'Free'}</span>
               </td>
               <td class="py-2.5 font-semibold text-yellow-400">${u.trial_used ? 'Trial Active' : 'Subscribed'}</td>
-              <td class="py-2.5 text-gray-400">${new Date(u.updated_at).toLocaleString()}</td>
+              <td class="py-2.5 text-gray-400">${new Date(lastUpdated).toLocaleString()}</td>
               <td class="py-2.5 text-right">
-                <select onchange="updateUserPlan('${u.id}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
+                <select onchange="updateUserPlan('${userId}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
                   <option value="Free" ${u.plan === 'Free' ? 'selected' : ''}>Free Tier</option>
                   <option value="Plus" ${u.plan === 'Plus' ? 'selected' : ''}>Plus Tier</option>
                   <option value="Pro" ${u.plan === 'Pro' ? 'selected' : ''}>Pro Tier</option>
                 </select>
               </td>
             </tr>
-          `).join('');
+          `;}).join('');
 
           document.getElementById('count-logs').innerText = `${telemetry.length} Logs`;
           const tableLogs = document.getElementById('table-logs');
@@ -395,12 +399,15 @@
             const title = meta.title || log.event || 'System Event';
             const status = meta.status || 'completed';
             const sizeStr = meta.sizeBytes ? (meta.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '—';
-            const client = log.user_id ? log.user_id.slice(0, 8) + '...' : log.machine_id ? log.machine_id.slice(0, 8) : '—';
+            const logIdStr = log.id ? String(log.id) : 'log-' + Math.random().toString(36).substring(2, 8);
+            const clientStr = log.user_id ? String(log.user_id) : log.machine_id ? String(log.machine_id) : '—';
+            const shortLogId = logIdStr.length > 8 ? logIdStr.slice(0, 8) + '...' : logIdStr;
+            const shortClient = clientStr.length > 8 ? clientStr.slice(0, 8) + '...' : clientStr;
             
             return `
               <tr class="hover:bg-[#2b2d31]/30">
-                <td class="py-2.5 font-mono text-gray-400 text-[10px]">${log.id.slice(0, 8)}...</td>
-                <td class="py-2.5 font-mono text-[10px] text-gray-400">${client}</td>
+                <td class="py-2.5 font-mono text-gray-400 text-[10px]">${shortLogId}</td>
+                <td class="py-2.5 font-mono text-[10px] text-gray-400">${shortClient}</td>
                 <td class="py-2.5 font-bold">${meta.platform || 'System'}</td>
                 <td class="py-2.5 text-gray-400">${meta.contentType || 'Event'}</td>
                 <td class="py-2.5 text-white max-w-[200px] truncate" title="${title}">${title}</td>

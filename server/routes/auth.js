@@ -4,20 +4,41 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { signToken, signRefreshToken } = require('../middleware/auth');
 
-// ─── Google OAuth ─────────────────────────────────────────────────────────────
+// Helper to resolve exact callback URL matching the request host
+function getCallbackUrl(req) {
+  if (process.env.GOOGLE_CALLBACK_URL && process.env.NODE_ENV !== 'development') {
+    return process.env.GOOGLE_CALLBACK_URL;
+  }
+  const protocol = (req.headers['x-forwarded-proto'] || req.protocol) === 'https' ? 'https' : 'http';
+  return `${protocol}://${req.headers.host}/auth/google/callback`;
+}
+
 // Step 1: Redirect to Google
 router.get('/google', (req, res, next) => {
   const state = req.query.redirect ? Buffer.from(req.query.redirect).toString('base64') : '';
   passport.authenticate('google', {
     scope: ['profile', 'email'],
     session: false,
+    callbackURL: getCallbackUrl(req),
     state
   })(req, res, next);
 });
 
 // Step 2: Google callback → issue JWT → redirect to Electron deep link or Web site
-router.get('/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/auth/failure' }),
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', {
+    session: false,
+    callbackURL: getCallbackUrl(req),
+    failureRedirect: '/auth/failure'
+  }, (err, user, info) => {
+    if (err || !user) {
+      console.error('[Google OAuth Failure]', err || info);
+      return res.redirect('aynx://oauth?error=' + encodeURIComponent(err?.message || info?.message || 'auth_failed'));
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+},
   (req, res) => {
     const user = req.user;
     const token = signToken(user);
