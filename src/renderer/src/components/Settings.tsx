@@ -387,7 +387,7 @@ Install Location: ${systemInfo.installDir}
       if (res.ok) {
         const data = await res.json();
         setLatestVersionData(data);
-        const currentVersion = '2.5.1'; // Current client build version
+        const currentVersion = '2.5.4'; // Current client build version
         if (data.latestVersion && data.latestVersion !== currentVersion) {
           setCheckUpdateStatus('update-available');
         } else {
@@ -1317,14 +1317,14 @@ Install Location: ${systemInfo.installDir}
                 <div className="max-w-xs mx-auto bg-discord-secondary/50 border border-discord-border rounded-xl p-4 my-6 space-y-2 text-xs text-left">
                   <div className="flex justify-between">
                     <span className="text-discord-textMuted font-bold">Current Version</span>
-                    <span className="font-extrabold text-discord-textNormal">v2.5.1</span>
+                    <span className="font-extrabold text-discord-textNormal">v2.5.4</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-discord-textMuted font-bold">Latest Release</span>
                     {checkUpdateStatus === 'update-available' ? (
                       <span className="font-extrabold text-discord-accent font-black animate-pulse">v{latestVersionData?.latestVersion} (New Update!)</span>
                     ) : (
-                      <span className="font-extrabold text-discord-success">v2.5.1 (Latest)</span>
+                      <span className="font-extrabold text-discord-success">v2.5.4 (Latest)</span>
                     )}
                   </div>
                   <div className="flex justify-between">

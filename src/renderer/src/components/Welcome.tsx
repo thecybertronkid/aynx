@@ -570,7 +570,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
 
       {/* Version watermark */}
       <p className="absolute bottom-4 text-center text-[10px] text-[#4e5058] font-bold">
-        AYNX v2.5.1 — Universal Media Downloader
+        AYNX v2.5.4 — Universal Media Downloader
       </p>
     </div>
   );

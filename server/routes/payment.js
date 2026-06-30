@@ -6,10 +6,14 @@ const { requireAuth } = require('../middleware/auth');
 const { supabase } = require('../db/supabase');
 const { signToken } = require('../middleware/auth');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+function getRazorpayInstance() {
+  const key_id = (process.env.RAZORPAY_KEY_ID || '').trim();
+  const key_secret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+  if (!key_id || !key_secret) {
+    throw new Error('Razorpay API keys missing in server environment variables (RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET).');
+  }
+  return { rzp: new Razorpay({ key_id, key_secret }), key_id };
+}
 
 // Pricing map (in paise)
 const PLANS = {
@@ -36,9 +40,11 @@ router.post('/create-order', requireAuth, async (req, res) => {
   try {
     const { planId } = req.body;
     const planInfo = PLANS[planId];
-    if (!planInfo) return res.status(400).json({ error: 'Invalid plan.' });
+    if (!planInfo) return res.status(400).json({ error: 'Invalid plan selected.' });
 
-    const order = await razorpay.orders.create({
+    const { rzp, key_id } = getRazorpayInstance();
+
+    const order = await rzp.orders.create({
       amount: planInfo.amount,
       currency: 'INR',
       receipt: `aynx_${req.user.id}_${Date.now()}`,
@@ -71,13 +77,14 @@ router.post('/create-order', requireAuth, async (req, res) => {
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: key_id,
       userEmail: req.user.email,
       userName: req.user.name
     });
   } catch (err) {
     console.error('[Razorpay] Create order error:', err);
-    res.status(500).json({ error: err.message || 'Failed to create payment order.' });
+    const msg = err?.error?.description || err?.description || err?.message || JSON.stringify(err);
+    res.status(500).json({ error: 'Payment Error: ' + msg });
   }
 });
 

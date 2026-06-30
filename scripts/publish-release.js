@@ -1,4 +1,4 @@
-// AYNX Auto Release Publisher Script v2.5.1
+// AYNX Auto Release Publisher Script v2.5.4
 // Automatically registers new packaged builds onto the online backend server.
 require('dotenv').config({ path: require('path').join(__dirname, '..', 'server', '.env') });
 

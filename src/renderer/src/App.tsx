@@ -103,7 +103,7 @@ const App: React.FC = () => {
                     <div className="bg-discord-secondary/40 border border-discord-border rounded-xl p-4 space-y-2.5 text-left text-xs">
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Version</span>
-                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.5.1</span>
+                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.5.4</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Created & Maintained by</span>

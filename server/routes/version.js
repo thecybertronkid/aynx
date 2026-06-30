@@ -23,9 +23,9 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.5.1', downloadUrl: '', changelog: '' });
+    res.json({ latestVersion: '2.5.4', downloadUrl: '', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.5.1', downloadUrl: '', changelog: '' });
+    res.json({ latestVersion: '2.5.4', downloadUrl: '', changelog: '' });
   }
 });
 

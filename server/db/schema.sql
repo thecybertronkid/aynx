@@ -87,11 +87,12 @@ CREATE TABLE IF NOT EXISTS announcements (
 -- ─── Seed: Initial version ────────────────────────────────────────────────────
 INSERT INTO app_versions (version, download_url, changelog, is_latest)
 VALUES (
-  '2.5.1',
-  'https://github.com/aynx-app/aynx/releases/download/v2.5.1/AYNX-Setup-2.5.1.exe',
-  'v2.5.1 - Cloud architecture, Google Auth, Razorpay payments, Supabase database.',
-  TRUE
-) ON CONFLICT DO NOTHING;
+  '2.5.4',
+  'https://github.com/aynx-app/aynx/releases/download/v2.5.4/AYNX-Setup-2.5.4.exe',
+  'v2.5.4 - Clean non-elevated NSIS setup (no Defender flags), Razorpay payment diagnostics, Supabase cloud architecture.',
+  true
+)
+ON CONFLICT DO NOTHING;
 
 -- ─── Disable RLS so backend service queries are never blocked ─────────────────
 ALTER TABLE users DISABLE ROW LEVEL SECURITY;
