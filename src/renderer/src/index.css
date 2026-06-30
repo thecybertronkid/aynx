@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark Theme Default */
+    --color-primary: #313338;
+    --color-secondary: #2b2d31;
+    --color-tertiary: #1e1f22;
+    --color-accent: #5865f2;
+    --color-success: #23a55a;
+    --color-danger: #f23f43;
+    --color-text-normal: #dbdee1;
+    --color-text-muted: #949ba4;
+    --color-hover: #35373c;
+    --color-active: #3b3e45;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-card: #2b2d31;
+  }
+
+  :root[data-theme="light"] {
+    /* Light Theme */
+    --color-primary: #f2f3f5;
+    --color-secondary: #ffffff;
+    --color-tertiary: #e3e5e8;
+    --color-accent: #4752c4;
+    --color-success: #248046;
+    --color-danger: #da373c;
+    --color-text-normal: #060607;
+    --color-text-muted: #4e5058;
+    --color-hover: #dbdee1;
+    --color-active: #e3e5e8;
+    --color-border: rgba(0, 0, 0, 0.08);
+    --color-card: #ffffff;
+  }
+
+  :root[data-theme="midnight"] {
+    --color-primary: #0f1015;
+    --color-secondary: #161820;
+    --color-tertiary: #090a0d;
+    --color-accent: #5865f2;
+    --color-success: #23a55a;
+    --color-danger: #f23f43;
+    --color-text-normal: #e3e6e8;
+    --color-text-muted: #7a828e;
+    --color-hover: #222530;
+    --color-active: #2b2e3c;
+    --color-border: rgba(255, 255, 255, 0.05);
+    --color-card: #161820;
+  }
+
+  :root[data-theme="amoled"] {
+    --color-primary: #000000;
+    --color-secondary: #080808;
+    --color-tertiary: #000000;
+    --color-accent: #5865f2;
+    --color-success: #23a55a;
+    --color-danger: #f23f43;
+    --color-text-normal: #ffffff;
+    --color-text-muted: #888888;
+    --color-hover: #161616;
+    --color-active: #222222;
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-card: #080808;
+  }
+
+  :root[data-theme="nord"] {
+    --color-primary: #2e3440;
+    --color-secondary: #3b4252;
+    --color-tertiary: #242933;
+    --color-accent: #88c0d0;
+    --color-success: #a3be8c;
+    --color-danger: #bf616a;
+    --color-text-normal: #d8dee9;
+    --color-text-muted: #81a1c1;
+    --color-hover: #434c5e;
+    --color-active: #4c566a;
+    --color-border: rgba(216, 222, 233, 0.07);
+    --color-card: #3b4252;
+  }
+
+  :root[data-theme="dracula"] {
+    --color-primary: #282a36;
+    --color-secondary: #1e1f29;
+    --color-tertiary: #191a21;
+    --color-accent: #bd93f9;
+    --color-success: #50fa7b;
+    --color-danger: #ff5555;
+    --color-text-normal: #f8f8f2;
+    --color-text-muted: #8be9fd;
+    --color-hover: #44475a;
+    --color-active: #6272a4;
+    --color-border: rgba(248, 248, 242, 0.06);
+    --color-card: #1e1f29;
+  }
+
+  :root[data-theme="catppuccin"] {
+    --color-primary: #1e1e2e;
+    --color-secondary: #181825;
+    --color-tertiary: #11111b;
+    --color-accent: #cba6f7;
+    --color-success: #a6e3a1;
+    --color-danger: #f38ba8;
+    --color-text-normal: #cdd6f4;
+    --color-text-muted: #bac2de;
+    --color-hover: #313244;
+    --color-active: #45475a;
+    --color-border: rgba(205, 214, 244, 0.06);
+    --color-card: #181825;
+  }
+
+  :root[data-theme="ocean"] {
+    --color-primary: #0f172a;
+    --color-secondary: #1e293b;
+    --color-tertiary: #020617;
+    --color-accent: #38bdf8;
+    --color-success: #10b981;
+    --color-danger: #ef4444;
+    --color-text-normal: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-hover: #334155;
+    --color-active: #475569;
+    --color-border: rgba(241, 245, 249, 0.06);
+    --color-card: #1e293b;
+  }
+
+  body {
+    @apply bg-discord-tertiary text-discord-textNormal select-none overflow-hidden antialiased transition-colors duration-300;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-active);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-hover);
+}
+
+/* Clean, modern glass components */
+.glass-panel {
+  background: rgba(43, 45, 49, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+:root[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-card {
+  background: rgba(30, 31, 34, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+}
+
+:root[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+}
+
+/* Custom UI styling helpers */
+.btn-primary {
+  @apply bg-discord-accent text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center justify-center space-x-2 select-none cursor-pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(88, 101, 242, 0.15);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  @apply bg-discord-secondary text-discord-textNormal border border-discord-border font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center justify-center space-x-2 select-none cursor-pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-hover);
+}
+
+.btn-secondary:active {
+  transform: scale(0.95);
+}
+
+.btn-ghost {
+  @apply text-discord-textMuted p-2 rounded-lg flex items-center justify-center cursor-pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost:hover {
+  color: var(--color-text-normal);
+  background-color: rgba(128, 128, 128, 0.15);
+}
+
+.btn-ghost:active {
+  transform: scale(0.95);
+}
+
+/* Skeleton loader style */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-secondary) 25%,
+    var(--color-hover) 50%,
+    var(--color-secondary) 75%
+  );
+  background-size: 200% 100%;
+}
+
+:root[data-theme="light"] .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f2f3f5 25%,
+    #e3e5e8 50%,
+    #f2f3f5 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Custom glowing badge */
+.glow-active {
+  box-shadow: 0 0 10px rgba(88, 101, 242, 0.35);
+}

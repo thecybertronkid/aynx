@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYNX Central Admin Portal</title>
+  <!-- Tailwind CSS for sleek styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #111214;
+      color: #dbdee1;
+    }
+    .glass-card {
+      background-color: #1e1f22;
+      border: 1px solid #2b2d31;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-[#111214] border-b border-[#2b2d31] px-8 py-4 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-[#5865f2] flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-[#5865f2]/20">
+        AY
+      </div>
+      <div>
+        <h1 class="text-base font-extrabold text-white tracking-wide">AYNX Admin Suite</h1>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Central Online Operations Portal</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-6">
+      <div class="text-right">
+        <span class="text-[10px] text-gray-400 font-bold uppercase block">Current Operator</span>
+        <span class="text-xs font-extrabold text-white">Ayan Kashyap</span>
+      </div>
+      <div class="h-8 w-[1px] bg-[#2b2d31]"></div>
+      <div class="flex items-center space-x-2 bg-[#23a55a]/10 border border-[#23a55a]/30 px-3.5 py-1.5 rounded-full">
+        <span class="w-2.5 h-2.5 bg-[#23a55a] rounded-full animate-pulse"></span>
+        <span class="text-[10px] font-bold text-[#23a55a] uppercase">Server Online</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-8 mt-8 space-y-8">
+
+    <!-- Overview Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <!-- Card 1 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Registered Users</span>
+          <i data-lucide="users" class="w-5 h-5 text-[#5865f2]"></i>
+        </div>
+        <div class="mt-4">
+          <h3 id="stat-users" class="text-3xl font-extrabold text-white">0</h3>
+          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Machine Contexts</p>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Downloads (Total)</span>
+          <i data-lucide="download-cloud" class="w-5 h-5 text-[#23a55a]"></i>
+        </div>
+        <div class="mt-4">
+          <h3 id="stat-downloads" class="text-3xl font-extrabold text-white">0</h3>
+          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Completed / Failed</p>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Active Telemetry</span>
+          <i data-lucide="activity" class="w-5 h-5 text-[#f0b232]"></i>
+        </div>
+        <div class="mt-4">
+          <h3 id="stat-active" class="text-3xl font-extrabold text-white">0</h3>
+          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Clients Downloading</p>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Plus Licenses</span>
+          <i data-lucide="sparkles" class="w-5 h-5 text-teal-400"></i>
+        </div>
+        <div class="mt-4">
+          <h3 id="stat-plus" class="text-3xl font-extrabold text-teal-400">0</h3>
+          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Active Keys</p>
+        </div>
+      </div>
+      <!-- Card 5 -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pro Licenses</span>
+          <i data-lucide="shield-check" class="w-5 h-5 text-[#5865f2]"></i>
+        </div>
+        <div class="mt-4">
+          <h3 id="stat-pro" class="text-3xl font-extrabold text-[#5865f2]">0</h3>
+          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Premium Tiers</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid: Graphs and Live Downloads -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Analytics Charts -->
+      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6">
+        <div class="border-b border-[#2b2d31] pb-4">
+          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#5865f2]"></i>
+            <span>Visual System Metrics</span>
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="planChart"></canvas>
+          </div>
+          <div class="h-64 flex items-center justify-center">
+            <canvas id="platformChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Release & Installer Updates -->
+      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="border-b border-[#2b2d31] pb-4 mb-5">
+            <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+              <i data-lucide="arrow-up-circle" class="w-4 h-4 text-emerald-400"></i>
+              <span>App Release & Updater Manager</span>
+            </h2>
+          </div>
+          <form id="update-form" class="space-y-4">
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Latest App Version</label>
+              <input type="text" id="latestVersion" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. 2.3.6">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Installer Download Link</label>
+              <input type="text" id="downloadUrl" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Installer setup URL link">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Release Changelog Notes</label>
+              <textarea id="changelog" rows="4" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] resize-none" placeholder="Features update notes..."></textarea>
+            </div>
+            <button type="submit" class="w-full bg-[#23a55a] hover:bg-[#1a7f45] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Publish Release Details</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active License Key Generator and Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Key Generator Card -->
+      <div class="glass-card rounded-2xl p-6 space-y-5">
+        <div class="border-b border-[#2b2d31] pb-4">
+          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+            <i data-lucide="key" class="w-4 h-4 text-yellow-400"></i>
+            <span>License Key Generator</span>
+          </h2>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Select Subscription Plan</label>
+            <select id="gen-plan" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
+              <option value="Plus">Plus Subscription</option>
+              <option value="Pro">Pro Subscription</option>
+            </select>
+          </div>
+          <button id="btn-generate" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Generate New Key</span>
+          </button>
+          <div id="gen-result" class="hidden bg-[#23a55a]/10 border border-[#23a55a]/30 p-3 rounded-lg flex items-center justify-between">
+            <span id="new-key" class="font-mono text-xs font-extrabold text-[#23a55a]"></span>
+            <button onclick="copyGeneratedKey()" class="text-[10px] font-bold text-white bg-[#2b2d31] px-2.5 py-1 rounded hover:bg-gray-700">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- License Registry Table -->
+      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
+        <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+            <i data-lucide="lock" class="w-4 h-4 text-[#5865f2]"></i>
+            <span>Global Licenses Database</span>
+          </h2>
+          <span id="count-keys" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Keys</span>
+        </div>
+        <div class="overflow-x-auto max-h-64 overflow-y-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                <th class="pb-2">License Key</th>
+                <th class="pb-2">Plan</th>
+                <th class="pb-2">Status</th>
+                <th class="pb-2">Device ID</th>
+                <th class="pb-2">Activated At</th>
+              </tr>
+            </thead>
+            <tbody id="table-licenses" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active/Online User Database List -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i data-lucide="globe" class="w-4 h-4 text-cyan-400"></i>
+          <span>Live Registered Clients Database</span>
+        </h2>
+        <span id="count-users" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Users</span>
+      </div>
+      <div class="overflow-x-auto max-h-72 overflow-y-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+              <th class="pb-2">Device Machine ID</th>
+              <th class="pb-2">Display Name</th>
+              <th class="pb-2">Plan Status</th>
+              <th class="pb-2">Active Task</th>
+              <th class="pb-2">Last Seen Activity</th>
+              <th class="pb-2 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-users" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Telemetry Logs Registry -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i data-lucide="history" class="w-4 h-4 text-[#f23f43]"></i>
+          <span>Global Telemetry Logs</span>
+        </h2>
+        <span id="count-logs" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Logs</span>
+      </div>
+      <div class="overflow-x-auto max-h-80 overflow-y-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+              <th class="pb-2">Log ID</th>
+              <th class="pb-2">Client ID</th>
+              <th class="pb-2">Platform</th>
+              <th class="pb-2">Type</th>
+              <th class="pb-2">Title</th>
+              <th class="pb-2">Status</th>
+              <th class="pb-2">Size</th>
+              <th class="pb-2">Logged Time</th>
+            </tr>
+          </thead>
+          <tbody id="table-logs" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Copy generated key function
+    function copyGeneratedKey() {
+      const keyText = document.getElementById('new-key').innerText;
+      navigator.clipboard.writeText(keyText).then(() => {
+        alert('License Key copied successfully!');
+      });
+    }
+
+    // Chart variables
+    let planChartObj = null;
+    let platformChartObj = null;
+
+    // Secure Admin secret
+    let adminSecret = localStorage.getItem('aynx_admin_secret');
+    if (!adminSecret) {
+      adminSecret = prompt('Enter AYNX Admin Secret Key:');
+      if (adminSecret) localStorage.setItem('aynx_admin_secret', adminSecret);
+    }
+
+    function adminFetch(url, options = {}) {
+      const secret = localStorage.getItem('aynx_admin_secret') || '';
+      options.headers = {
+        ...(options.headers || {}),
+        'x-admin-secret': secret
+      };
+      return fetch(url, options).then(res => {
+        if (res.status === 403 || res.status === 401) {
+          localStorage.removeItem('aynx_admin_secret');
+          alert('Invalid Admin Secret. Page will reload.');
+          window.location.reload();
+          throw new Error('Unauthorized');
+        }
+        return res;
+      });
+    }
+
+    // Load API stats
+    function loadStats() {
+      adminFetch('/api/admin/dashboard')
+        .then(res => res.json())
+        .then(data => {
+          const { licenses, users, telemetry, settings } = data;
+
+          // Render summary stats
+          document.getElementById('stat-users').innerText = users.length;
+          document.getElementById('stat-downloads').innerText = telemetry.length;
+          
+          const activeUsers = users.filter(u => {
+            const lastSeen = new Date(u.lastSeen).getTime();
+            const now = Date.now();
+            return (now - lastSeen) < 30000; // active in last 30s
+          });
+          document.getElementById('stat-active').innerText = activeUsers.length;
+          
+          document.getElementById('stat-plus').innerText = licenses.filter(l => l.plan === 'Plus' && l.activated).length;
+          document.getElementById('stat-pro').innerText = licenses.filter(l => l.plan === 'Pro' && l.activated).length;
+
+          // Render Updater inputs
+          if (settings) {
+            document.getElementById('latestVersion').value = settings.latestVersion || '';
+            document.getElementById('downloadUrl').value = settings.downloadUrl || '';
+            document.getElementById('changelog').value = settings.changelog || '';
+          }
+
+          // Populate tables
+          document.getElementById('count-keys').innerText = `${licenses.length} Keys`;
+          const tableLicenses = document.getElementById('table-licenses');
+          tableLicenses.innerHTML = licenses.map(l => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-2.5 font-mono font-bold text-white">${l.key}</td>
+              <td class="py-2.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${l.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : 'bg-teal-400/10 border border-teal-400/30 text-teal-400'}">${l.plan}</span>
+              </td>
+              <td class="py-2.5 font-semibold ${l.activated ? 'text-[#23a55a]' : 'text-gray-400'}">${l.activated ? 'Activated' : 'Available'}</td>
+              <td class="py-2.5 text-gray-400 font-mono text-[10px]">${l.machineId || '—'}</td>
+              <td class="py-2.5 text-gray-400">${l.activatedAt ? new Date(l.activatedAt).toLocaleString() : '—'}</td>
+            </tr>
+          `).join('');
+
+          document.getElementById('count-users').innerText = `${users.length} Users`;
+          const tableUsers = document.getElementById('table-users');
+          tableUsers.innerHTML = users.map(u => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${u.machineId}</td>
+              <td class="py-2.5 font-bold text-white">${u.displayName}</td>
+              <td class="py-2.5">
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan}</span>
+              </td>
+              <td class="py-2.5 font-semibold text-yellow-400">${u.activeDownloads > 0 ? `Downloading (${u.activeDownloads})` : 'Idle'}</td>
+              <td class="py-2.5 text-gray-400">${new Date(u.lastSeen).toLocaleString()}</td>
+              <td class="py-2.5 text-right">
+                <select onchange="updateUserPlan('${u.machineId}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
+                  <option value="Free" ${u.plan === 'Free' ? 'selected' : ''}>Free Tier</option>
+                  <option value="Plus" ${u.plan === 'Plus' ? 'selected' : ''}>Plus Tier</option>
+                  <option value="Pro" ${u.plan === 'Pro' ? 'selected' : ''}>Pro Tier</option>
+                </select>
+              </td>
+            </tr>
+          `).join('');
+
+          document.getElementById('count-logs').innerText = `${telemetry.length} Logs`;
+          const tableLogs = document.getElementById('table-logs');
+          tableLogs.innerHTML = telemetry.slice().reverse().map(log => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-2.5 font-mono text-gray-400 text-[10px]">${log.id}</td>
+              <td class="py-2.5 font-mono text-[10px] text-gray-400">${log.machineId.slice(0,8)}...</td>
+              <td class="py-2.5 font-bold">${log.platform}</td>
+              <td class="py-2.5 text-gray-400">${log.contentType}</td>
+              <td class="py-2.5 text-white max-w-[200px] truncate" title="${log.title}">${log.title}</td>
+              <td class="py-2.5">
+                <span class="font-bold uppercase text-[9px] px-1.5 py-0.5 rounded ${log.status === 'completed' ? 'text-[#23a55a] bg-[#23a55a]/10' : 'text-[#f23f43] bg-[#f23f43]/10'}">${log.status}</span>
+              </td>
+              <td class="py-2.5 text-gray-400 font-semibold">${log.sizeBytes ? (log.sizeBytes / (1024*1024)).toFixed(1) + ' MB' : '—'}</td>
+              <td class="py-2.5 text-gray-400">${new Date(log.timestamp).toLocaleTimeString()}</td>
+            </tr>
+          `).join('');
+
+          // Update Charts
+          renderCharts(users, telemetry);
+        });
+    }
+
+    // Render stats charts
+    function renderCharts(users, telemetry) {
+      // 1. Plan Distribution
+      const plans = { Free: 0, Plus: 0, Pro: 0 };
+      users.forEach(u => plans[u.plan] = (plans[u.plan] || 0) + 1);
+
+      if (planChartObj) planChartObj.destroy();
+      const ctx1 = document.getElementById('planChart').getContext('2d');
+      planChartObj = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: ['Free User', 'Plus Subscription', 'Pro Subscription'],
+          datasets: [{
+            data: [plans.Free || 0, plans.Plus || 0, plans.Pro || 0],
+            backgroundColor: ['#4e5058', '#00cccc', '#5865f2'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#dbdee1', font: { family: 'Outfit', size: 10 } } },
+            title: { display: true, text: 'Plan Distribution Tiers', color: '#fff', font: { size: 12, weight: 'bold' } }
+          }
+        }
+      });
+
+      // 2. Download Platforms Breakdown
+      const platforms = {};
+      telemetry.forEach(log => platforms[log.platform] = (platforms[log.platform] || 0) + 1);
+
+      if (platformChartObj) platformChartObj.destroy();
+      const ctx2 = document.getElementById('platformChart').getContext('2d');
+      platformChartObj = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(platforms),
+          datasets: [{
+            label: 'Downloads volume',
+            data: Object.values(platforms),
+            backgroundColor: '#23a55a',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Downloads Volume per Platform', color: '#fff', font: { size: 12, weight: 'bold' } }
+          },
+          scales: {
+            x: { ticks: { color: '#dbdee1', font: { size: 9 } }, grid: { display: false } },
+            y: { ticks: { color: '#dbdee1', font: { size: 9 } }, grid: { color: '#2b2d31' } }
+          }
+        }
+      });
+    }
+
+    // Generate Key handler
+    document.getElementById('btn-generate').addEventListener('click', () => {
+      const plan = document.getElementById('gen-plan').value;
+      adminFetch('/api/admin/generate-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('new-key').innerText = data.key;
+            document.getElementById('gen-result').classList.remove('hidden');
+            loadStats();
+          }
+        });
+    });
+
+    // Update Form handler
+    document.getElementById('update-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const latestVersion = document.getElementById('latestVersion').value;
+      const downloadUrl = document.getElementById('downloadUrl').value;
+      const changelog = document.getElementById('changelog').value;
+
+      adminFetch('/api/version/set', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latestVersion, downloadUrl, changelog })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('App update rollout config saved successfully online!');
+            loadStats();
+          }
+        });
+    });
+
+    function updateUserPlan(machineId, plan) {
+      adminFetch('/api/admin/update-user-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machineId, plan })
+      })
+      .then(res => {
+        if (res.ok) {
+          loadStats();
+        } else {
+          alert('Failed to update plan.');
+        }
+      });
+    }
+
+    // Initialize Page
+    lucide.createIcons();
+    loadStats();
+    setInterval(loadStats, 5000); // Poll server every 5 seconds
+  </script>
+</body>
+</html>
