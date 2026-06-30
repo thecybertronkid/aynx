@@ -180,7 +180,7 @@ function startTelemetryHeartbeat() {
       const displayName = settings.displayName || 'Anonymous User';
       const plan = settings.plan || 'Free';
       const token = settings.authToken;
-      const apiBase = process.env.API_BASE_URL || 'http://localhost:5000';
+      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
       
       let activeCount = 0;
       try {

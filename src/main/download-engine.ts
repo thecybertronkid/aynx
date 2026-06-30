@@ -402,7 +402,8 @@ async function startDownloadJob(ad: ActiveDownload) {
       try {
         const settings = await getSettings();
         const machineId = settings.machineId || 'Unknown';
-        fetch('http://localhost:5000/api/telemetry/report', {
+        const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+        fetch(`${apiBase}/telemetry/report`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -427,7 +428,8 @@ async function startDownloadJob(ad: ActiveDownload) {
         try {
           const settings = await getSettings();
           const machineId = settings.machineId || 'Unknown';
-          fetch('http://localhost:5000/api/telemetry/report', {
+          const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+          fetch(`${apiBase}/telemetry/report`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

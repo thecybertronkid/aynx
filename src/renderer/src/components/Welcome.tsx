@@ -366,7 +366,7 @@ const LicenseKeyScreen: React.FC<{
   const [error, setError] = useState('');
   const [showKey, setShowKey] = useState(false);
 
-  const API_BASE = 'http://localhost:5000';
+  const API_BASE = 'https://aynx-api.onrender.com';
 
   const handleActivate = async () => {
     if (!key.trim() || !email.trim()) {

@@ -156,7 +156,7 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
             return;
           }
           
-          const apiBase = 'http://localhost:5000';
+          const apiBase = 'https://aynx-api.onrender.com';
           const res = await fetch(`${apiBase}/license/activate`, {
             method: 'POST',
             headers: { 

@@ -383,7 +383,7 @@ Install Location: ${systemInfo.installDir}
   const checkUpdatesAction = async () => {
     setCheckUpdateStatus('checking');
     try {
-      const res = await fetch('http://localhost:5000/api/version/check');
+      const res = await fetch('https://aynx-api.onrender.com/version/check');
       if (res.ok) {
         const data = await res.json();
         setLatestVersionData(data);

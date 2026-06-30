@@ -93,6 +93,15 @@ VALUES (
   TRUE
 ) ON CONFLICT DO NOTHING;
 
+-- ─── Seed: Initial License Keys ───────────────────────────────────────────────
+INSERT INTO license_keys (key, plan, active, max_activations)
+VALUES 
+  ('AYNX-PLUS-PLAN-2026', 'Plus', TRUE, 9999),
+  ('AYNX-PRO-PLAN-2026', 'Pro', TRUE, 9999),
+  ('AYNX-PLUS-VIP-0001', 'Plus', TRUE, 10),
+  ('AYNX-PRO-VIP-0001', 'Pro', TRUE, 10)
+ON CONFLICT DO NOTHING;
+
 -- ─── Indexes ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
