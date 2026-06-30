@@ -1,0 +1,20 @@
+[
+  {
+    "key": "AYNX-FREE-PLAN-2026",
+    "plan": "Free",
+    "expires_at": null,
+    "activated_by": null
+  },
+  {
+    "key": "AYNX-PLUS-PLAN-2026",
+    "plan": "Plus",
+    "expires_at": null,
+    "activated_by": null
+  },
+  {
+    "key": "AYNX-PRO-PLAN-2026",
+    "plan": "Pro",
+    "expires_at": null,
+    "activated_by": null
+  }
+]

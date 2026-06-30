@@ -1,5 +1,6 @@
 // AYNX Auto Release Publisher Script v2.5.1
 // Automatically registers new packaged builds onto the online backend server.
+require('dotenv').config({ path: require('path').join(__dirname, '..', 'server', '.env') });
 
 const fs = require('fs');
 const path = require('path');
@@ -36,13 +37,17 @@ const payload = {
 
 console.log(`[AYNX Publisher] Registering build v${version} on backend...`);
 
+const adminSecret = process.env.ADMIN_SECRET || 'aynx_admin_secret_key_2026';
 const req = require('http').request(
   {
     hostname: 'localhost',
     port: 5000,
     path: '/api/version/set',
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 
+      'Content-Type': 'application/json',
+      'x-admin-secret': adminSecret
+    }
   },
   (res) => {
     let body = '';
