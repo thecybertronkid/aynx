@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Cloud, CheckCircle2, Lock, Sparkles, Check, X } from 'lucide-react';
 import { useSettingsStore } from '../store/settingsStore';
+import { useAuthStore } from '../store/authStore';
+import UpgradeModal from './UpgradeModal';
 import { showUpgradeToast } from './UpgradeToast';
 
 interface PlatformInfo {
@@ -14,8 +16,10 @@ interface PlatformInfo {
 
 const Platforms: React.FC = () => {
   const { settings } = useSettingsStore();
-  const currentPlan = settings.plan || 'Free';
+  const { user } = useAuthStore();
+  const currentPlan = user?.plan || settings.plan || 'Free';
   const [activeTab, setActiveTab] = useState<'platforms' | 'plans'>('platforms');
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
   const platformsList: PlatformInfo[] = [
     {
@@ -306,7 +310,7 @@ const Platforms: React.FC = () => {
                   }`}
                   onClick={() => {
                     if (plan.name !== 'Free' && currentPlan !== plan.name) {
-                      alert(`To upgrade to ${plan.name}, go to Accounts Center → License Key and enter your ${plan.name} plan key.`);
+                      setUpgradeModalOpen(true);
                     }
                   }}
                 >
@@ -357,6 +361,10 @@ const Platforms: React.FC = () => {
         </div>
       )}
     </div>
+
+    {upgradeModalOpen && (
+      <UpgradeModal onClose={() => setUpgradeModalOpen(false)} />
+    )}
   );
 };
 
