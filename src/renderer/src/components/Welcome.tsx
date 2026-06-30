@@ -129,9 +129,10 @@ const HeroScreen: React.FC<{ onNext: () => void }> = ({ onNext }) => (
 // Screen 2: Auth selection
 const AuthScreen: React.FC<{
   onGoogle: () => void;
+  onLicenseKey: () => void;
   onFree: () => void;
   googleLoading: boolean;
-}> = ({ onGoogle, onFree, googleLoading }) => (
+}> = ({ onGoogle, onLicenseKey, onFree, googleLoading }) => (
   <motion.div
     variants={pageVariants}
     initial="initial"
@@ -183,11 +184,28 @@ const AuthScreen: React.FC<{
         <div className="flex-1 h-px bg-[#3f4147]" />
       </div>
 
-      {/* Continue Free */}
+      {/* License Key */}
       <motion.button
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
+        onClick={onLicenseKey}
+        whileHover={{ scale: 1.02, y: -1 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full flex items-center space-x-4 bg-[#2b2d31] border border-[#3f4147] text-white font-bold px-6 py-4 rounded-2xl hover:border-[#5865f2]/60 hover:bg-[#313338] transition-all cursor-pointer"
+      >
+        <Key className="w-6 h-6 text-[#f5a623]" />
+        <div className="flex-1 text-left">
+          <p className="font-black text-sm">I have a License Key</p>
+          <p className="text-xs font-semibold text-[#b5bac1] mt-0.5">Enter your purchased key</p>
+        </div>
+      </motion.button>
+
+      {/* Continue Free */}
+      <motion.button
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
         onClick={onFree}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
@@ -337,9 +355,133 @@ const GoogleSuccessScreen: React.FC<{
   );
 };
 
+// Screen 3b: License Key Entry
+const LicenseKeyScreen: React.FC<{
+  onBack: () => void;
+  onComplete: (plan: string) => void;
+}> = ({ onBack, onComplete }) => {
+  const [key, setKey] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showKey, setShowKey] = useState(false);
+
+  const API_BASE = 'https://aynx-api.onrender.com';
+
+  const handleActivate = async () => {
+    if (!key.trim() || !email.trim()) {
+      setError('Please enter both your email and license key.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${API_BASE}/license/activate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key.trim(), email: email.trim() })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Save to settings
+        await (window.api as any).saveSetting('licenseKey', data.key);
+        await (window.api as any).saveSetting('plan', data.plan);
+        await (window.api as any).saveSetting('email', email.trim());
+        if (data.expiresAt) await (window.api as any).saveSetting('expiresAt', data.expiresAt);
+        onComplete(data.plan);
+      } else {
+        setError(data.error || 'Failed to activate license key. Please try again.');
+      }
+    } catch (_) {
+      setError('Cannot connect to activation server. Please check your internet connection.');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={pageTransition}
+      className="flex flex-col items-center justify-center h-full px-12 space-y-7"
+    >
+      <motion.button
+        onClick={onBack}
+        className="absolute top-6 left-6 text-[#b5bac1] hover:text-white transition-colors cursor-pointer flex items-center space-x-1.5 text-xs font-bold"
+      >
+        <X className="w-3.5 h-3.5" />
+        <span>Back</span>
+      </motion.button>
+
+      <div className="text-center space-y-2">
+        <div className="w-14 h-14 bg-[#f5a623]/10 border border-[#f5a623]/30 rounded-2xl flex items-center justify-center mx-auto">
+          <Key className="w-6 h-6 text-[#f5a623]" />
+        </div>
+        <h2 className="text-3xl font-black text-white">Activate License</h2>
+        <p className="text-[#b5bac1] text-sm font-semibold">Enter your license key to activate your plan</p>
+      </div>
+
+      <div className="w-full max-w-sm space-y-4">
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-[#b5bac1] uppercase tracking-widest">Email Address</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full bg-[#1e1f22] border border-[#3f4147] focus:border-[#5865f2] text-white text-sm px-4 py-3 rounded-xl outline-none transition-colors placeholder:text-[#4e5058] font-semibold"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-[#b5bac1] uppercase tracking-widest">License Key</label>
+          <div className="relative">
+            <input
+              type={showKey ? 'text' : 'password'}
+              value={key}
+              onChange={e => setKey(e.target.value)}
+              placeholder="AYNX-XXXX-XXXX-XXXX"
+              className="w-full bg-[#1e1f22] border border-[#3f4147] focus:border-[#5865f2] text-white text-sm pl-4 pr-10 py-3 rounded-xl outline-none transition-colors placeholder:text-[#4e5058] font-mono tracking-wider"
+              onKeyDown={e => e.key === 'Enter' && handleActivate()}
+            />
+            <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-3.5 text-[#4e5058] hover:text-[#b5bac1] cursor-pointer">
+              {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xs text-[#f23f43] font-bold bg-[#f23f43]/10 border border-[#f23f43]/30 px-3 py-2 rounded-lg"
+          >
+            {error}
+          </motion.p>
+        )}
+
+        <motion.button
+          onClick={handleActivate}
+          disabled={loading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-[#5865f2] to-[#7c3aed] text-white font-bold py-3.5 rounded-xl shadow-lg cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+          <span>{loading ? 'Activating...' : 'Activate License'}</span>
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+};
+
 // ─── Main Welcome Component ───────────────────────────────────────────────────
 const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
-  const [screen, setScreen] = useState<'hero' | 'auth' | 'success'>('hero');
+  const [screen, setScreen] = useState<'hero' | 'auth' | 'success' | 'license'>('hero');
   const [googleLoading, setGoogleLoading] = useState(false);
   const [successUser, setSuccessUser] = useState<any>(null);
   const { login } = useAuthStore();
@@ -365,6 +507,11 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
     onComplete();
   };
 
+  const handleLicenseSuccess = (plan: string) => {
+    setSuccessUser({ name: 'AYNX User', email: '', avatar: '', plan, trial: false, trialExpiry: '' });
+    setScreen('success');
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-[#111214] flex items-center justify-center overflow-hidden">
       <Particles />
@@ -381,7 +528,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
         <div className="absolute top-5 right-6 flex space-x-1.5">
           {(['hero', 'auth', 'success'] as const).map((s, i) => (
             <div key={s} className={`h-1 rounded-full transition-all duration-300 ${
-              screen === s
+              screen === s || (screen === 'license' && i === 1)
                 ? 'w-6 bg-[#5865f2]'
                 : i < (['hero', 'auth', 'success'].indexOf(screen))
                 ? 'w-4 bg-[#23a55a]'
@@ -399,8 +546,16 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
             <AuthScreen
               key="auth"
               onGoogle={handleGoogleLogin}
+              onLicenseKey={() => setScreen('license')}
               onFree={handleFreeMode}
               googleLoading={googleLoading}
+            />
+          )}
+          {screen === 'license' && (
+            <LicenseKeyScreen
+              key="license"
+              onBack={() => setScreen('auth')}
+              onComplete={handleLicenseSuccess}
             />
           )}
           {screen === 'success' && successUser && (

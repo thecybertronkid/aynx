@@ -38,9 +38,11 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
   const [username, setUsername] = useState('');
   const [avatarColor, setAvatarColor] = useState('#5865f2');
   const [avatarImage, setAvatarImage] = useState('');
+  const [licenseKeyInput, setLicenseKeyInput] = useState('');
+  
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [activeTab, setActiveTab] = useState<'profile' | 'stats' | 'achievements' | 'timeline'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'stats' | 'achievements' | 'timeline' | 'license'>('profile');
 
   // Stats / Timeline states
   const [storageStats, setStorageStats] = useState<StorageStats | null>(null);
@@ -49,6 +51,7 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
   const [accountsCount, setAccountsCount] = useState(0);
 
   const currentPlan = user?.plan || settings.plan || 'Free';
+  const currentKey = settings.licenseKey || 'No License Key';
 
   useEffect(() => {
     setDisplayName(user?.name || settings.displayName || 'Local Service');
@@ -109,6 +112,12 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
     return score;
   };
 
+  // Mask license key for display
+  const getMaskedKey = (key: string): string => {
+    if (key.length <= 8) return key;
+    return key.slice(0, 5) + '••••-••••-' + key.slice(key.length - 4);
+  };
+
   const handleGoogleLogin = async () => {
     try {
       setErrorMsg('');
@@ -133,6 +142,75 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
       await updateSetting('username', username.trim().toLowerCase() || 'local_user');
       await updateSetting('avatarColor', avatarColor);
       await updateSetting('avatarImage', avatarImage);
+
+      // License key upgrade logic
+      if (licenseKeyInput.trim() && licenseKeyInput.trim() !== currentKey) {
+        const inputKey = licenseKeyInput.trim();
+        
+        try {
+          const machineId = settings.machineId || '';
+          const email = user?.email || settings.email || '';
+          if (!email) {
+            setErrorMsg('No email address registered. Please sign in with Google or run installer setup.');
+            setSaveStatus('idle');
+            return;
+          }
+          
+          const apiBase = 'https://aynx-api.onrender.com';
+          const res = await fetch(`${apiBase}/license/activate`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+              key: inputKey.trim().toUpperCase().replace(/\s+/g, '-'),
+              machineId,
+              email,
+              displayName
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json();
+            setErrorMsg(errData.error || 'Failed to activate license online.');
+            setSaveStatus('idle');
+            return;
+          }
+
+          const actData = await res.json(); // { success: true, key: "...", plan: "Pro", token: "..." }
+          
+          await updateSetting('licenseKey', actData.key);
+          await updateSetting('plan', actData.plan);
+          if (actData.expiresAt) await updateSetting('expiresAt', actData.expiresAt);
+          if (actData.token) {
+            await updateSetting('authToken', actData.token);
+            // update authStore if logged in
+            if (user) {
+              useAuthStore.getState().setUser({ ...user, plan: actData.plan });
+              useAuthStore.getState().setToken(actData.token);
+            }
+          }
+          
+          // Log Activity
+          await window.api.addActivity({
+            id: Math.random().toString(36).substring(7),
+            type: 'license',
+            description: `Upgraded license level online to ${actData.plan} Plan`,
+            timestamp: new Date().toISOString(),
+            icon: 'zap'
+          });
+
+          // Unlock achievement
+          await window.api.unlockAchievement('proUpgrade');
+
+          setLicenseKeyInput('');
+        } catch (e) {
+          setErrorMsg('License server is unreachable. Please ensure you are online and try again.');
+          setSaveStatus('idle');
+          return;
+        }
+      }
 
       // Log Activity
       await window.api.addActivity({
@@ -193,6 +271,19 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
     setAvatarImage('');
   };
 
+  const copyLicenseToClipboard = () => {
+    navigator.clipboard.writeText(currentKey);
+    alert('License Key copied to clipboard!');
+  };
+
+  const handleDeactivate = async () => {
+    if (confirm('Are you sure you want to deactivate this device license key? AYNX will fallback to Free Plan status.')) {
+      await updateSetting('licenseKey', 'TRIAL');
+      await updateSetting('plan', 'Free');
+      await updateSetting('activatedOnline', 'false');
+      loadProfileStats();
+    }
+  };
 
   const handleResetSettings = async () => {
     if (confirm('⚠️ DANGER: This will permanently reset all configurations settings to defaults values. Profile and subscriptions status will stay. Proceed?')) {
@@ -236,7 +327,7 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
     { id: 'batchDownload', title: 'Batch Master', desc: 'Complete your first batch download job.', icon: <Layers className="w-5 h-5" />, category: 'Features' },
     // Profile milestones
     { id: 'profileComplete', title: 'Perfectionist', desc: 'Reach 100% profile completion score.', icon: <Award className="w-5 h-5" />, category: 'Profile' },
-    { id: 'proUpgrade', title: 'Elite Member', desc: 'Upgrade your account to Pro or Plus plan.', icon: <ShieldCheck className="w-5 h-5" />, category: 'Profile' },
+    { id: 'proUpgrade', title: 'Elite Member', desc: 'Upgrade your license to Pro or Plus plan.', icon: <ShieldCheck className="w-5 h-5" />, category: 'Profile' },
     // Special
     { id: 'nightOwl', title: 'Night Owl', desc: 'Open AYNX between midnight and 4:00 AM.', icon: <Clock className="w-5 h-5" />, category: 'Special' },
   ];
@@ -293,6 +384,15 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
               <span>Activity Log</span>
             </button>
 
+            <button
+              onClick={() => setActiveTab('license')}
+              className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-[11px] font-bold text-left transition-colors cursor-pointer ${
+                activeTab === 'license' ? 'bg-discord-secondary text-discord-textNormal border-l-2 border-discord-accent' : 'text-discord-textMuted hover:bg-discord-hover hover:text-discord-textNormal'
+              }`}
+            >
+              <Key className="w-4 h-4" />
+              <span>License Status</span>
+            </button>
           </div>
 
           {/* Quick Actions at bottom */}
@@ -608,6 +708,81 @@ const AccountsCenter: React.FC<AccountsCenterProps> = ({ onClose }) => {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* TAB: LICENSE */}
+            {activeTab === 'license' && (
+              <div className="space-y-4 animate-scaleIn">
+                <div className="bg-discord-secondary/35 border border-discord-border rounded-xl p-4.5 space-y-3.5 shadow-sm">
+                  
+                  <div className="flex justify-between items-center select-none">
+                    <span className="text-[10px] font-bold text-discord-textMuted uppercase tracking-wider">License Subscription Plan</span>
+                    <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border shadow-sm ${
+                      currentPlan === 'Pro' 
+                        ? 'bg-discord-accent/15 border-discord-accent text-discord-accent'
+                        : currentPlan === 'Plus'
+                        ? 'bg-discord-success/15 border-discord-success text-discord-success'
+                        : 'bg-discord-textMuted/15 border-discord-textMuted text-discord-textMuted'
+                    }`}>
+                      {currentPlan} Plan
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-[10px] text-discord-textMuted">
+                    <span>License Key:</span>
+                    <span className="font-bold font-mono text-discord-textNormal flex items-center space-x-2">
+                      <span>{getMaskedKey(currentKey)}</span>
+                      <Copy className="w-3.5 h-3.5 cursor-pointer text-discord-textMuted hover:text-discord-textNormal" onClick={copyLicenseToClipboard} />
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 border-t border-discord-border pt-3.5 text-[9px] text-discord-textMuted select-none font-bold uppercase">
+                    <div>
+                      <span>Activation Date</span>
+                      <p className="text-[10px] text-discord-textNormal mt-1 font-semibold">June 29, 2026</p>
+                    </div>
+                    <div>
+                      <span>License Status</span>
+                      <p className="text-[10px] text-discord-success mt-1 font-semibold flex items-center">
+                        <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                        Activated
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* License key upgrades */}
+                  <div className="space-y-1.5 border-t border-discord-border pt-3.5">
+                    <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block">Upgrade License Key</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={licenseKeyInput}
+                        onChange={(e) => setLicenseKeyInput(e.target.value)}
+                        className="w-full bg-discord-secondary text-discord-textNormal text-[10px] pl-9 pr-4 py-2.5 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-mono"
+                        placeholder="XXXX-XXXX-XXXX-XXXX"
+                      />
+                      <Key className="absolute left-2.5 top-3 w-4 h-4 text-discord-textMuted/60" />
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-2.5 pt-2 select-none">
+                    <button
+                      type="button"
+                      onClick={handleDeactivate}
+                      className="flex-1 btn-secondary text-[10px] py-2 border-discord-danger text-discord-danger bg-discord-danger/5 hover:bg-discord-danger/10"
+                    >
+                      Deactivate Device
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => alert('License fully registered on local hardware device context.')}
+                      className="flex-1 btn-secondary text-[10px] py-2"
+                    >
+                      Copy Device context
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
