@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>AYNX — Universal Media Downloader</title>
+  <meta name="description" content="Download videos and audio up to 4K/8K resolution across 8 platforms. Features Spotify matching, download scheduler, and built-in browser.">
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Glow Backgrounds -->
+  <div class="glow-container">
+    <div class="glow-circle glow-1"></div>
+    <div class="glow-circle glow-2"></div>
+  </div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="#" class="logo">
+        <span>AYNX</span><i>.</i>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pain-points">Compare</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+      <div>
+        <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" id="nav-download-btn" class="btn btn-primary">
+          <i data-lucide="download"></i>
+          <span>Download</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="version-badge">
+        <span class="dot"></span>
+        <span id="version-label">Version v2.5.1 is now live</span>
+      </div>
+      
+      <h1 class="hero-title">
+        Universal Downloader built for <span>Speed & Quality</span>.
+      </h1>
+      
+      <p class="hero-subtitle">
+        Download files up to 4K/8K resolution from YouTube, Spotify, Instagram, SoundCloud, and more. Skip watermarks, match metadata, and run downloads on a scheduler.
+      </p>
+      
+      <div class="hero-cta">
+        <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" id="hero-download-btn" class="btn btn-primary">
+          <i data-lucide="download"></i>
+          <span>Download for Windows</span>
+        </a>
+        <a href="#features" class="btn btn-secondary">Explore Features</a>
+      </div>
+      
+      <!-- App Showcase Preview mockup -->
+      <div class="mockup-wrapper">
+        <div class="mockup-header">
+          <div class="mockup-dot red"></div>
+          <div class="mockup-dot yellow"></div>
+          <div class="mockup-dot green"></div>
+        </div>
+        <!-- Built-in preview vector placeholder to represent the dashboard -->
+        <svg viewBox="0 0 1000 500" class="mockup-img" style="background:#1e1f22;">
+          <rect x="0" y="0" width="220" height="500" fill="#111214"/>
+          <circle cx="40" cy="40" r="16" fill="#5865f2"/>
+          <rect x="70" y="32" width="80" height="16" rx="4" fill="#dbdee1" opacity="0.8"/>
+          <rect x="25" y="100" width="170" height="32" rx="8" fill="#2b2d31"/>
+          <rect x="25" y="145" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
+          <rect x="25" y="190" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
+          <rect x="25" y="235" width="170" height="32" rx="8" fill="#111214" opacity="0.5"/>
+          
+          <rect x="250" y="30" width="300" height="120" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+          <rect x="250" y="170" width="300" height="120" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+          <rect x="570" y="30" width="400" height="260" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+          
+          <rect x="270" y="55" width="100" height="12" rx="3" fill="#949ba4" opacity="0.5"/>
+          <rect x="270" y="75" width="150" height="24" rx="6" fill="#fff" opacity="0.9"/>
+          
+          <rect x="590" y="55" width="120" height="12" rx="3" fill="#949ba4" opacity="0.5"/>
+          <rect x="590" y="90" width="360" height="32" rx="8" fill="#1e1f22"/>
+          <rect x="590" y="130" width="360" height="32" rx="8" fill="#1e1f22"/>
+          <rect x="590" y="170" width="360" height="32" rx="8" fill="#1e1f22"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain Points Section -->
+  <section class="pain-section" id="pain-points">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Why AYNX?</span>
+        <h2 class="section-title">Frustrated with standard downloaders?</h2>
+      </div>
+      
+      <div class="pain-grid">
+        <div class="compare-card">
+          <!-- Traditional Problems -->
+          <div class="compare-column left">
+            <h3 class="column-header red">
+              <i data-lucide="alert-octagon"></i>
+              <span>Other Downloaders</span>
+            </h3>
+            <ul class="compare-list">
+              <li>
+                <i data-lucide="x" style="color:#f23f43;"></i>
+                <span>Throttled speeds at 50KB/s on long playlists.</span>
+              </li>
+              <li>
+                <i data-lucide="x" style="color:#f23f43;"></i>
+                <span>Annoying watermarks plastered on TikTok and IG reels.</span>
+              </li>
+              <li>
+                <i data-lucide="x" style="color:#f23f43;"></i>
+                <span>Separate video/audio files requiring manual merging tools.</span>
+              </li>
+              <li>
+                <i data-lucide="x" style="color:#f23f43;"></i>
+                <span>No metadata tags or cover artwork matching for music files.</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- AYNX Solution -->
+          <div class="compare-column right">
+            <h3 class="column-header green">
+              <i data-lucide="check-circle-2"></i>
+              <span>AYNX Experience</span>
+            </h3>
+            <ul class="compare-list">
+              <li>
+                <i data-lucide="check" style="color:#23a55a;"></i>
+                <span>Parallel engines for unrestricted multi-threaded speeds.</span>
+              </li>
+              <li>
+                <i data-lucide="check" style="color:#23a55a;"></i>
+                <span>100% clean watermark-free downloads natively.</span>
+              </li>
+              <li>
+                <i data-lucide="check" style="color:#23a55a;"></i>
+                <span>Automatic background muxing of audio and video tracks.</span>
+              </li>
+              <li>
+                <i data-lucide="check" style="color:#23a55a;"></i>
+                <span>Dynamic Spotify metadata matcher with ID3 cover tags.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid Section -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Capabilities</span>
+        <h2 class="section-title">Built-in Features for Media Enthusiasts</h2>
+      </div>
+      
+      <div class="features-grid">
+        <!-- 1. All Platforms -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="globe"></i>
+          </div>
+          <h3>8 Supported Platforms</h3>
+          <p>Download natively from YouTube, Spotify, Instagram, X (Twitter), TikTok, SoundCloud, Twitch, and Reddit.</p>
+        </div>
+        
+        <!-- 2. Parallel Queue -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="zap"></i>
+          </div>
+          <h3>Parallel Downloads</h3>
+          <p>Download full albums or playlists concurrently using our multi-threaded active queue scheduler.</p>
+        </div>
+        
+        <!-- 3. Scheduler -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="calendar"></i>
+          </div>
+          <h3>Download Scheduler</h3>
+          <p>Schedule downloads to start during off-peak hours automatically. Set target days and sleep triggers.</p>
+        </div>
+        
+        <!-- 4. Browser -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i data-lucide="chrome"></i>
+          </div>
+          <h3>Built-in Browser</h3>
+          <p>Surf your favorite platforms inside the app. Sniff and capture downloadable streams on the fly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Pricing Plans</span>
+        <h2 class="section-title">Upgrade to AYNX Premium</h2>
+      </div>
+      
+      <!-- Billing Period Toggle -->
+      <div class="pricing-toggle-wrapper">
+        <div class="pricing-toggle">
+          <button id="toggle-monthly" class="active" onclick="setBilling('monthly')">Monthly</button>
+          <button id="toggle-yearly" onclick="setBilling('yearly')">Yearly (Save 20%)</button>
+        </div>
+      </div>
+      
+      <div class="pricing-grid">
+        <!-- FREE PLAN -->
+        <div class="pricing-card">
+          <div>
+            <h3>Free Plan</h3>
+            <div class="price-wrapper">
+              <span class="price-currency">₹</span>
+              <span class="price-amount">0</span>
+              <span class="price-period">/ forever</span>
+            </div>
+            <p class="description">Basic downloader with speed limits and parallel restrictions.</p>
+            <ul class="pricing-features-list">
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>YouTube downloads</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Max 1080p video caps</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>192kbps audio capacity</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Basic interface colors</span></li>
+            </ul>
+          </div>
+          <button class="btn btn-secondary" disabled>Current Plan</button>
+        </div>
+        
+        <!-- PLUS PLAN -->
+        <div class="pricing-card popular">
+          <span class="card-badge">Popular</span>
+          <div>
+            <h3>Plus Plan</h3>
+            <div class="price-wrapper">
+              <span class="price-currency">₹</span>
+              <span id="price-plus" class="price-amount">299</span>
+              <span id="period-plus" class="price-period">/ mo</span>
+            </div>
+            <p class="description">Supercharged speeds, scheduler engines, and multiplatform extraction.</p>
+            <ul class="pricing-features-list">
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>YouTube + Spotify + Instagram</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Max 1080p Full HD Resolution</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>320kbps High Quality Audio</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>3 parallel downloads queue</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Accent color custom stylings</span></li>
+            </ul>
+          </div>
+          <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" class="btn btn-primary" style="background:var(--plus-color);">Get Plus</a>
+        </div>
+        
+        <!-- PRO PLAN -->
+        <div class="pricing-card premium">
+          <span class="card-badge">All Features</span>
+          <div>
+            <h3>Pro Plan</h3>
+            <div class="price-wrapper">
+              <span class="price-currency">₹</span>
+              <span id="price-pro" class="price-amount">499</span>
+              <span id="period-pro" class="price-period">/ mo</span>
+            </div>
+            <p class="description">Lossless audio outputs, maximum 4K/8K resolutions, and premium automation tools.</p>
+            <ul class="pricing-features-list">
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>All 8 supported platforms</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Uncapped speeds (Unlimited)</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Lossless audio (FLAC/WAV)</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Uncapped parallel queues</span></li>
+              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Download scheduler engine</span></li>
+            </ul>
+          </div>
+          <a href="file:///E:/AYNX/AYNX%20Setup%202.5.1.exe" class="btn btn-primary" style="background:var(--pro-color);">Get Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">
+        AYNX<span>.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pain-points">Compare</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-copy">
+        &copy; 2026 Ayan Kashyap. All rights reserved. AYNX is a personalization media utility.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Pricing toggle logic
+    function setBilling(period) {
+      const toggleMonthly = document.getElementById('toggle-monthly');
+      const toggleYearly = document.getElementById('toggle-yearly');
+      
+      const pricePlus = document.getElementById('price-plus');
+      const pricePro = document.getElementById('price-pro');
+      
+      const periodPlus = document.getElementById('period-plus');
+      const periodPro = document.getElementById('period-pro');
+      
+      if (period === 'monthly') {
+        toggleMonthly.classList.add('active');
+        toggleYearly.classList.remove('active');
+        
+        pricePlus.innerText = '299';
+        pricePro.innerText = '499';
+        
+        periodPlus.innerText = '/ mo';
+        periodPro.innerText = '/ mo';
+      } else {
+        toggleMonthly.classList.remove('active');
+        toggleYearly.classList.add('active');
+        
+        pricePlus.innerText = '2,499';
+        pricePro.innerText = '3,999';
+        
+        periodPlus.innerText = '/ yr';
+        periodPro.innerText = '/ yr';
+      }
+    }
+
+    // Dynamic Version and Download Link Loader
+    window.addEventListener('load', () => {
+      fetch('https://aynx-api.onrender.com/api/version/check')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.latestVersion) {
+            // Update labels
+            document.getElementById('version-label').innerText = `Version v${data.latestVersion} is now live`;
+            
+            const dlBtnNav = document.getElementById('nav-download-btn');
+            const dlBtnHero = document.getElementById('hero-download-btn');
+            
+            if (data.downloadUrl) {
+              dlBtnNav.href = data.downloadUrl;
+              dlBtnHero.href = data.downloadUrl;
+            }
+          }
+        })
+        .catch(err => {
+          console.warn('[AYNX Website] Backend check offline — using offline local compiled fallback path.');
+        });
+    });
+  </script>
+</body>
+</html>
