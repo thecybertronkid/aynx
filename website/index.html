@@ -78,27 +78,40 @@
         <!-- Built-in preview vector placeholder to represent the dashboard -->
         <!-- Built-in preview vector placeholder to represent the dashboard -->
         <svg viewBox="0 0 1000 600" class="mockup-img" style="background:#1e1f22; font-family:var(--font-sans);">
-          <!-- Left Sidebar -->
+          <!-- Left Sidebar Background -->
           <rect x="0" y="0" width="220" height="600" fill="#111214"/>
           <!-- Logo -->
           <text x="30" y="45" fill="#ffffff" font-size="18" font-family="var(--font-heading)" font-weight="900" letter-spacing="1">AYNX<tspan fill="#5865f2">.</tspan></text>
-          <!-- Nav Items -->
-          <!-- Item 1: Dashboard (Selected) -->
-          <rect x="15" y="80" width="190" height="36" rx="8" fill="rgba(88, 101, 242, 0.15)"/>
-          <rect x="15" y="80" width="4" height="36" rx="2" fill="#5865f2"/>
-          <text x="50" y="103" fill="#ffffff" font-size="12" font-weight="700">Dashboard</text>
           
-          <!-- Item 2: Queue Manager -->
-          <text x="50" y="153" fill="#949ba4" font-size="12" font-weight="600">Queue Manager</text>
-          
-          <!-- Item 3: Media Library -->
-          <text x="50" y="203" fill="#949ba4" font-size="12" font-weight="600">Media Library</text>
-          
-          <!-- Item 4: Platforms -->
-          <text x="50" y="253" fill="#949ba4" font-size="12" font-weight="600">Platforms & Plans</text>
-          
-          <!-- Item 5: Settings -->
-          <text x="50" y="303" fill="#949ba4" font-size="12" font-weight="600">Settings</text>
+          <!-- Dynamic Selector Pill & Indicator -->
+          <rect id="mockup-active-pill" x="15" y="80" width="190" height="36" rx="8" fill="rgba(88, 101, 242, 0.15)" style="transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;"/>
+          <rect id="mockup-active-bar" x="15" y="80" width="4" height="36" rx="2" fill="#5865f2" style="transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;"/>
+
+          <!-- Nav Items Wrapper with transparent backing hitboxes -->
+          <g id="mockup-tab-dashboard" cursor="pointer">
+            <rect x="15" y="80" width="190" height="36" rx="8" fill="transparent"/>
+            <text id="mockup-txt-dashboard" x="50" y="103" fill="#ffffff" font-size="12" font-weight="700" style="transition: color 0.3s;">Dashboard</text>
+          </g>
+
+          <g id="mockup-tab-queue" cursor="pointer">
+            <rect x="15" y="130" width="190" height="36" rx="8" fill="transparent"/>
+            <text id="mockup-txt-queue" x="50" y="153" fill="#949ba4" font-size="12" font-weight="600" style="transition: color 0.3s;">Queue Manager</text>
+          </g>
+
+          <g id="mockup-tab-library" cursor="pointer">
+            <rect x="15" y="180" width="190" height="36" rx="8" fill="transparent"/>
+            <text id="mockup-txt-library" x="50" y="203" fill="#949ba4" font-size="12" font-weight="600" style="transition: color 0.3s;">Media Library</text>
+          </g>
+
+          <g id="mockup-tab-platforms" cursor="pointer">
+            <rect x="15" y="230" width="190" height="36" rx="8" fill="transparent"/>
+            <text id="mockup-txt-platforms" x="50" y="253" fill="#949ba4" font-size="12" font-weight="600" style="transition: color 0.3s;">Platforms & Plans</text>
+          </g>
+
+          <g id="mockup-tab-settings" cursor="pointer">
+            <rect x="15" y="280" width="190" height="36" rx="8" fill="transparent"/>
+            <text id="mockup-txt-settings" x="50" y="303" fill="#949ba4" font-size="12" font-weight="600" style="transition: color 0.3s;">Settings</text>
+          </g>
 
           <!-- Sidebar Profile Card -->
           <rect x="15" y="520" width="190" height="60" rx="12" fill="#1e1f22" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
@@ -106,76 +119,166 @@
           <text x="75" y="546" fill="#ffffff" font-size="11" font-weight="700">Local User</text>
           <text x="75" y="562" fill="#23a55a" font-size="9" font-weight="800" letter-spacing="1">PRO UPGRADE</text>
 
-          <!-- Main Dashboard Area -->
-          <!-- Top Link Bar / Input Search -->
-          <rect x="250" y="25" width="720" height="44" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-          <text x="275" y="51" fill="#949ba4" font-size="12" font-weight="500">https://www.youtube.com/watch?v=dQw4w9WgXcQ</text>
-          <!-- Download Button inside input bar -->
-          <rect x="850" y="31" width="110" height="32" rx="8" fill="#5865f2"/>
-          <text x="877" y="51" fill="#ffffff" font-size="11" font-weight="700">Download</text>
+          <!-- ─── SCREEN 1: DASHBOARD (Active by default) ─── -->
+          <g id="mockup-screen-dashboard">
+            <!-- Top Link Bar / Input Search -->
+            <rect x="250" y="25" width="720" height="44" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <text x="275" y="51" fill="#949ba4" font-size="12" font-weight="500">https://www.youtube.com/watch?v=dQw4w9WgXcQ</text>
+            <rect x="850" y="31" width="110" height="32" rx="8" fill="#5865f2"/>
+            <text x="877" y="51" fill="#ffffff" font-size="11" font-weight="700">Download</text>
 
-          <!-- Active Downloads Section -->
-          <text x="250" y="105" fill="#ffffff" font-size="14" font-family="var(--font-heading)" font-weight="900">Active Downloads</text>
+            <text x="250" y="105" fill="#ffffff" font-size="14" font-family="var(--font-heading)" font-weight="900">Active Downloads</text>
 
-          <!-- Download Item 1 (YouTube Video - Progressing) -->
-          <rect x="250" y="125" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-          <!-- Thumbnail placeholder -->
-          <rect x="265" y="140" width="90" height="50" rx="6" fill="#1e1f22"/>
-          <circle cx="310" cy="165" r="10" fill="#f23f43" opacity="0.8"/>
-          <!-- Info -->
-          <text x="370" y="156" fill="#ffffff" font-size="12" font-weight="700">Taylor Swift - Fortnight (feat. Post Malone) [Official Video]</text>
-          <text x="370" y="172" fill="#f23f43" font-size="9" font-weight="800" letter-spacing="0.5">YOUTUBE 4K</text>
-          <text x="890" y="156" fill="#ffffff" font-size="11" font-weight="700">74%</text>
-          <text x="890" y="172" fill="#949ba4" font-size="9" font-weight="600">12.4 MB/s</text>
-          <!-- Progress bar track -->
-          <rect x="370" y="184" width="580" height="6" rx="3" fill="#111214"/>
-          <!-- Progress bar fill -->
-          <rect x="370" y="184" width="429" height="6" rx="3" fill="#23a55a"/>
+            <!-- YouTube Video Item -->
+            <rect x="250" y="125" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <rect x="265" y="140" width="90" height="50" rx="6" fill="#1e1f22"/>
+            <circle cx="310" cy="165" r="10" fill="#f23f43" opacity="0.8"/>
+            <text x="370" y="156" fill="#ffffff" font-size="12" font-weight="700">Taylor Swift - Fortnight (feat. Post Malone) [Official Video]</text>
+            <text x="370" y="172" fill="#f23f43" font-size="9" font-weight="800" letter-spacing="0.5">YOUTUBE 4K</text>
+            <text x="890" y="156" fill="#ffffff" font-size="11" font-weight="700">74%</text>
+            <text x="890" y="172" fill="#949ba4" font-size="9" font-weight="600">12.4 MB/s</text>
+            <rect x="370" y="184" width="580" height="6" rx="3" fill="#111214"/>
+            <rect x="370" y="184" width="429" height="6" rx="3" fill="#23a55a"/>
 
-          <!-- Download Item 2 (Spotify Track - Completed) -->
-          <rect x="250" y="220" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-          <!-- Artwork placeholder -->
-          <rect x="265" y="235" width="90" height="50" rx="6" fill="#1e1f22"/>
-          <rect x="302" y="252" width="16" height="16" rx="4" fill="#23a55a" opacity="0.8"/>
-          <!-- Info -->
-          <text x="370" y="251" fill="#ffffff" font-size="12" font-weight="700">Billie Eilish - CHIHIRO</text>
-          <text x="370" y="267" fill="#23a55a" font-size="9" font-weight="800" letter-spacing="0.5">SPOTIFY AUDIO 320KBPS</text>
-          <text x="915" y="262" fill="#23a55a" font-size="11" font-weight="800">COMPLETED</text>
-          <!-- Progress bar track -->
-          <rect x="370" y="279" width="580" height="6" rx="3" fill="#111214"/>
-          <!-- Progress bar fill -->
-          <rect x="370" y="279" width="580" height="6" rx="3" fill="#23a55a"/>
+            <!-- Spotify Track Item -->
+            <rect x="250" y="220" width="720" height="80" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <rect x="265" y="235" width="90" height="50" rx="6" fill="#1e1f22"/>
+            <rect x="302" y="252" width="16" height="16" rx="4" fill="#23a55a" opacity="0.8"/>
+            <text x="370" y="251" fill="#ffffff" font-size="12" font-weight="700">Billie Eilish - CHIHIRO</text>
+            <text x="370" y="267" fill="#23a55a" font-size="9" font-weight="800" letter-spacing="0.5">SPOTIFY AUDIO 320KBPS</text>
+            <text x="915" y="262" fill="#23a55a" font-size="11" font-weight="800">COMPLETED</text>
+            <rect x="370" y="279" width="580" height="6" rx="3" fill="#111214"/>
+            <rect x="370" y="279" width="580" height="6" rx="3" fill="#23a55a"/>
 
-          <!-- Two Column Widgets Row -->
-          <!-- Widget 1: Disk Usage Gauge -->
-          <rect x="250" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-          <text x="275" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Disk Storage Usage</text>
-          <!-- Circle Chart -->
-          <circle cx="422" cy="455" r="55" fill="none" stroke="#111214" stroke-width="12"/>
-          <circle cx="422" cy="455" r="55" fill="none" stroke="#a458f2" stroke-width="12" stroke-dasharray="345" stroke-dashoffset="110"/>
-          <text x="422" y="460" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="900">68%</text>
-          <text x="422" y="540" text-anchor="middle" fill="#949ba4" font-size="10" font-weight="600">342.5 GB / 500 GB Used</text>
+            <!-- Widgets -->
+            <rect x="250" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <text x="275" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Disk Storage Usage</text>
+            <circle cx="422" cy="455" r="55" fill="none" stroke="#111214" stroke-width="12"/>
+            <circle cx="422" cy="455" r="55" fill="none" stroke="#a458f2" stroke-width="12" stroke-dasharray="345" stroke-dashoffset="110"/>
+            <text x="422" y="460" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="900">68%</text>
+            <text x="422" y="540" text-anchor="middle" fill="#949ba4" font-size="10" font-weight="600">342.5 GB / 500 GB Used</text>
 
-          <!-- Widget 2: Platform Download Distribution Stats -->
-          <rect x="625" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-          <text x="650" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Downloads per Platform</text>
-          <!-- Bar charts -->
-          <!-- YouTube -->
-          <text x="650" y="395" fill="#dbdee1" font-size="10" font-weight="700">YouTube</text>
-          <rect x="730" y="386" width="180" height="10" rx="5" fill="#111214"/>
-          <rect x="730" y="386" width="145" height="10" rx="5" fill="#f23f43"/>
-          <!-- Spotify -->
-          <text x="650" y="435" fill="#dbdee1" font-size="10" font-weight="700">Spotify</text>
-          <rect x="730" y="426" width="180" height="10" rx="5" fill="#111214"/>
-          <rect x="730" y="426" width="110" height="10" rx="5" fill="#23a55a"/>
-          <!-- Instagram -->
-          <text x="650" y="475" fill="#dbdee1" font-size="10" font-weight="700">Instagram</text>
-          <rect x="730" y="466" width="180" height="10" rx="5" fill="#111214"/>
-          <rect x="730" y="466" width="60" height="10" rx="5" fill="#e1306c"/>
-          <!-- Other -->
-          <text x="650" y="515" fill="#dbdee1" font-size="10" font-weight="700">SoundCloud</text>
-          <rect x="730" y="506" width="180" height="10" rx="5" fill="#111214"/>
-          <rect x="730" y="506" width="35" height="10" rx="5" fill="#ff5500"/>
+            <rect x="625" y="325" width="345" height="250" rx="20" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <text x="650" y="355" fill="#ffffff" font-size="13" font-family="var(--font-heading)" font-weight="900">Downloads per Platform</text>
+            <text x="650" y="395" fill="#dbdee1" font-size="10" font-weight="700">YouTube</text>
+            <rect x="730" y="386" width="180" height="10" rx="5" fill="#111214"/>
+            <rect x="730" y="386" width="145" height="10" rx="5" fill="#f23f43"/>
+            <text x="650" y="435" fill="#dbdee1" font-size="10" font-weight="700">Spotify</text>
+            <rect x="730" y="426" width="180" height="10" rx="5" fill="#111214"/>
+            <rect x="730" y="426" width="110" height="10" rx="5" fill="#23a55a"/>
+            <text x="650" y="475" fill="#dbdee1" font-size="10" font-weight="700">Instagram</text>
+            <rect x="730" y="466" width="180" height="10" rx="5" fill="#111214"/>
+            <rect x="730" y="466" width="60" height="10" rx="5" fill="#e1306c"/>
+            <text x="650" y="515" fill="#dbdee1" font-size="10" font-weight="700">SoundCloud</text>
+            <rect x="730" y="506" width="180" height="10" rx="5" fill="#111214"/>
+            <rect x="730" y="506" width="35" height="10" rx="5" fill="#ff5500"/>
+          </g>
+
+          <!-- ─── SCREEN 2: QUEUE MANAGER (Initially Hidden) ─── -->
+          <g id="mockup-screen-queue" style="display: none;">
+            <text x="250" y="45" fill="#ffffff" font-size="16" font-family="var(--font-heading)" font-weight="900">Active Queue Scheduler</text>
+            <text x="250" y="70" fill="#949ba4" font-size="11" font-weight="500">Manage multiple extraction threads in parallel.</text>
+
+            <!-- Thread #1 -->
+            <rect x="250" y="100" width="720" height="100" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <text x="275" y="130" fill="#ffffff" font-size="12" font-weight="700">Thread #1: Spotify Album Download (12 tracks)</text>
+            <text x="275" y="150" fill="#23a55a" font-size="10" font-weight="700">Downloading track 5/12 — "Espresso"</text>
+            <rect x="275" y="165" width="580" height="8" rx="4" fill="#111214"/>
+            <rect x="275" y="165" width="360" height="8" rx="4" fill="#23a55a"/>
+            <text x="880" y="150" fill="#ffffff" font-size="12" font-weight="700">62%</text>
+
+            <!-- Thread #2 -->
+            <rect x="250" y="220" width="720" height="100" rx="16" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <text x="275" y="250" fill="#ffffff" font-size="12" font-weight="700">Thread #2: YouTube Playlist extraction (4K Nature)</text>
+            <text x="275" y="270" fill="#5865f2" font-size="10" font-weight="700">Pending next queue slot</text>
+            <rect x="275" y="285" width="580" height="8" rx="4" fill="#111214"/>
+            <rect x="275" y="285" width="110" height="8" rx="4" fill="#5865f2"/>
+            <text x="880" y="270" fill="#ffffff" font-size="12" font-weight="700">18%</text>
+
+            <!-- Info Panel -->
+            <rect x="250" y="340" width="720" height="100" rx="16" fill="#2b2d31" opacity="0.6"/>
+            <text x="275" y="375" fill="#ffffff" font-size="11" font-weight="700">Concurrency status: Uncapped (Pro Plan Active)</text>
+            <text x="275" y="395" fill="#949ba4" font-size="10" font-weight="500">Parallel threads are downloading at full multi-core speeds. Scheduler rules active.</text>
+          </g>
+
+          <!-- ─── SCREEN 3: MEDIA LIBRARY (Initially Hidden) ─── -->
+          <g id="mockup-screen-library" style="display: none;">
+            <text x="250" y="45" fill="#ffffff" font-size="16" font-family="var(--font-heading)" font-weight="900">Downloaded Media Library</text>
+            <text x="250" y="70" fill="#949ba4" font-size="11" font-weight="500">Your local downloaded offline collection.</text>
+
+            <!-- File Item 1 -->
+            <rect x="250" y="100" width="720" height="60" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <circle cx="285" cy="130" r="12" fill="#23a55a" opacity="0.15"/>
+            <circle cx="285" cy="130" r="4" fill="#23a55a"/>
+            <text x="315" y="134" fill="#ffffff" font-size="12" font-weight="700">Kendrick Lamar - Not Like Us.mp3</text>
+            <text x="315" y="148" fill="#949ba4" font-size="9" font-weight="500">Spotify Track • Audio • 7.4 MB</text>
+            <rect x="880" y="115" width="60" height="30" rx="6" fill="#111214"/>
+            <text x="910" y="133" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="700">Play</text>
+
+            <!-- File Item 2 -->
+            <rect x="250" y="175" width="720" height="60" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <circle cx="285" cy="205" r="12" fill="#f23f43" opacity="0.15"/>
+            <circle cx="285" cy="205" r="4" fill="#f23f43"/>
+            <text x="315" y="209" fill="#ffffff" font-size="12" font-weight="700">MrBeast - $1 vs $1,000,000,000 Yacht.mp4</text>
+            <text x="315" y="223" fill="#949ba4" font-size="9" font-weight="500">YouTube 1080p • Video • 412 MB</text>
+            <rect x="880" y="190" width="60" height="30" rx="6" fill="#111214"/>
+            <text x="910" y="208" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="700">Play</text>
+
+            <!-- File Item 3 -->
+            <rect x="250" y="250" width="720" height="60" rx="12" fill="#2b2d31" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            <circle cx="285" cy="280" r="12" fill="#e1306c" opacity="0.15"/>
+            <circle cx="285" cy="280" r="4" fill="#e1306c"/>
+            <text x="315" y="284" fill="#ffffff" font-size="12" font-weight="700">Reel_LionPrideSafari_WatermarkFree.mp4</text>
+            <text x="315" y="298" fill="#949ba4" font-size="9" font-weight="500">Instagram Reel • Video • 18.5 MB</text>
+            <rect x="880" y="265" width="60" height="30" rx="6" fill="#111214"/>
+            <text x="910" y="283" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="700">Play</text>
+          </g>
+
+          <!-- ─── SCREEN 4: PLATFORMS & PLANS (Initially Hidden) ─── -->
+          <g id="mockup-screen-platforms" style="display: none;">
+            <text x="250" y="45" fill="#ffffff" font-size="16" font-family="var(--font-heading)" font-weight="900">Platforms accounts & License</text>
+            <text x="250" y="70" fill="#949ba4" font-size="11" font-weight="500">Verify client status and integration modules.</text>
+
+            <rect x="250" y="100" width="345" height="100" rx="16" fill="#2b2d31"/>
+            <text x="275" y="130" fill="#ffffff" font-size="12" font-weight="700">YouTube Parser Module</text>
+            <text x="275" y="150" fill="#23a55a" font-size="10" font-weight="700">✅ ONLINE & ACCELERATED</text>
+            <text x="275" y="175" fill="#949ba4" font-size="9" font-weight="500">Downloads up to 4K/8K resolution.</text>
+
+            <rect x="625" y="100" width="345" height="100" rx="16" fill="#2b2d31"/>
+            <text x="650" y="130" fill="#ffffff" font-size="12" font-weight="700">Spotify Metadata Matcher</text>
+            <text x="650" y="150" fill="#23a55a" font-size="10" font-weight="700">✅ CONNECTED (320kbps)</text>
+            <text x="650" y="175" fill="#949ba4" font-size="9" font-weight="500">IDs tags and album art downloads active.</text>
+
+            <rect x="250" y="220" width="720" height="120" rx="16" fill="#2b2d31"/>
+            <text x="275" y="255" fill="#ffffff" font-size="13" font-weight="700">Active Subscription Plan</text>
+            <text x="275" y="275" fill="#a458f2" font-size="11" font-weight="800">AYNX PRO LICENSE ACTIVE</text>
+            <text x="275" y="300" fill="#949ba4" font-size="9" font-weight="500">License Key: AYNX-PRO-MEMBER-VERIFIED-2026</text>
+          </g>
+
+          <!-- ─── SCREEN 5: SETTINGS (Initially Hidden) ─── -->
+          <g id="mockup-screen-settings" style="display: none;">
+            <text x="250" y="45" fill="#ffffff" font-size="16" font-family="var(--font-heading)" font-weight="900">Application Preferences</text>
+            <text x="250" y="70" fill="#949ba4" font-size="11" font-weight="500">Configure file paths, audio conversions, and limits.</text>
+
+            <!-- Save location option -->
+            <rect x="250" y="100" width="720" height="60" rx="12" fill="#2b2d31"/>
+            <text x="275" y="125" fill="#ffffff" font-size="12" font-weight="700">Default Save Directory</text>
+            <text x="275" y="145" fill="#949ba4" font-size="10" font-weight="600">E:\Downloads\AYNX</text>
+            <rect x="850" y="115" width="90" height="30" rx="6" fill="#111214"/>
+            <text x="895" y="133" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="700">Browse</text>
+
+            <!-- Video options -->
+            <rect x="250" y="175" width="720" height="60" rx="12" fill="#2b2d31"/>
+            <text x="275" y="200" fill="#ffffff" font-size="12" font-weight="700">Preferred Video Format</text>
+            <text x="275" y="220" fill="#949ba4" font-size="10" font-weight="600">MP4 (Best resolution up to 4K/8K)</text>
+            <rect x="850" y="190" width="90" height="30" rx="6" fill="#111214"/>
+            <text x="895" y="208" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="700">Change</text>
+
+            <!-- Concurrent tasks -->
+            <rect x="250" y="250" width="720" height="60" rx="12" fill="#2b2d31"/>
+            <text x="275" y="275" fill="#ffffff" font-size="12" font-weight="700">Max Concurrent Operations</text>
+            <text x="275" y="295" fill="#949ba4" font-size="10" font-weight="600">5 parallel queues slots active (Uncapped)</text>
+          </g>
         </svg>
       </div>
     </div>
@@ -496,6 +599,49 @@
       }, { threshold: 0.05 });
 
       document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+      // 6. Hook Download Buttons for Download Assistant Modal Check
+      document.getElementById('nav-download-btn').addEventListener('click', handleDownloadClick);
+      document.getElementById('hero-download-btn').addEventListener('click', handleDownloadClick);
+
+      // 7. Hook Mockup Interactive Tabs
+      const mockupTabs = ['dashboard', 'queue', 'library', 'platforms', 'settings'];
+      mockupTabs.forEach((tab, index) => {
+        const tabEl = document.getElementById(`mockup-tab-${tab}`);
+        if (tabEl) {
+          tabEl.addEventListener('click', () => {
+            // Hide all screens & reset label text styles
+            mockupTabs.forEach(t => {
+              const scr = document.getElementById(`mockup-screen-${t}`);
+              if (scr) scr.style.display = 'none';
+              
+              const txt = document.getElementById(`mockup-txt-${t}`);
+              if (txt) {
+                txt.setAttribute('fill', '#949ba4');
+                txt.setAttribute('font-weight', '600');
+              }
+            });
+
+            // Show selected screen & highlight label text
+            const selectedScr = document.getElementById(`mockup-screen-${tab}`);
+            if (selectedScr) selectedScr.style.display = 'block';
+
+            const selectedTxt = document.getElementById(`mockup-txt-${tab}`);
+            if (selectedTxt) {
+              selectedTxt.setAttribute('fill', '#ffffff');
+              selectedTxt.setAttribute('font-weight', '700');
+            }
+
+            // Animate selection indicator bar & pill
+            const offset = index * 50;
+            const indicatorPill = document.getElementById('mockup-active-pill');
+            const indicatorBar = document.getElementById('mockup-active-bar');
+            
+            if (indicatorPill) indicatorPill.style.transform = `translateY(${offset}px)`;
+            if (indicatorBar) indicatorBar.style.transform = `translateY(${offset}px)`;
+          });
+        }
+      });
     });
 
     function updateAuthState() {
@@ -531,7 +677,6 @@
     function handleUpgrade(plan) {
       const token = localStorage.getItem('aynx_token');
       if (!token) {
-        // Redirect to Google login
         const redirectTarget = window.location.href;
         window.location.href = `https://aynx-api.onrender.com/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
         return;
@@ -539,7 +684,6 @@
 
       const planId = `${plan.toLowerCase()}_${currentBillingPeriod}`;
       
-      // Load order details
       fetch('https://aynx-api.onrender.com/payment/create-order', {
         method: 'POST',
         headers: {
@@ -553,7 +697,6 @@
         return res.json();
       })
       .then(orderData => {
-        // Open Razorpay Checkout Form
         const options = {
           key: orderData.keyId,
           amount: orderData.amount,
@@ -569,7 +712,6 @@
             color: plan === 'Plus' ? '#23a55a' : '#5865f2'
           },
           handler: function(response) {
-            // Verify payment
             fetch('https://aynx-api.onrender.com/payment/verify', {
               method: 'POST',
               headers: {
@@ -587,7 +729,6 @@
             .then(verifyData => {
               if (verifyData.success) {
                 alert(`Congratulations! You have upgraded to AYNX ${plan}.`);
-                // Update local storage plan cache and reload
                 localStorage.setItem('aynx_user_plan', plan);
                 window.location.reload();
               } else {
@@ -603,6 +744,48 @@
         alert(err.message || 'Payment processor failed to initialize. Try again.');
       });
     }
+
+    // Download modal helper functions
+    function handleDownloadClick(e) {
+      const href = e.currentTarget.getAttribute('href');
+      // If the link is file:/// or default placeholder, open the assistant modal!
+      if (!href || href.startsWith('file:///') || href.startsWith('#')) {
+        e.preventDefault();
+        openDownloadModal();
+      }
+    }
+
+    function openDownloadModal() {
+      document.getElementById('download-modal').style.display = 'flex';
+    }
+
+    function closeDownloadModal() {
+      document.getElementById('download-modal').style.display = 'none';
+    }
   </script>
+
+  <!-- Download Assistant Modal Overlay -->
+  <div id="download-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 18, 20, 0.85); backdrop-filter: blur(16px); z-index: 200; align-items: center; justify-content: center;">
+    <div class="glass-card" style="max-width: 500px; width: 90%; padding: 2.5rem; border-radius: 24px; position: relative; border: 1px solid var(--border-color); text-align: center;">
+      <button onclick="closeDownloadModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem;">&times;</button>
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(88,101,242,0.1); display: flex; align-items: center; justify-content: center; color: var(--accent); margin: 0 auto 1.5rem auto;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      </div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff; margin-bottom: 0.8rem; font-weight:900;">How to Download AYNX</h3>
+      <p style="font-size: 0.85rem; color: var(--text-normal); margin-bottom: 1.2rem; line-height: 1.6;">
+        Your production-ready promptless setup installer is fully built and compiled on your local machine at:
+      </p>
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 0.8rem 1rem; border-radius: 12px; font-family: monospace; font-size: 0.8rem; color: var(--plus-color); margin-bottom: 1.2rem; word-break: break-all; font-weight:700;">
+        E:\AYNX\AYNX Setup 2.5.1.exe
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.8rem; line-height: 1.6;">
+        To let web visitors download it, open your live Render Admin Dashboard and upload this installer using the new <strong>Upload Setup</strong> feature. This button will then automatically download it from the cloud!
+      </p>
+      <div style="display: flex; gap: 0.8rem; justify-content: center;">
+        <button onclick="closeDownloadModal()" class="btn btn-secondary" style="padding:0.6rem 1.5rem;">Close</button>
+        <a href="https://aynx-api.onrender.com/admin" target="_blank" class="btn btn-primary" style="padding:0.6rem 1.5rem;">Go to Admin Portal</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
