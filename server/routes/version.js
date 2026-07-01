@@ -4,6 +4,11 @@ const { supabase } = require('../db/supabase');
 
 // GET /version/check (legacy: /api/version/check)
 router.get('/check', async (req, res) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
   try {
     if (supabase) {
       const { data } = await supabase
@@ -23,9 +28,9 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
   }
 });
 

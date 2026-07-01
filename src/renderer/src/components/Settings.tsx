@@ -393,9 +393,9 @@ Install Location: ${systemInfo.installDir}
     try {
       let res;
       try {
-        res = await fetch('http://localhost:5000/api/version/check');
+        res = await fetch(`http://localhost:5000/api/version/check?t=${Date.now()}`);
       } catch (err) {
-        res = await fetch('https://aynx-api.onrender.com/version/check');
+        res = await fetch(`https://aynx-api.onrender.com/version/check?t=${Date.now()}`);
       }
       if (res.ok) {
         const data = await res.json();
