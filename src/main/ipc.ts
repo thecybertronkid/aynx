@@ -429,7 +429,8 @@ export function setupIpcListeners(mainWindow: any) {
       const { saveSetting } = await import('./database');
       const settings = await import('./database').then(m => m.getSettings());
       const token = settings.authToken;
-      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+      const { app } = require('electron');
+      const apiBase = process.env.API_BASE_URL || (app.isPackaged ? 'https://aynx-api.onrender.com' : 'http://localhost:5000');
 
       const res = await fetch(`${apiBase}/payment/create-order`, {
         method: 'POST',
@@ -462,7 +463,8 @@ export function setupIpcListeners(mainWindow: any) {
     try {
       const settings = await import('./database').then(m => m.getSettings());
       const token = settings.authToken;
-      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+      const { app } = require('electron');
+      const apiBase = process.env.API_BASE_URL || (app.isPackaged ? 'https://aynx-api.onrender.com' : 'http://localhost:5000');
 
       const res = await fetch(`${apiBase}/payment/verify`, {
         method: 'POST',
@@ -505,7 +507,8 @@ export function setupIpcListeners(mainWindow: any) {
     try {
       const settings = await import('./database').then(m => m.getSettings());
       const token = settings.authToken;
-      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+      const { app } = require('electron');
+      const apiBase = process.env.API_BASE_URL || (app.isPackaged ? 'https://aynx-api.onrender.com' : 'http://localhost:5000');
 
       const res = await fetch(`${apiBase}/license/ticket/create`, {
         method: 'POST',
@@ -529,7 +532,8 @@ export function setupIpcListeners(mainWindow: any) {
     try {
       const settings = await import('./database').then(m => m.getSettings());
       const token = settings.authToken;
-      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+      const { app } = require('electron');
+      const apiBase = process.env.API_BASE_URL || (app.isPackaged ? 'https://aynx-api.onrender.com' : 'http://localhost:5000');
 
       const res = await fetch(`${apiBase}/license/tickets`, {
         method: 'POST',

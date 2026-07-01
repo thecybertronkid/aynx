@@ -19,6 +19,7 @@ export const DownloadNotifications: React.FC = () => {
   const { settings } = useSettingsStore();
   const { activeDownloads } = useDownloadStore();
   const [notifications, setNotifications] = useState<Record<string, ActiveNotification>>({});
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
   const currentPlan = settings.plan || 'Free';
 
@@ -29,6 +30,9 @@ export const DownloadNotifications: React.FC = () => {
 
       // 1. Process active queue items
       for (const [id, item] of Object.entries(activeDownloads)) {
+        if (dismissedIds.has(id)) {
+          continue;
+        }
         const progress = item.progress || 0;
         const speed = item.speed || '0 KB/s';
         const currentNotif = prev[id];
@@ -85,6 +89,11 @@ export const DownloadNotifications: React.FC = () => {
   }, [activeDownloads]);
 
   const handleDismiss = (id: string) => {
+    setDismissedIds((prevSet) => {
+      const nextSet = new Set(prevSet);
+      nextSet.add(id);
+      return nextSet;
+    });
     setNotifications((prev) => {
       const next = { ...prev };
       if (next[id]) {

@@ -119,6 +119,17 @@ const AppInner: React.FC<{
   const [activeNotification, setActiveNotification] = useState<any>(null);
   const [activeAnnouncement, setActiveAnnouncement] = useState<any>(null);
 
+  const dismissNotification = (notif: any) => {
+    if (notif && notif.id) {
+      const closed = JSON.parse(localStorage.getItem('aynx_closed_notifications') || '[]');
+      if (!closed.includes(notif.id)) {
+        closed.push(notif.id);
+        localStorage.setItem('aynx_closed_notifications', JSON.stringify(closed));
+      }
+    }
+    setActiveNotification(null);
+  };
+
   // Handle remote commands, announcements, notifications from main process
   useEffect(() => {
     // 1. Force logout command listener
@@ -150,6 +161,12 @@ const AppInner: React.FC<{
     if ((window.api as any).onRemoteNotification) {
       const unsub = (window.api as any).onRemoteNotification((_: any, notif: any) => {
         console.log('[React App] Received remote notification toast:', notif);
+        if (notif && notif.id) {
+          const closed = JSON.parse(localStorage.getItem('aynx_closed_notifications') || '[]');
+          if (closed.includes(notif.id)) {
+            return;
+          }
+        }
         setActiveNotification(notif);
       });
       return () => unsub();
@@ -264,7 +281,7 @@ const AppInner: React.FC<{
                     <div className="bg-discord-secondary/40 border border-discord-border rounded-xl p-4 space-y-2.5 text-left text-xs">
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Version</span>
-                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.7.0</span>
+                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.7.1</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Created & Maintained by</span>
@@ -293,7 +310,7 @@ const AppInner: React.FC<{
                       </a>
                       <button
                         onClick={() => {
-                          alert("You are running the latest version of AYNX (v2.7.0).");
+                          alert("You are running the latest version of AYNX (v2.7.1).");
                         }}
                         className="btn-secondary text-[11px] py-2.5 flex items-center justify-center gap-1.5 rounded-lg border border-discord-border hover:bg-discord-secondary/60 transition-colors"
                       >
@@ -436,7 +453,7 @@ const AppInner: React.FC<{
                 <button
                   onClick={() => {
                     window.api.openSystemUrl(activeNotification.link);
-                    setActiveNotification(null);
+                    dismissNotification(activeNotification);
                   }}
                   className="bg-[#5865f2] hover:bg-[#4752c4] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                 >
@@ -444,7 +461,7 @@ const AppInner: React.FC<{
                 </button>
               )}
               <button
-                onClick={() => setActiveNotification(null)}
+                onClick={() => dismissNotification(activeNotification)}
                 className="bg-[#2b2d31] hover:bg-[#3f4147] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
               >
                 Close

@@ -34,20 +34,39 @@ function writeDataFile(filename, data) {
   }
 }
 
-// Seed Feature Flags if not present
+// Seed Feature Flags with plan levels and migrate legacy booleans
 const FLAGS_FILE = 'feature_flags.json';
-if (!fs.existsSync(path.join(DATA_DIR, FLAGS_FILE))) {
-  const defaultFlags = {
-    built_in_browser: true,
-    scheduler: true,
-    clipboard_monitor: true,
-    cloud_sync: true,
-    themes: true,
-    dashboard_widgets: true,
-    ai_assistant: true,
-    browser_extension: true,
-    media_converter: true
-  };
+const defaultFlags = {
+  built_in_browser: 'Plus',
+  scheduler: 'Pro',
+  clipboard_monitor: 'Free',
+  cloud_sync: 'Pro',
+  themes: 'Plus',
+  dashboard_widgets: 'Free',
+  ai_assistant: 'Plus',
+  browser_extension: 'Plus',
+  media_converter: 'Pro',
+  favorites: 'Plus'
+};
+
+let currentFlags = {};
+if (fs.existsSync(path.join(DATA_DIR, FLAGS_FILE))) {
+  currentFlags = readDataFile(FLAGS_FILE, {});
+  let migrated = false;
+  Object.keys(defaultFlags).forEach(flag => {
+    if (typeof currentFlags[flag] === 'boolean' || currentFlags[flag] === undefined) {
+      if (currentFlags[flag] === false) {
+        currentFlags[flag] = 'Disabled';
+      } else {
+        currentFlags[flag] = defaultFlags[flag];
+      }
+      migrated = true;
+    }
+  });
+  if (migrated) {
+    writeDataFile(FLAGS_FILE, currentFlags);
+  }
+} else {
   writeDataFile(FLAGS_FILE, defaultFlags);
 }
 
@@ -217,7 +236,7 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
       safeGetTable('license_keys', 'created_at', false, 'license_keys.json'),
       safeGetTable('telemetry', 'created_at', false, 'telemetry.json'),
       safeGetTable('app_versions', 'published_at', false, 'app_versions.json', [
-        { version: '2.7.0', is_latest: true, published_at: new Date().toISOString(), download_url: 'https://drive.usercontent.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: 'v2.7.0-stable' }
+        { version: '2.7.1', is_latest: true, published_at: new Date().toISOString(), download_url: 'https://drive.usercontent.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: 'v2.7.1-stable' }
       ]),
       safeGetTable('announcements', 'created_at', false, 'announcements.json')
     ]);
