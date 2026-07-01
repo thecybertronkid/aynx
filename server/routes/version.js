@@ -28,9 +28,9 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://aynx-api.onrender.com/uploads/AYNX_2.6.2.stable_1782926850845.exe', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://aynx-api.onrender.com/uploads/AYNX_2.6.2.stable_1782926850845.exe', changelog: '' });
   }
 });
 
