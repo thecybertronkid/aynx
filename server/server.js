@@ -51,9 +51,9 @@ if (!fs.existsSync(LICENSES_FILE)) {
 
 if (!fs.existsSync(SETTINGS_FILE)) {
   const initialSettings = {
-    latestVersion: '2.3.6',
-    downloadUrl: 'file:///e:/SABLE%202.0/release/AYNX%20Setup%202.3.6.exe',
-    changelog: 'v2.3.6 Release Notes:\n- Added customizable UI dashboard modules gating\n- Fixed YouTube speed throttling issues\n- Added fallback Spotify embed metadata lookup scraper\n- Added Instagram session cookies import assistance'
+    latestVersion: '2.6.0',
+    downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing',
+    changelog: 'v2.6.0 Release Notes:\n- Added supported platforms and trust partners indicators\n- Expanded features comparison table\n- Implemented mobile-first responsive dashboard layout\n- Upgraded UI/UX style grid layouts'
   };
   writeJSON(SETTINGS_FILE, initialSettings);
 }
