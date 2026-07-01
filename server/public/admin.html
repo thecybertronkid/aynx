@@ -21,9 +21,46 @@
       background-color: #1e1f22;
       border: 1px solid #2b2d31;
     }
+
+    /* Bottom Navigation Tab Bar for mobile layout */
+    .mobile-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(17, 18, 20, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid #2b2d31;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 90;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .mobile-tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      gap: 3px;
+      cursor: pointer;
+      flex: 1;
+      height: 100%;
+      transition: all 0.2s ease;
+    }
+
+    /* Responsive displaying rules */
+    @media (min-width: 1024px) {
+      .admin-section-tab {
+        display: contents !important;
+      }
+    }
   </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen pb-24 lg:pb-12">
 
   <!-- Top Navigation Header -->
   <header class="bg-[#111214] border-b border-[#2b2d31] px-4 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-50">
@@ -58,7 +95,7 @@
   <main class="max-w-7xl mx-auto px-4 md:px-8 mt-8 space-y-8">
 
     <!-- Overview Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6" data-tab="overview">
       <!-- Card 1 -->
       <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div class="flex justify-between items-start">
@@ -119,7 +156,7 @@
     <!-- Main Grid: Graphs and Live Downloads -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Analytics Charts -->
-      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6">
+      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6" data-tab="overview">
         <div class="border-b border-[#2b2d31] pb-4">
           <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
             <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#5865f2]"></i>
@@ -137,7 +174,7 @@
       </div>
 
       <!-- App Release & Installer Updates -->
-      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between" data-tab="releases">
         <div>
           <div class="border-b border-[#2b2d31] pb-4 mb-5">
             <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
@@ -174,7 +211,7 @@
     </div>
 
     <!-- Active License Key Generator and Table -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-tab="licensing">
       <!-- Key Generator Card -->
       <div class="glass-card rounded-2xl p-6 space-y-5">
         <div class="border-b border-[#2b2d31] pb-4">
@@ -231,7 +268,7 @@
     </div>
 
     <!-- Active/Online User Database List -->
-    <div class="glass-card rounded-2xl p-6 space-y-4">
+    <div class="glass-card rounded-2xl p-6 space-y-4" data-tab="users">
       <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
         <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
           <i data-lucide="globe" class="w-4 h-4 text-cyan-400"></i>
@@ -259,7 +296,7 @@
     </div>
 
     <!-- Telemetry Logs Registry -->
-    <div class="glass-card rounded-2xl p-6 space-y-4">
+    <div class="glass-card rounded-2xl p-6 space-y-4" data-tab="logs">
       <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
         <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
           <i data-lucide="history" class="w-4 h-4 text-[#f23f43]"></i>
@@ -606,9 +643,31 @@
       }
     }
 
-    // Initialize Page
+    function switchMobileTab(tabId) {
+      // Remove mobile-show from all elements
+      document.querySelectorAll('[data-tab]').forEach(el => {
+        el.classList.remove('mobile-show');
+      });
+      // Add mobile-show to elements matching the active tab
+      document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(el => {
+        el.classList.add('mobile-show');
+      });
+      // Update tab buttons active classes
+      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        btn.classList.remove('text-[#5865f2]');
+        btn.classList.add('text-[#949ba4]');
+      });
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-[#949ba4]');
+        activeBtn.classList.add('text-[#5865f2]');
+      }
+    }
+
+    // Initialize Page & Tabs
     lucide.createIcons();
     loadStats();
+    switchMobileTab('overview');
     setInterval(loadStats, 5000); // Poll server every 5 seconds
   </script>
 
@@ -669,6 +728,28 @@
       <div class="pt-2 flex justify-end">
         <button onclick="toggleWebsiteAnalyticsModal(false)" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition-colors">Close Portal</button>
       </div>
+    </div>
+  <!-- Bottom Mobile Tab Bar -->
+  <div class="mobile-tab-bar lg:hidden">
+    <div id="tab-btn-overview" onclick="switchMobileTab('overview')" class="mobile-tab-btn active text-[#5865f2]">
+      <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+      <span>Overview</span>
+    </div>
+    <div id="tab-btn-releases" onclick="switchMobileTab('releases')" class="mobile-tab-btn text-[#949ba4]">
+      <i data-lucide="arrow-up-circle" class="w-5 h-5"></i>
+      <span>Releases</span>
+    </div>
+    <div id="tab-btn-licensing" onclick="switchMobileTab('licensing')" class="mobile-tab-btn text-[#949ba4]">
+      <i data-lucide="key" class="w-5 h-5"></i>
+      <span>Licenses</span>
+    </div>
+    <div id="tab-btn-users" onclick="switchMobileTab('users')" class="mobile-tab-btn text-[#949ba4]">
+      <i data-lucide="users" class="w-5 h-5"></i>
+      <span>Users</span>
+    </div>
+    <div id="tab-btn-logs" onclick="switchMobileTab('logs')" class="mobile-tab-btn text-[#949ba4]">
+      <i data-lucide="history" class="w-5 h-5"></i>
+      <span>Logs</span>
     </div>
   </div>
 </body>
