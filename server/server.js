@@ -286,17 +286,14 @@ const server = http.createServer((req, res) => {
 
   else if (pathname === '/api/telemetry/report' && req.method === 'POST') {
     getBody().then(data => {
-      const { machineId, platform, contentType, title, status, sizeBytes } = data;
+      const { event, machineId, platform, contentType, title, status, sizeBytes, metadata } = data;
       const telemetry = readJSON(TELEMETRY_FILE);
 
       const log = {
         id: Math.random().toString(36).substring(2, 11),
         machineId,
-        platform,
-        contentType,
-        title,
-        status,
-        sizeBytes: sizeBytes || 0,
+        event: event || 'download',
+        metadata: metadata || { platform, contentType, title, status, sizeBytes: sizeBytes || 0 },
         timestamp: new Date().toISOString()
       };
 
@@ -383,12 +380,34 @@ const server = http.createServer((req, res) => {
     const telemetry = readJSON(TELEMETRY_FILE);
     const settings = readJSON(SETTINGS_FILE, {});
 
+    // Aggregate Website Analytics
+    const websiteAnalytics = {
+      views: { total: 0, hero: 0, features: 0, compare: 0, pricing: 0 },
+      logins: 0,
+      downloads: 0
+    };
+
+    telemetry.forEach(evt => {
+      if (evt.event === 'website_view') {
+        websiteAnalytics.views.total++;
+        const section = evt.metadata?.section;
+        if (section && websiteAnalytics.views.hasOwnProperty(section)) {
+          websiteAnalytics.views[section]++;
+        }
+      } else if (evt.event === 'website_login') {
+        websiteAnalytics.logins++;
+      } else if (evt.event === 'website_download_click') {
+        websiteAnalytics.downloads++;
+      }
+    });
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       licenses,
       users,
       telemetry,
-      settings
+      settings,
+      websiteAnalytics
     }));
   }
 

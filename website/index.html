@@ -17,26 +17,29 @@
 </head>
 <body>
 
-  <!-- Glow Backgrounds -->
+  <!-- Background Grid Pattern & Glowing Orbs -->
+  <div class="grid-overlay"></div>
   <div class="glow-container">
     <div class="glow-circle glow-1"></div>
     <div class="glow-circle glow-2"></div>
+    <div class="glow-circle glow-3"></div>
   </div>
 
   <!-- Header / Navigation Bar -->
   <header class="navbar">
     <div class="container navbar-container">
       <a href="#" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>AYNX</span><i>.</i>
       </a>
       <nav class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#pain-points">Compare</a>
-        <a href="#pricing">Pricing</a>
-        <span id="user-nav" style="margin-left: 10px; display: inline-flex; align-items: center;"></span>
+        <a href="#features" class="nav-item">Features</a>
+        <a href="#pain-points" class="nav-item">Compare</a>
+        <a href="#pricing" class="nav-item">Pricing</a>
       </nav>
-      <div>
-        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="nav-download-btn" class="btn btn-primary">
+      <div class="nav-actions">
+        <span id="user-nav" class="user-auth-zone"></span>
+        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="nav-download-btn" class="btn btn-primary btn-glow">
           <i data-lucide="download"></i>
           <span>Download</span>
         </a>
@@ -45,7 +48,7 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
+  <section class="hero" id="hero">
     <div class="container fade-in">
       <div class="version-badge">
         <span class="dot"></span>
@@ -61,7 +64,7 @@
       </p>
       
       <div class="hero-cta">
-        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="hero-download-btn" class="btn btn-primary">
+        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="hero-download-btn" class="btn btn-primary btn-glow">
           <i data-lucide="download"></i>
           <span>Download for Windows</span>
         </a>
@@ -71,11 +74,13 @@
       <!-- App Showcase Preview mockup -->
       <div class="mockup-wrapper fade-in">
         <div class="mockup-header">
-          <div class="mockup-dot red"></div>
-          <div class="mockup-dot yellow"></div>
-          <div class="mockup-dot green"></div>
+          <div class="mockup-dots">
+            <div class="mockup-dot red"></div>
+            <div class="mockup-dot yellow"></div>
+            <div class="mockup-dot green"></div>
+          </div>
+          <div class="mockup-title">AYNX App Interface Preview</div>
         </div>
-        <!-- Built-in preview vector placeholder to represent the dashboard -->
         <!-- Built-in preview vector placeholder to represent the dashboard -->
         <svg viewBox="0 0 1000 600" class="mockup-img" style="background:#1e1f22; font-family:var(--font-sans);">
           <!-- Left Sidebar Background -->
@@ -284,68 +289,52 @@
     </div>
   </section>
 
-  <!-- Pain Points Section -->
+  <!-- Pain Points Section (Slack/Openclaw comparison card) -->
   <section class="pain-section" id="pain-points">
     <div class="container">
       <div class="section-header">
         <span class="section-label">Why AYNX?</span>
         <h2 class="section-title">Frustrated with standard downloaders?</h2>
+        <p class="section-subtitle">See how AYNX compares with standard web tools and other common desktop utilities.</p>
       </div>
       
-      <div class="pain-grid">
-        <div class="compare-card fade-in">
-          <!-- Traditional Problems -->
-          <div class="compare-column left">
-            <h3 class="column-header red">
-              <i data-lucide="alert-octagon"></i>
-              <span>Other Downloaders</span>
-            </h3>
-            <ul class="compare-list">
-              <li>
-                <i data-lucide="x" style="color:#f23f43;"></i>
-                <span>Throttled speeds at 50KB/s on long playlists.</span>
-              </li>
-              <li>
-                <i data-lucide="x" style="color:#f23f43;"></i>
-                <span>Annoying watermarks plastered on TikTok and IG reels.</span>
-              </li>
-              <li>
-                <i data-lucide="x" style="color:#f23f43;"></i>
-                <span>Separate video/audio files requiring manual merging tools.</span>
-              </li>
-              <li>
-                <i data-lucide="x" style="color:#f23f43;"></i>
-                <span>No metadata tags or cover artwork matching for music files.</span>
-              </li>
-            </ul>
-          </div>
-          
-          <!-- AYNX Solution -->
-          <div class="compare-column right">
-            <h3 class="column-header green">
-              <i data-lucide="check-circle-2"></i>
-              <span>AYNX Experience</span>
-            </h3>
-            <ul class="compare-list">
-              <li>
-                <i data-lucide="check" style="color:#23a55a;"></i>
-                <span>Parallel engines for unrestricted multi-threaded speeds.</span>
-              </li>
-              <li>
-                <i data-lucide="check" style="color:#23a55a;"></i>
-                <span>100% clean watermark-free downloads natively.</span>
-              </li>
-              <li>
-                <i data-lucide="check" style="color:#23a55a;"></i>
-                <span>Automatic background muxing of audio and video tracks.</span>
-              </li>
-              <li>
-                <i data-lucide="check" style="color:#23a55a;"></i>
-                <span>Dynamic Spotify metadata matcher with ID3 cover tags.</span>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div class="compare-table-wrapper fade-in">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Features comparison</th>
+              <th>Other Downloaders</th>
+              <th class="aynx-col">AYNX Experience</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feature-name">Download Speeds</td>
+              <td class="bad">Throttled (mostly under 50KB/s)</td>
+              <td class="good aynx-col"><i data-lucide="zap"></i>Unrestricted Parallel Speeds</td>
+            </tr>
+            <tr>
+              <td class="feature-name">TikTok & Instagram reels</td>
+              <td class="bad">Watermarked or failing</td>
+              <td class="good aynx-col"><i data-lucide="check"></i>100% Watermark-Free Natively</td>
+            </tr>
+            <tr>
+              <td class="feature-name">YouTube Audio Matching</td>
+              <td class="bad">Low quality 128kbps without tag art</td>
+              <td class="good aynx-col"><i data-lucide="music"></i>Spotify Metadata Autocomplete</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Full Playlist download</td>
+              <td class="bad">Requires clicking each item manually</td>
+              <td class="good aynx-col"><i data-lucide="layers"></i>1-Click Batch Scheduler</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Built-in Media Player</td>
+              <td class="bad">None (requires third-party player)</td>
+              <td class="good aynx-col"><i data-lucide="play-circle"></i>Integrated Premium Viewer</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -356,12 +345,13 @@
       <div class="section-header">
         <span class="section-label">Capabilities</span>
         <h2 class="section-title">Built-in Features for Media Enthusiasts</h2>
+        <p class="section-subtitle">A professional workstation for media extraction, offline parsing, and cataloging.</p>
       </div>
       
       <div class="features-grid fade-in">
         <!-- 1. All Platforms -->
-        <div class="feature-card">
-          <div class="feature-icon-wrapper">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-wrapper text-blue">
             <i data-lucide="globe"></i>
           </div>
           <h3>8 Supported Platforms</h3>
@@ -369,8 +359,8 @@
         </div>
         
         <!-- 2. Parallel Queue -->
-        <div class="feature-card">
-          <div class="feature-icon-wrapper">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-wrapper text-teal">
             <i data-lucide="zap"></i>
           </div>
           <h3>Parallel Downloads</h3>
@@ -378,8 +368,8 @@
         </div>
         
         <!-- 3. Scheduler -->
-        <div class="feature-card">
-          <div class="feature-icon-wrapper">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-wrapper text-pink">
             <i data-lucide="calendar"></i>
           </div>
           <h3>Download Scheduler</h3>
@@ -387,8 +377,8 @@
         </div>
         
         <!-- 4. Browser -->
-        <div class="feature-card">
-          <div class="feature-icon-wrapper">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon-wrapper text-purple">
             <i data-lucide="chrome"></i>
           </div>
           <h3>Built-in Browser</h3>
@@ -404,6 +394,7 @@
       <div class="section-header">
         <span class="section-label">Pricing Plans</span>
         <h2 class="section-title">Upgrade to AYNX Premium</h2>
+        <p class="section-subtitle">Unlock unlimited downloads, full speed queues, and advanced automation.</p>
       </div>
       
       <!-- Billing Period Toggle -->
@@ -416,8 +407,8 @@
       
       <div class="pricing-grid fade-in">
         <!-- FREE PLAN -->
-        <div class="pricing-card">
-          <div>
+        <div class="pricing-card glass-panel">
+          <div class="pricing-header">
             <h3>Free Plan</h3>
             <div class="price-wrapper">
               <span class="price-currency">₹</span>
@@ -425,20 +416,20 @@
               <span class="price-period">/ forever</span>
             </div>
             <p class="description">Basic downloader with speed limits and parallel restrictions.</p>
-            <ul class="pricing-features-list">
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>YouTube downloads</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Max 1080p video caps</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>192kbps audio capacity</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Basic interface colors</span></li>
-            </ul>
           </div>
+          <ul class="pricing-features-list">
+            <li><i data-lucide="check" class="text-teal"></i><span>YouTube downloads</span></li>
+            <li><i data-lucide="check" class="text-teal"></i><span>Max 1080p video caps</span></li>
+            <li><i data-lucide="check" class="text-teal"></i><span>192kbps audio capacity</span></li>
+            <li><i data-lucide="check" class="text-teal"></i><span>Basic interface colors</span></li>
+          </ul>
           <button class="btn btn-secondary" disabled>Current Plan</button>
         </div>
         
         <!-- PLUS PLAN -->
-        <div class="pricing-card popular">
-          <span class="card-badge">Popular</span>
-          <div>
+        <div class="pricing-card popular relative">
+          <span class="card-badge bg-emerald">Popular</span>
+          <div class="pricing-header">
             <h3>Plus Plan</h3>
             <div class="price-wrapper">
               <span class="price-currency">₹</span>
@@ -446,21 +437,21 @@
               <span id="period-plus" class="price-period">/ mo</span>
             </div>
             <p class="description">Supercharged speeds, scheduler engines, and multiplatform extraction.</p>
-            <ul class="pricing-features-list">
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>YouTube + Spotify + Instagram</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Max 1080p Full HD Resolution</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>320kbps High Quality Audio</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>3 parallel downloads queue</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Accent color custom stylings</span></li>
-            </ul>
           </div>
-          <button id="btn-upgrade-plus" class="btn btn-primary" style="background:var(--plus-color); width: 100%;">Get Plus</button>
+          <ul class="pricing-features-list">
+            <li><i data-lucide="check" class="text-emerald"></i><span>YouTube + Spotify + Instagram</span></li>
+            <li><i data-lucide="check" class="text-emerald"></i><span>Max 1080p Full HD Resolution</span></li>
+            <li><i data-lucide="check" class="text-emerald"></i><span>320kbps High Quality Audio</span></li>
+            <li><i data-lucide="check" class="text-emerald"></i><span>3 parallel downloads queue</span></li>
+            <li><i data-lucide="check" class="text-emerald"></i><span>Accent color custom stylings</span></li>
+          </ul>
+          <button id="btn-upgrade-plus" class="btn btn-primary btn-emerald">Get Plus</button>
         </div>
         
         <!-- PRO PLAN -->
-        <div class="pricing-card premium">
-          <span class="card-badge">All Features</span>
-          <div>
+        <div class="pricing-card premium relative">
+          <span class="card-badge bg-purple">All Features</span>
+          <div class="pricing-header">
             <h3>Pro Plan</h3>
             <div class="price-wrapper">
               <span class="price-currency">₹</span>
@@ -468,15 +459,15 @@
               <span id="period-pro" class="price-period">/ mo</span>
             </div>
             <p class="description">Lossless audio outputs, maximum 4K/8K resolutions, and premium automation tools.</p>
-            <ul class="pricing-features-list">
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>All 8 supported platforms</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Uncapped speeds (Unlimited)</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Lossless audio (FLAC/WAV)</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Uncapped parallel queues</span></li>
-              <li><i data-lucide="check" style="color:#23a55a;"></i><span>Download scheduler engine</span></li>
-            </ul>
           </div>
-          <button id="btn-upgrade-pro" class="btn btn-primary" style="background:var(--pro-color); width: 100%;">Get Pro</button>
+          <ul class="pricing-features-list">
+            <li><i data-lucide="check" class="text-purple"></i><span>All 8 supported platforms</span></li>
+            <li><i data-lucide="check" class="text-purple"></i><span>Uncapped speeds (Unlimited)</span></li>
+            <li><i data-lucide="check" class="text-purple"></i><span>Lossless audio (FLAC/WAV)</span></li>
+            <li><i data-lucide="check" class="text-purple"></i><span>Uncapped parallel queues</span></li>
+            <li><i data-lucide="check" class="text-purple"></i><span>Download scheduler engine</span></li>
+          </ul>
+          <button id="btn-upgrade-pro" class="btn btn-primary btn-purple">Get Pro</button>
         </div>
       </div>
     </div>
@@ -539,6 +530,25 @@
       }
     }
 
+    // Analytics Reporting Helper
+    function reportAnalytics(event, metadata = {}) {
+      const token = localStorage.getItem('aynx_token');
+      const body = {
+        event,
+        machineId: 'website_visitor',
+        metadata
+      };
+      
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
+      fetch('https://aynx-api.onrender.com/api/telemetry/report', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      }).catch(() => {});
+    }
+
     // Dynamic Version and Download Link Loader
     window.addEventListener('load', () => {
       // 1. Process URL redirect callback parameters
@@ -551,6 +561,12 @@
         localStorage.setItem('aynx_user_avatar', urlParams.get('avatar') || '');
         localStorage.setItem('aynx_user_plan', urlParams.get('plan') || 'Free');
         
+        // Report Login Event to backend analytics!
+        reportAnalytics('website_login', {
+          email: urlParams.get('email'),
+          name: urlParams.get('name')
+        });
+
         // Clean URL params from bar
         window.history.replaceState({}, document.title, window.location.pathname);
       }
@@ -589,20 +605,39 @@
       document.getElementById('btn-upgrade-plus').addEventListener('click', () => handleUpgrade('Plus'));
       document.getElementById('btn-upgrade-pro').addEventListener('click', () => handleUpgrade('Pro'));
 
-      // 5. Scroll Visibility Observer for Animations
+      // 5. Scroll Visibility Observer for Animations and Section View Analytics
+      const reportedSections = new Set();
+      
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
+            // Trigger animation class
             entry.target.classList.add('visible');
+
+            // Send analytical section view event (limit to once per section view session)
+            const sectionId = entry.target.id;
+            if (sectionId && !reportedSections.has(sectionId)) {
+              reportedSections.add(sectionId);
+              reportAnalytics('website_view', { section: sectionId });
+            }
           }
         });
-      }, { threshold: 0.05 });
+      }, { threshold: 0.1 });
 
-      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+      // Observe major landing sections
+      document.querySelectorAll('.fade-in, section').forEach(el => observer.observe(el));
 
-      // 6. Hook Download Buttons for Download Assistant Modal Check
-      document.getElementById('nav-download-btn').addEventListener('click', handleDownloadClick);
-      document.getElementById('hero-download-btn').addEventListener('click', handleDownloadClick);
+      // Report initial Hero page load view
+      reportAnalytics('website_view', { section: 'hero' });
+
+      // 6. Hook Download Buttons for Download Assistant Modal Check & Analytics
+      const onDownloadClick = (e, buttonId) => {
+        reportAnalytics('website_download_click', { button: buttonId });
+        handleDownloadClick(e);
+      };
+
+      document.getElementById('nav-download-btn').addEventListener('click', (e) => onDownloadClick(e, 'nav-download'));
+      document.getElementById('hero-download-btn').addEventListener('click', (e) => onDownloadClick(e, 'hero-download'));
 
       // 7. Hook Mockup Interactive Tabs
       const mockupTabs = ['dashboard', 'queue', 'library', 'platforms', 'settings'];
@@ -655,17 +690,18 @@
         const avatar = localStorage.getItem('aynx_user_avatar') || '';
         
         userNav.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); padding: 0.3rem 0.8rem; border-radius: 50px; background: var(--bg-secondary);">
-            ${avatar ? `<img src="${avatar}" style="width: 20px; height: 20px; border-radius: 50%;" />` : ''}
-            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-white);">${name}</span>
-            <span style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; background: var(--accent); color: #fff; padding: 0.1rem 0.4rem; border-radius: 4px; scale: 0.95;">${plan}</span>
-            <button onclick="handleLogout()" style="background: none; border: none; font-size: 0.75rem; color: var(--text-muted); hover: color: var(--text-white); font-weight: 700; cursor: pointer; margin-left: 10px; transition: color 0.2s;">Log Out</button>
+          <div class="user-pill">
+            ${avatar ? `<img src="${avatar}" class="user-avatar" />` : '<div class="user-avatar-placeholder">U</div>'}
+            <span class="user-name">${name}</span>
+            <span class="user-plan-badge badge-${plan.toLowerCase()}">${plan}</span>
+            <button onclick="handleLogout()" class="btn-logout">Logout</button>
           </div>
         `;
       } else {
         const redirectTarget = window.location.href;
         const loginUrl = `https://aynx-api.onrender.com/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
-        userNav.innerHTML = `<a href="${loginUrl}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; hover: color: var(--text-white);">Sign In</a>`;
+        userNav.innerHTML = `<a href="${loginUrl}" class="btn-signin"><i data-lucide="log-in" style="width:14px; height:14px; margin-right:6px;"></i>Sign In</a>`;
+        lucide.createIcons();
       }
     }
 

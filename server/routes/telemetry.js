@@ -39,15 +39,15 @@ router.post('/heartbeat', optionalAuth, async (req, res) => {
 // POST /telemetry/report (legacy: /api/telemetry/report)
 router.post('/report', optionalAuth, async (req, res) => {
   try {
-    const { machineId, platform, contentType, title, status, sizeBytes } = req.body;
+    const { event, machineId, platform, contentType, title, status, sizeBytes, metadata } = req.body;
     const userId = req.user?.id;
 
     if (supabase) {
       await supabase.from('telemetry').insert({
         user_id: userId || null,
-        machine_id: machineId,
-        event: 'download',
-        metadata: { platform, contentType, title, status, sizeBytes: sizeBytes || 0 }
+        machine_id: machineId || null,
+        event: event || 'download',
+        metadata: metadata || { platform, contentType, title, status, sizeBytes: sizeBytes || 0 }
       });
     }
 

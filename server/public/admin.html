@@ -166,6 +166,56 @@
           </form>
         </div>
       </div>
+    <!-- Website Analytics & Traffic Card -->
+    <div class="glass-card rounded-2xl p-6 space-y-4">
+      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i data-lucide="line-chart" class="w-4 h-4 text-pink-500"></i>
+          <span>Website Traffic & Login Analytics</span>
+        </h2>
+        <span class="bg-[#111214] text-[10px] text-pink-500 font-extrabold px-3 py-1 rounded-full border border-pink-500/20">LIVE REPORT</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+        <!-- Views -->
+        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl space-y-2">
+          <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+            <span>Total Section Views</span>
+            <i data-lucide="eye" class="w-4 h-4 text-teal-400"></i>
+          </div>
+          <h3 id="analytics-views" class="text-2xl font-extrabold text-white">0</h3>
+          <div class="space-y-1 pt-2 border-t border-[#2b2d31]/50 text-[10px] text-gray-400 font-medium">
+            <div class="flex justify-between"><span>Hero Section:</span><span id="views-hero" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Features Matrix:</span><span id="views-features" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Comparison Chart:</span><span id="views-compare" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Pricing Plans:</span><span id="views-pricing" class="text-white font-bold">0</span></div>
+          </div>
+        </div>
+
+        <!-- Logins -->
+        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+              <span>Website Logins</span>
+              <i data-lucide="log-in" class="w-4 h-4 text-indigo-400"></i>
+            </div>
+            <h3 id="analytics-logins" class="text-3xl font-extrabold text-white">0</h3>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2 font-medium leading-relaxed">Counts the total number of times visitors authenticated via Google OAuth on the website.</p>
+        </div>
+
+        <!-- Download Clicks -->
+        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+              <span>Website Download Clicks</span>
+              <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i>
+            </div>
+            <h3 id="analytics-downloads" class="text-3xl font-extrabold text-white">0</h3>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-2 font-medium leading-relaxed">Counts clicks on the download buttons (Hero, Nav, Modal) to track conversion rate.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Active License Key Generator and Table -->
@@ -327,7 +377,19 @@
       adminFetch('/api/admin/dashboard')
         .then(res => res.json())
         .then(data => {
-          const { licenses, users, telemetry, settings } = data;
+          const { licenses, users, telemetry, settings, websiteAnalytics } = data;
+
+          // Render website analytics
+          if (websiteAnalytics) {
+            const web = websiteAnalytics;
+            document.getElementById('analytics-views').innerText = web.views.total;
+            document.getElementById('views-hero').innerText = web.views.hero;
+            document.getElementById('views-features').innerText = web.views.features;
+            document.getElementById('views-compare').innerText = web.views.compare;
+            document.getElementById('views-pricing').innerText = web.views.pricing;
+            document.getElementById('analytics-logins').innerText = web.logins;
+            document.getElementById('analytics-downloads').innerText = web.downloads;
+          }
 
           // Render summary stats
           document.getElementById('stat-users').innerText = users.length;

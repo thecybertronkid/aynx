@@ -34,6 +34,36 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
     const plusUsers = users.data?.filter(u => u.plan === 'Plus').length || 0;
     const proUsers = users.data?.filter(u => u.plan === 'Pro').length || 0;
 
+    // Aggregate Website Analytics
+    const websiteAnalytics = {
+      views: { total: 0, hero: 0, features: 0, compare: 0, pricing: 0 },
+      logins: 0,
+      downloads: 0
+    };
+
+    if (supabase) {
+      const { data: webEvents } = await supabase
+        .from('telemetry')
+        .select('event,metadata')
+        .like('event', 'website_%');
+
+      if (webEvents) {
+        webEvents.forEach(evt => {
+          if (evt.event === 'website_view') {
+            websiteAnalytics.views.total++;
+            const section = evt.metadata?.section;
+            if (section && websiteAnalytics.views.hasOwnProperty(section)) {
+              websiteAnalytics.views[section]++;
+            }
+          } else if (evt.event === 'website_login') {
+            websiteAnalytics.logins++;
+          } else if (evt.event === 'website_download_click') {
+            websiteAnalytics.downloads++;
+          }
+        });
+      }
+    }
+
     res.json({
       users: users.data || [],
       subscriptions: subscriptions.data || [],
@@ -41,7 +71,8 @@ router.get('/dashboard', requireAdmin, async (req, res) => {
       telemetry: telemetry.data || [],
       versions: versions.data || [],
       announcements: announcements.data || [],
-      stats: { activeUsers, totalDownloads, plusUsers, proUsers, totalUsers: users.data?.length || 0 }
+      stats: { activeUsers, totalDownloads, plusUsers, proUsers, totalUsers: users.data?.length || 0 },
+      websiteAnalytics
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
