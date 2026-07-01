@@ -32,6 +32,32 @@ const Browser: React.FC = () => {
   const [activeTabId, setActiveTabId] = useState<string>('default');
   const [inputUrl, setInputUrl] = useState<string>('https://www.youtube.com');
   const [showSettings, setShowSettings] = useState(false);
+  const [showDirectDownload, setShowDirectDownload] = useState(false);
+  const [selectedFormat, setSelectedFormat] = useState<'MP4' | 'MP3'>('MP4');
+  const [selectedQuality, setSelectedQuality] = useState<string>('Best Available');
+
+  const handleDirectDownload = async (format: 'MP4' | 'MP3', quality: string) => {
+    const url = activeTab.url;
+    const isAudio = format === 'MP3';
+    const id = `${url}_${Date.now()}`;
+    
+    try {
+      await window.api.queueDownload({
+        id: id,
+        url: url,
+        title: activeTab.title || 'Browser Download',
+        platform: getPlatformName(url),
+        contentType: isAudio ? 'audio' : 'video',
+        quality: quality,
+        format: format
+      });
+      alert(`Download started successfully!\n[Type: ${isAudio ? 'Audio' : 'Video'}, Quality: ${quality}]`);
+      setShowDirectDownload(false);
+    } catch (e: any) {
+      alert(`Failed to start download: ${e.message || 'Unknown error'}`);
+    }
+  };
+
   const [homepage, setHomepage] = useState('https://www.youtube.com');
   const [searchEngine, setSearchEngine] = useState('https://www.google.com/search?q=');
   const [jsEnabled, setJsEnabled] = useState(true);
@@ -283,10 +309,123 @@ const Browser: React.FC = () => {
           </button>
         </div>
 
-        {/* Security / Logo Branding */}
-        <div className="flex items-center space-x-2 text-[10px] text-[#949ba4] font-bold pr-2 bg-[#2b2d31]/20 border border-[#2b2d31]/40 px-2.5 py-0.5 rounded-full">
-          <Shield className="w-3 h-3 text-[#23a55a]" />
-          <span>AYNX Secure Sandbox</span>
+        {/* Direct Download & Sandbox Indicators */}
+        <div className="flex items-center space-x-2 pr-2 shrink-0">
+          {isDownloadable(activeTab.url) && (
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowDirectDownload(!showDirectDownload);
+                  setShowSettings(false);
+                }}
+                className={`flex items-center space-x-1.5 text-[10px] font-bold px-3 py-1 rounded-full shadow transition-all active:scale-95 cursor-pointer border ${
+                  showDirectDownload 
+                    ? 'bg-[#23a55a] border-[#23a55a] text-white shadow-emerald-500/20' 
+                    : 'bg-[#5865f2]/10 border-[#5865f2]/30 text-[#dbdee1] hover:bg-[#5865f2]/20'
+                }`}
+                title="Download this media directly"
+              >
+                <Download className="w-3 h-3 animate-pulse" />
+                <span>Direct Download</span>
+              </button>
+
+              {/* Direct Download Popover Dropdown */}
+              {showDirectDownload && (
+                <div className="absolute top-[32px] right-0 bg-[#2b2d31] border border-[#1e1f22] rounded-xl p-4 w-72 shadow-2xl space-y-4 animate-scaleIn select-none z-55 text-left">
+                  <div className="flex items-center justify-between border-b border-[#1e1f22] pb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#dbdee1] flex items-center space-x-1.5">
+                      <Download className="w-3.5 h-3.5 text-[#23a55a]" />
+                      <span>Direct Download Options</span>
+                    </h3>
+                    <button 
+                      onClick={() => setShowDirectDownload(false)}
+                      className="text-[#949ba4] hover:text-[#dbdee1] p-0.5"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    {/* Media Type Selection */}
+                    <div>
+                      <label className="block text-[#949ba4] text-[10px] font-bold uppercase mb-1.5">Download Format</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFormat('MP4');
+                            setSelectedQuality('Best Available');
+                          }}
+                          className={`py-1.5 rounded font-bold text-center border transition-all ${
+                            selectedFormat === 'MP4'
+                              ? 'bg-[#5865f2] border-[#5865f2] text-white'
+                              : 'bg-[#111214] border-[#1e1f22] text-[#dbdee1] hover:bg-[#1e1f22]'
+                          }`}
+                        >
+                          Video (MP4)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFormat('MP3');
+                            setSelectedQuality('320kbps High');
+                          }}
+                          className={`py-1.5 rounded font-bold text-center border transition-all ${
+                            selectedFormat === 'MP3'
+                              ? 'bg-[#5865f2] border-[#5865f2] text-white'
+                              : 'bg-[#111214] border-[#1e1f22] text-[#dbdee1] hover:bg-[#1e1f22]'
+                          }`}
+                        >
+                          Audio (MP3)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Quality Selection */}
+                    <div>
+                      <label className="block text-[#949ba4] text-[10px] font-bold uppercase mb-1">Quality Level</label>
+                      <select
+                        value={selectedQuality}
+                        onChange={(e) => setSelectedQuality(e.target.value)}
+                        className="w-full bg-[#111214] border border-[#1e1f22] rounded px-2.5 py-1.5 text-[#dbdee1] focus:outline-none focus:border-[#5865f2] font-semibold"
+                      >
+                        {selectedFormat === 'MP4' ? (
+                          <>
+                            <option value="Best Available">Best Available Quality</option>
+                            <option value="1080p">1080p Full HD</option>
+                            <option value="720p">720p HD</option>
+                            <option value="480p">480p SD</option>
+                          </>
+                        ) : (
+                          <>
+                            <option value="320kbps High">320kbps High Fidelity</option>
+                            <option value="192kbps Medium">192kbps Medium Quality</option>
+                            <option value="128kbps Standard">128kbps Standard Quality</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Download Trigger Button */}
+                    <div className="border-t border-[#1e1f22] pt-3">
+                      <button
+                        onClick={() => handleDirectDownload(selectedFormat, selectedQuality)}
+                        className="w-full bg-[#23a55a] hover:bg-[#1f8b4c] text-white py-2 rounded font-black text-xs flex items-center justify-center space-x-1.5 transition-all duration-200 active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/10"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Start Direct Download</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center space-x-2 text-[10px] text-[#949ba4] font-bold bg-[#2b2d31]/20 border border-[#2b2d31]/40 px-2.5 py-0.5 rounded-full shrink-0">
+            <Shield className="w-3 h-3 text-[#23a55a]" />
+            <span>AYNX Secure Sandbox</span>
+          </div>
         </div>
       </div>
 
