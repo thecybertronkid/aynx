@@ -64,8 +64,8 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose }) => {
   };
 
   const pricing = {
-    Plus: billingPeriod === 'monthly' ? { price: '299', raw: 29900 } : { price: '2,499', raw: 249900 },
-    Pro: billingPeriod === 'monthly' ? { price: '499', raw: 49900 } : { price: '3,999', raw: 399900 }
+    Plus: billingPeriod === 'monthly' ? { price: '79', raw: 7900 } : { price: '699', raw: 69900 },
+    Pro: billingPeriod === 'monthly' ? { price: '99', raw: 9900 } : { price: '899', raw: 89900 }
   };
 
   const featureComparison = [
