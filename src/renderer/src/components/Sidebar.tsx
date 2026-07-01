@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, FolderDown, Layers, Star, 
@@ -19,6 +19,38 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenAccountsCenter }) => {
   const { settings, updateSetting } = useSettingsStore();
   const { user, isOnline } = useAuthStore();
 
+  // Local feature flags state
+  const [flags, setFlags] = useState<Record<string, boolean>>({
+    built_in_browser: true,
+    scheduler: true,
+    clipboard_monitor: true,
+    cloud_sync: true,
+    themes: true,
+    dashboard_widgets: true,
+    ai_assistant: true,
+    browser_extension: true,
+    media_converter: true,
+    favorites: true
+  });
+
+  useEffect(() => {
+    // Initial fetch
+    if ((window.api as any).getFeatureFlags) {
+      (window.api as any).getFeatureFlags().then((f: any) => {
+        if (f) setFlags(f);
+      });
+    }
+
+    // Listen for heartbeat updates
+    if ((window.api as any).onFeatureFlagsUpdated) {
+      const unsub = (window.api as any).onFeatureFlagsUpdated((_event: any, updatedFlags: any) => {
+        if (updatedFlags) setFlags(updatedFlags);
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, []);
+
   const currentTheme = settings.theme || 'dark';
   
   // Use auth store values with settings fallback
@@ -30,22 +62,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onOpenAccountsCenter }) => {
   const trialDaysLeft = user?.trialExpiry ? getDaysRemaining(user.trialExpiry) : 0;
   const isTrial = user?.trial || false;
 
-
-  const menuItems = [
+  const rawMenuItems = [
     { to: '/', icon: Home, label: 'Home', locked: false, requiredPlan: null as any },
     { to: '#', icon: Globe, label: 'Built-in Browser', onClick: () => {
         if (currentPlan === 'Free') { showUpgradeToast('Built-in Browser requires Plus or Pro', 'Plus'); }
         else { window.api.openBrowser(); }
-      }, locked: currentPlan === 'Free', requiredPlan: 'Plus' as const
+      }, locked: currentPlan === 'Free', requiredPlan: 'Plus' as const, flagKey: 'built_in_browser'
     },
     { to: '/downloads', icon: FolderDown, label: 'Media Library', locked: false, requiredPlan: null as any },
     { to: '/queue', icon: Layers, label: 'Download Queue', badge: activeCount > 0 ? activeCount : undefined, locked: false, requiredPlan: null as any },
-    { to: '/scheduler', icon: Clock, label: 'Scheduler', locked: currentPlan !== 'Pro', requiredPlan: 'Pro' as const },
-    { to: '/favorites', icon: Star, label: 'Favorites', locked: currentPlan === 'Free', requiredPlan: 'Plus' as const },
+    { to: '/scheduler', icon: Clock, label: 'Scheduler', locked: currentPlan !== 'Pro', requiredPlan: 'Pro' as const, flagKey: 'scheduler' },
+    { to: '/favorites', icon: Star, label: 'Favorites', locked: currentPlan === 'Free', requiredPlan: 'Plus' as const, flagKey: 'favorites' },
     { to: '/platforms', icon: Cloud, label: 'Platforms', locked: false, requiredPlan: null as any },
     { to: '/settings', icon: SettingsIcon, label: 'Settings', locked: false, requiredPlan: null as any },
     { to: '/about', icon: Info, label: 'About', locked: false, requiredPlan: null as any },
   ];
+
+  const menuItems = rawMenuItems.filter(item => {
+    if (item.flagKey && flags[item.flagKey] === false) {
+      return false;
+    }
+    return true;
+  });
 
   // Helper to extract name initials
   const getInitials = (name: string): string => {

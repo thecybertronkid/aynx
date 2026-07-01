@@ -6,7 +6,8 @@ import {
   getSettings, saveSetting, getAccounts, saveAccount, deleteAccount,
   clearDownloads, getStorageStats,
   addActivity, getActivities, getAchievements, unlockAchievement,
-  getScheduledDownloads, saveScheduledDownload, deleteScheduledDownload
+  getScheduledDownloads, saveScheduledDownload, deleteScheduledDownload,
+  getFeatureFlags, getAnnouncements
 } from './database';
 import { 
   analyzeUrl, queueDownload, pauseDownload, resumeDownload, cancelDownload, 
@@ -33,6 +34,14 @@ export function setupIpcListeners(mainWindow: any) {
 
   ipcMain.handle('db:get-settings', async () => {
     return await getSettings();
+  });
+
+  ipcMain.handle('db:get-feature-flags', async () => {
+    return await getFeatureFlags();
+  });
+
+  ipcMain.handle('db:get-announcements', async () => {
+    return await getAnnouncements();
   });
 
   ipcMain.handle('db:save-setting', async (_, key: string, value: string) => {

@@ -114,6 +114,106 @@ const AppInner: React.FC<{
   setAccountsCenterOpen: (v: boolean) => void;
 }> = ({ isBrowserWindow, showWelcome, welcomeCompleted, setWelcomeCompleted, viewerItem, setViewerItem, accountsCenterOpen, setAccountsCenterOpen }) => {
   const navigate = useNavigate();
+  const { logout, refreshUserPlan } = useAuthStore();
+
+  const [activeNotification, setActiveNotification] = useState<any>(null);
+  const [activeAnnouncement, setActiveAnnouncement] = useState<any>(null);
+
+  // Handle remote commands, announcements, notifications from main process
+  useEffect(() => {
+    // 1. Force logout command listener
+    if ((window.api as any).onAuthLogout) {
+      const unsub = (window.api as any).onAuthLogout(() => {
+        console.log('[React App] Admin forced logout remote command received.');
+        logout();
+        navigate('/');
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, [navigate, logout]);
+
+  useEffect(() => {
+    // 2. Auth plan refresh command listener
+    if ((window.api as any).onAuthRefresh) {
+      const unsub = (window.api as any).onAuthRefresh(() => {
+        console.log('[React App] Admin triggered account plan refresh.');
+        refreshUserPlan();
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, [refreshUserPlan]);
+
+  useEffect(() => {
+    // 3. Remote admin notification banner listener
+    if ((window.api as any).onRemoteNotification) {
+      const unsub = (window.api as any).onRemoteNotification((_: any, notif: any) => {
+        console.log('[React App] Received remote notification toast:', notif);
+        setActiveNotification(notif);
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    // 4. Remote diagnostic logs consent request listener
+    if ((window.api as any).onUploadLogsRequest) {
+      const unsub = (window.api as any).onUploadLogsRequest(async (_: any, machineId: string) => {
+        const consent = window.confirm('AYNX Administrator has requested system diagnostic logs for troubleshooting. Do you consent to upload details about your settings and platform specifications?');
+        if (consent) {
+          try {
+            const settings = await window.api.getSettings();
+            await fetch('https://aynx-api.onrender.com/telemetry/report', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                event: 'diagnostic_logs_upload',
+                machineId,
+                metadata: { settings, uploadedAt: new Date().toISOString() }
+              })
+            });
+            alert('Diagnostic logs uploaded successfully.');
+          } catch (e) {
+            console.error('Failed to upload diagnostics:', e);
+          }
+        }
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, []);
+
+  // 5. Check for unread announcements on startup
+  useEffect(() => {
+    if ((window.api as any).getAnnouncements) {
+      (window.api as any).getAnnouncements().then((list: any[]) => {
+        if (list && list.length > 0) {
+          const latest = list[0];
+          const lastRead = localStorage.getItem('aynx_last_read_announcement');
+          if (latest.id !== lastRead && latest.active) {
+            setActiveAnnouncement(latest);
+          }
+        }
+      });
+    }
+
+    // Listen to changes in announcements from live heartbeat
+    if ((window.api as any).onAnnouncementsUpdated) {
+      const unsub = (window.api as any).onAnnouncementsUpdated((_: any, list: any[]) => {
+        if (list && list.length > 0) {
+          const latest = list[0];
+          const lastRead = localStorage.getItem('aynx_last_read_announcement');
+          if (latest.id !== lastRead && latest.active) {
+            setActiveAnnouncement(latest);
+          }
+        }
+      });
+      return () => unsub();
+    }
+    return undefined;
+  }, []);
 
   // Handle jump list / tray actions from main process
   useEffect(() => {
@@ -319,6 +419,71 @@ const AppInner: React.FC<{
 
         {/* Global Progress Notifications overlay (gated to Plus+) */}
         <DownloadNotifications />
+
+        {/* Remote System Notifications Overlay */}
+        {activeNotification && (
+          <div className="fixed bottom-20 right-6 bg-[#1e1f22] border border-[#2b2d31] p-5 rounded-2xl max-w-sm shadow-2xl z-[999] animate-fadeIn">
+            <h4 className="text-sm font-extrabold text-white flex items-center space-x-1.5 uppercase tracking-wide">
+              <span className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-ping"></span>
+              <span>{activeNotification.title || 'System Notice'}</span>
+            </h4>
+            <p className="text-xs text-[#dbdee1] mt-2 leading-relaxed">{activeNotification.text}</p>
+            {activeNotification.image && (
+              <img src={activeNotification.image} alt="Notification" className="w-full h-32 object-cover rounded-xl mt-3 animate-fadeIn" />
+            )}
+            <div className="mt-4 flex justify-end space-x-2">
+              {activeNotification.link && (
+                <button
+                  onClick={() => {
+                    window.api.openSystemUrl(activeNotification.link);
+                    setActiveNotification(null);
+                  }}
+                  className="bg-[#5865f2] hover:bg-[#4752c4] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                >
+                  Learn More
+                </button>
+              )}
+              <button
+                onClick={() => setActiveNotification(null)}
+                className="bg-[#2b2d31] hover:bg-[#3f4147] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Announcements Dialog Startup Modal Overlay */}
+        {activeAnnouncement && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-scaleIn">
+              <div className="flex items-center space-x-2.5 pb-2.5 border-b border-[#2b2d31]">
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                  <span className="text-lg">📢</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white uppercase tracking-wider">System Announcement</h3>
+                  <p className="text-[9px] text-[#23a55a] font-bold uppercase tracking-wider">Official Message</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-sm font-extrabold text-white">{activeAnnouncement.title}</h4>
+                <p className="text-xs text-[#dbdee1] leading-relaxed whitespace-pre-line bg-[#111214] p-3 rounded-xl border border-[#2b2d31] max-h-48 overflow-y-auto">{activeAnnouncement.body}</p>
+              </div>
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => {
+                    localStorage.setItem('aynx_last_read_announcement', activeAnnouncement.id);
+                    setActiveAnnouncement(null);
+                  }}
+                  className="bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer shadow"
+                >
+                  Got It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
   );
 };

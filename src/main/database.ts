@@ -175,6 +175,54 @@ export async function initDatabase(_userDataPath: string) {
 }
 
 function startTelemetryHeartbeat() {
+  // Cache hardware properties once on startup
+  let cpu = 'Unknown CPU';
+  let ram = '—';
+  let gpu = '—';
+  let storage = '—';
+  let windowsVersion = 'Windows';
+  let deviceName = 'AYNX Device';
+  let appVersion = '2.6.2';
+  let ffmpegVersion = '—';
+
+  try {
+    const os = require('os');
+    const { app } = require('electron');
+    deviceName = os.hostname();
+    appVersion = app.getVersion();
+    windowsVersion = `${os.type()} ${os.release()} (${os.arch()})`;
+    cpu = os.cpus()[0]?.model || 'Unknown CPU';
+    ram = `${Math.round(os.totalmem() / (1024 * 1024 * 1024))} GB`;
+
+    const { execSync } = require('child_process');
+    try {
+      const out = execSync('wmic path win32_VideoController get name', { encoding: 'utf8', timeout: 1500 });
+      const lines = out.split('\n').map((l: string) => l.trim()).filter((l: string) => l && !l.startsWith('Name'));
+      if (lines.length > 0) gpu = lines[0];
+    } catch {}
+
+    try {
+      const out = execSync('wmic logicaldisk where "DeviceID=\'C:\'" get Size,FreeSpace /format:csv', { encoding: 'utf8', timeout: 1500 });
+      const lines = out.trim().split('\n').filter((l: string) => l.trim() && !l.startsWith('Node'));
+      if (lines.length > 0) {
+        const parts = lines[0].split(',');
+        if (parts.length >= 3) {
+          const freeGB = Math.round(parseInt(parts[1]) / (1024 * 1024 * 1024)) || 0;
+          const totalGB = Math.round(parseInt(parts[2]) / (1024 * 1024 * 1024)) || 0;
+          storage = `${freeGB} GB Free / ${totalGB} GB Total`;
+        }
+      }
+    } catch {}
+
+    try {
+      const out = execSync('ffmpeg -version', { encoding: 'utf8', timeout: 1500 });
+      const m = out.match(/ffmpeg version\s+(\S+)/);
+      if (m) ffmpegVersion = m[1];
+    } catch {}
+  } catch (err) {
+    console.error('Error fetching system specs for telemetry:', err);
+  }
+
   setInterval(async () => {
     try {
       const store = await getStore();
@@ -202,20 +250,88 @@ function startTelemetryHeartbeat() {
           displayName,
           plan,
           activeDownloads: activeCount,
-          statusText: activeCount > 0 ? 'Downloading' : 'Idle'
+          statusText: activeCount > 0 ? 'Downloading' : 'Idle',
+          cpu,
+          ram,
+          gpu,
+          storage,
+          windowsVersion,
+          ffmpegVersion,
+          deviceName,
+          appVersion
         })
       });
 
       if (res.ok) {
         const data = await res.json();
+        
+        // 1. Sync Plan changes
         if (data.plan && data.plan !== settings.plan) {
           settings.plan = data.plan;
           if (data.expiresAt) settings.expiresAt = data.expiresAt;
           store.set('settings', settings);
-          // Notify renderer about settings update
+          
           const { BrowserWindow } = require('electron');
           BrowserWindow.getAllWindows().forEach((win: any) => {
             win.webContents.send('settings-updated');
+          });
+        }
+
+        // 2. Sync Feature Flags
+        if (data.featureFlags) {
+          store.set('featureFlags', data.featureFlags);
+          const { BrowserWindow } = require('electron');
+          BrowserWindow.getAllWindows().forEach((win: any) => {
+            win.webContents.send('feature-flags-updated', data.featureFlags);
+          });
+        }
+
+        // 3. Sync Announcements
+        if (data.announcements) {
+          store.set('announcements', data.announcements);
+          const { BrowserWindow } = require('electron');
+          BrowserWindow.getAllWindows().forEach((win: any) => {
+            win.webContents.send('announcements-updated', data.announcements);
+          });
+        }
+
+        // 4. Remote Notification Banner
+        if (data.notifications && data.notifications.length > 0) {
+          const { BrowserWindow } = require('electron');
+          BrowserWindow.getAllWindows().forEach((win: any) => {
+            win.webContents.send('remote-notification', data.notifications[0]);
+          });
+        }
+
+        // 5. Execute Remote Commands
+        if (data.commands && data.commands.length > 0) {
+          const { BrowserWindow } = require('electron');
+          const wins = BrowserWindow.getAllWindows();
+          
+          data.commands.forEach(async (cmd: string) => {
+            console.log(`[AYNX Heartbeat] Executing remote command: ${cmd}`);
+            if (cmd === 'force_logout') {
+              const { clearAuth } = require('./auth');
+              await clearAuth();
+              wins.forEach((w: any) => w.webContents.send('auth-logout'));
+            } else if (cmd === 'refresh_account' || cmd === 'refresh_subscription') {
+              wins.forEach((w: any) => w.webContents.send('auth-refresh'));
+            } else if (cmd === 'refresh_feature_flags') {
+              wins.forEach((w: any) => w.webContents.send('feature-flags-updated', data.featureFlags));
+            } else if (cmd === 'clear_cache') {
+              try {
+                wins.forEach((w: any) => {
+                  w.webContents.session.clearCache();
+                  w.webContents.send('cache-cleared');
+                });
+              } catch {}
+            } else if (cmd === 'revalidate_license') {
+              wins.forEach((w: any) => w.webContents.send('license-revalidate'));
+            } else if (cmd === 'check_updates') {
+              wins.forEach((w: any) => w.webContents.send('check-updates-trigger'));
+            } else if (cmd === 'upload_logs') {
+              wins.forEach((w: any) => w.webContents.send('upload-logs-request', machineId));
+            }
           });
         }
       }
@@ -229,6 +345,16 @@ function startTelemetryHeartbeat() {
 export async function getSettings(): Promise<Record<string, string>> {
   const store = await getStore();
   return store.get('settings') as Record<string, string>;
+}
+
+export async function getFeatureFlags(): Promise<Record<string, boolean>> {
+  const store = await getStore();
+  return (store.get('featureFlags') as Record<string, boolean>) || {};
+}
+
+export async function getAnnouncements(): Promise<any[]> {
+  const store = await getStore();
+  return (store.get('announcements') as any[]) || [];
 }
 
 export function getSettingsSync(): Record<string, string> {

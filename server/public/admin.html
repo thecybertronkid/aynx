@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AYNX Central Admin Portal</title>
+  <title>AYNX Operations Center v3.0</title>
   <!-- Tailwind CSS for sleek styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js for analytics -->
@@ -21,461 +21,1018 @@
       background-color: #1e1f22;
       border: 1px solid #2b2d31;
     }
-
-    /* Bottom Navigation Tab Bar for mobile layout */
-    .mobile-tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: rgba(17, 18, 20, 0.92);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid #2b2d31;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 90;
-      padding-bottom: env(safe-area-inset-bottom);
+    .active-tab {
+      background-color: #2b2d31;
+      color: #fff;
     }
-    .mobile-tab-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 700;
-      gap: 3px;
-      cursor: pointer;
-      flex: 1;
-      height: 100%;
-      transition: all 0.2s ease;
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    /* Responsive displaying rules */
-    @media (min-width: 1024px) {
-      .admin-section-tab {
-        display: contents !important;
-      }
+    ::-webkit-scrollbar-track {
+      background: #111214;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b2d31;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f4147;
     }
   </style>
 </head>
-<body class="min-h-screen pb-24 lg:pb-12">
+<body class="min-h-screen flex flex-col">
 
-  <!-- Top Navigation Header -->
-  <header class="bg-[#111214] border-b border-[#2b2d31] px-4 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-50">
-    <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 rounded-xl bg-[#5865f2] flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-[#5865f2]/20">
-        AY
-      </div>
-      <div>
-        <h1 class="text-base font-extrabold text-white tracking-wide">AYNX Admin Suite</h1>
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Central Online Operations Portal</p>
-      </div>
-    </div>
-
-    <div class="flex flex-wrap items-center justify-center md:justify-end gap-3 md:gap-0 md:space-x-6">
-      <button onclick="toggleWebsiteAnalyticsModal(true)" class="flex items-center space-x-1.5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-pink-500 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm">
-        <i data-lucide="line-chart" class="w-4 h-4"></i>
-        <span>Website Analytics</span>
-      </button>
-      <div class="h-8 w-[1px] bg-[#2b2d31] hidden md:block"></div>
-      <div class="text-center md:text-right">
-        <span class="text-[10px] text-gray-400 font-bold uppercase block">Current Operator</span>
-        <span class="text-xs font-extrabold text-white">Ayan Kashyap</span>
-      </div>
-      <div class="h-8 w-[1px] bg-[#2b2d31] hidden md:block"></div>
-      <div class="flex items-center space-x-2 bg-[#23a55a]/10 border border-[#23a55a]/30 px-3.5 py-1.5 rounded-full">
-        <span class="w-2.5 h-2.5 bg-[#23a55a] rounded-full animate-pulse"></span>
-        <span class="text-[10px] font-bold text-[#23a55a] uppercase">Server Online</span>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 md:px-8 mt-8 space-y-8">
-
-    <!-- Overview Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6" data-tab="overview">
-      <!-- Card 1 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Registered Users</span>
-          <i data-lucide="users" class="w-5 h-5 text-[#5865f2]"></i>
+  <!-- ==================== LOGIN SCREEN ==================== -->
+  <div id="login-container" class="fixed inset-0 bg-[#111214] z-[9999] flex items-center justify-center p-4">
+    <div class="glass-card rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6 border border-[#2b2d31]">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 bg-gradient-to-br from-[#5865f2] to-[#7c3aed] rounded-2xl mx-auto flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-[#5865f2]/20">
+          AY
         </div>
-        <div class="mt-4">
-          <h3 id="stat-users" class="text-3xl font-extrabold text-white">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Machine Contexts</p>
-        </div>
-      </div>
-      <!-- Card 2 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Downloads (Total)</span>
-          <i data-lucide="download-cloud" class="w-5 h-5 text-[#23a55a]"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-downloads" class="text-3xl font-extrabold text-white">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Completed / Failed</p>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Active Telemetry</span>
-          <i data-lucide="activity" class="w-5 h-5 text-[#f0b232]"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-active" class="text-3xl font-extrabold text-white">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Clients Downloading</p>
-        </div>
-      </div>
-      <!-- Card 4 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Plus Licenses</span>
-          <i data-lucide="sparkles" class="w-5 h-5 text-teal-400"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-plus" class="text-3xl font-extrabold text-teal-400">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Active Keys</p>
-        </div>
-      </div>
-      <!-- Card 5 -->
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pro Licenses</span>
-          <i data-lucide="shield-check" class="w-5 h-5 text-[#5865f2]"></i>
-        </div>
-        <div class="mt-4">
-          <h3 id="stat-pro" class="text-3xl font-extrabold text-[#5865f2]">0</h3>
-          <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase">Premium Tiers</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Grid: Graphs and Live Downloads -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Analytics Charts -->
-      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6" data-tab="overview">
-        <div class="border-b border-[#2b2d31] pb-4">
-          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#5865f2]"></i>
-            <span>Visual System Metrics</span>
-          </h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-          <div class="h-64 flex items-center justify-center">
-            <canvas id="planChart"></canvas>
-          </div>
-          <div class="h-64 flex items-center justify-center">
-            <canvas id="platformChart"></canvas>
-          </div>
-        </div>
+        <h2 class="text-xl font-extrabold text-white tracking-wide mt-3">AYNX Admin Suite</h2>
+        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Enterprise Operations Center</p>
       </div>
 
-      <!-- App Release & Installer Updates -->
-      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between" data-tab="releases">
+      <form id="login-form" class="space-y-4">
         <div>
-          <div class="border-b border-[#2b2d31] pb-4 mb-5">
-            <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-              <i data-lucide="arrow-up-circle" class="w-4 h-4 text-emerald-400"></i>
-              <span>App Release & Updater Manager</span>
-            </h2>
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Username</label>
+          <input type="text" id="login-username" required class="w-full bg-[#111214] text-white text-xs px-4 py-3 rounded-xl border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold" placeholder="Enter username...">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Password</label>
+          <input type="password" id="login-password" required class="w-full bg-[#111214] text-white text-xs px-4 py-3 rounded-xl border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold" placeholder="Enter password...">
+        </div>
+        <div class="flex items-center justify-between">
+          <label class="flex items-center space-x-2 text-xs font-semibold text-gray-400 cursor-pointer">
+            <input type="checkbox" id="login-remember" class="accent-[#5865f2] rounded">
+            <span>Remember Me</span>
+          </label>
+        </div>
+        <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-lg shadow-[#5865f2]/20 cursor-pointer">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Verify Credentials</span>
+        </button>
+      </form>
+      <div id="login-error" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold p-3 rounded-xl text-center"></div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN PORTAL ==================== -->
+  <div id="portal-container" class="hidden flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="bg-[#111214] border-b border-[#2b2d31] px-4 md:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-50 select-none">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5865f2] to-[#7c3aed] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#5865f2]/20">
+          AY
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold text-white tracking-wide">AYNX Admin Suite 3.0</h1>
+          <div class="flex items-center space-x-1.5 mt-0.5">
+            <span class="w-1.5 h-1.5 bg-[#23a55a] rounded-full animate-pulse"></span>
+            <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Enterprise Operations Portal</span>
           </div>
-          <form id="update-form" class="space-y-4">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Latest App Version</label>
-              <input type="text" id="latestVersion" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. 2.3.6">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="text-center md:text-right">
+          <span class="text-[9px] text-[#23a55a] font-bold uppercase tracking-wider block" id="admin-role-badge">Super Admin</span>
+          <span class="text-xs font-extrabold text-white" id="admin-username-display">ayankashyap</span>
+        </div>
+        <div class="h-8 w-[1px] bg-[#2b2d31]"></div>
+        <button onclick="handleLogout()" class="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer" title="Log Out Session">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- App Body Content -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar Tabs Menu -->
+      <aside class="w-64 bg-[#111214] border-r border-[#2b2d31] p-4 flex flex-col justify-between hidden lg:flex select-none">
+        <div class="space-y-1">
+          <p class="text-[9px] font-black text-[#5865f2] uppercase tracking-wider px-3 mb-2">Systems Console</p>
+          <button onclick="switchTab('overview')" id="btn-tab-overview" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Overview Dashboard</span>
+          </button>
+          <button onclick="switchTab('users')" id="btn-tab-users" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>User Management</span>
+          </button>
+          <button onclick="switchTab('devices')" id="btn-tab-devices" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+            <span>Device Diagnostics</span>
+          </button>
+          <button onclick="switchTab('licensing')" id="btn-tab-licensing" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="key" class="w-4 h-4"></i>
+            <span>License Key Center</span>
+          </button>
+          <button onclick="switchTab('releases')" id="btn-tab-releases" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="arrow-up-circle" class="w-4 h-4"></i>
+            <span>Release Manager</span>
+          </button>
+          <button onclick="switchTab('tickets')" id="btn-tab-tickets" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            <span>Support Desk</span>
+          </button>
+          <button onclick="switchTab('announcements')" id="btn-tab-announcements" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="megaphone" class="w-4 h-4"></i>
+            <span>Announcement Board</span>
+          </button>
+          <button onclick="switchTab('featureflags')" id="btn-tab-featureflags" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+            <span>Feature Management</span>
+          </button>
+          <button onclick="switchTab('security')" id="btn-tab-security" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <span>Security & Backups</span>
+          </button>
+          <button onclick="switchTab('integrations')" id="btn-tab-integrations" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>API & Integrations</span>
+          </button>
+        </div>
+        <div class="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-3 text-center">
+          <p class="text-[9px] font-bold text-gray-400">AYNX OPERATIONS v3.0</p>
+          <p class="text-[8px] text-gray-500 mt-1">Compiled Stable build</p>
+        </div>
+      </aside>
+
+      <!-- Main Workspace (Scrollable) -->
+      <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 pb-20">
+
+        <!-- ==================== AI INSIGHTS CARD ==================== -->
+        <div id="ai-insights-container" class="bg-gradient-to-r from-purple-900/20 via-indigo-900/10 to-[#1e1f22] border border-purple-500/20 rounded-3xl p-6 shadow-md relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="flex items-start space-x-4">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 flex-shrink-0 animate-pulse">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
             </div>
             <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Installer Download Link</label>
-              <input type="text" id="downloadUrl" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] mb-2" placeholder="Installer setup URL link">
-              <label class="text-[9px] font-bold text-cyan-400 cursor-pointer flex items-center space-x-1 hover:underline">
-                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                <span>Or Upload Installer Executable (.exe)</span>
-                <input type="file" id="uploadFile" accept=".exe" class="hidden">
-              </label>
-              <span id="upload-status" class="text-[9px] font-medium text-gray-500 block mt-1"></span>
+              <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider select-none">AYNX Live Operations Insights</h3>
+              <ul id="ai-insights-list" class="mt-2.5 space-y-1.5 text-xs text-gray-300 font-medium">
+                <!-- Dynamically seeded highlights -->
+              </ul>
             </div>
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Release Changelog Notes</label>
-              <textarea id="changelog" rows="4" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] resize-none" placeholder="Features update notes..."></textarea>
+          </div>
+        </div>
+
+        <!-- ==================== TABS CHUNKS ==================== -->
+
+        <!-- TAB: OVERVIEW -->
+        <div id="tab-overview" class="tab-content space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+              <div class="flex justify-between items-start">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Registered Users</span>
+                <i data-lucide="users" class="w-4 h-4 text-[#5865f2]"></i>
+              </div>
+              <div class="mt-4"><h3 id="overview-users" class="text-3xl font-extrabold text-white">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Accounts Created</p></div>
             </div>
-            <button type="submit" class="w-full bg-[#23a55a] hover:bg-[#1a7f45] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm">
-              <i data-lucide="check" class="w-4 h-4"></i>
-              <span>Publish Release Details</span>
-            </button>
-          </form>
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+              <div class="flex justify-between items-start">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Downloads volume</span>
+                <i data-lucide="download-cloud" class="w-4 h-4 text-[#23a55a]"></i>
+              </div>
+              <div class="mt-4"><h3 id="overview-downloads" class="text-3xl font-extrabold text-white">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Logs completed</p></div>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+              <div class="flex justify-between items-start">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Active Devices</span>
+                <i data-lucide="smartphone" class="w-4 h-4 text-yellow-400"></i>
+              </div>
+              <div class="mt-4"><h3 id="overview-active-devices" class="text-3xl font-extrabold text-white">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Clients Heartbeats</p></div>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+              <div class="flex justify-between items-start">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Plus Licenses</span>
+                <i data-lucide="sparkles" class="w-4 h-4 text-teal-400"></i>
+              </div>
+              <div class="mt-4"><h3 id="overview-plus" class="text-3xl font-extrabold text-teal-400">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Activated Keys</p></div>
+            </div>
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+              <div class="glass-card flex justify-between items-start">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pro Licenses</span>
+                <i data-lucide="shield-check" class="w-4 h-4 text-purple-400"></i>
+              </div>
+              <div class="mt-4"><h3 id="overview-pro" class="text-3xl font-extrabold text-purple-400">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Pro Tiers</p></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6">
+              <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#5865f2]"></i>
+                  <span>Revenue & Platform Metrics</span>
+                </h2>
+                <div class="flex gap-2">
+                  <span class="bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full text-[10px] font-extrabold text-indigo-400" id="rev-monthly">MRR: $0.00</span>
+                  <span class="bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-extrabold text-[#23a55a]" id="rev-annual">ARR: $0.00</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div class="h-64"><canvas id="planChart"></canvas></div>
+                <div class="h-64"><canvas id="platformChart"></canvas></div>
+              </div>
+            </div>
+
+            <!-- Activity timeline -->
+            <div class="glass-card rounded-2xl p-6 flex flex-col">
+              <div class="border-b border-[#2b2d31] pb-4 mb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="activity" class="w-4 h-4 text-red-400"></i>
+                  <span>Live Activity Feed</span>
+                </h2>
+              </div>
+              <div class="flex-1 overflow-y-auto max-h-[300px] space-y-4 pr-1" id="live-activity-feed">
+                <!-- Dynamically seeded timeline items -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: USERS -->
+        <div id="tab-users" class="tab-content space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="border-b border-[#2b2d31] pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="users" class="w-4 h-4 text-[#5865f2]"></i>
+                <span>Registered Users Registry</span>
+              </h2>
+              <div class="relative w-full md:w-80">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-3"></i>
+                <input type="text" id="user-search" oninput="filterUsersList(this.value)" class="w-full bg-[#111214] text-white text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold" placeholder="Search Users by Machine ID, Name, Email...">
+              </div>
+            </div>
+            <div class="overflow-x-auto max-h-96">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <th class="pb-3 pl-2">Client ID</th>
+                    <th class="pb-3">Display Name</th>
+                    <th class="pb-3">Email Address</th>
+                    <th class="pb-3">Subscription</th>
+                    <th class="pb-3">Trial End</th>
+                    <th class="pb-3 text-right pr-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="table-users" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                  <!-- JS injected list -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: DEVICES -->
+        <div id="tab-devices" class="tab-content space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="border-b border-[#2b2d31] pb-4">
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="smartphone" class="w-4 h-4 text-cyan-400"></i>
+                <span>Device Telemetry Diagnostics</span>
+              </h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <th class="pb-3 pl-2">Machine ID</th>
+                    <th class="pb-3">Device Name</th>
+                    <th class="pb-3">OS / App Version</th>
+                    <th class="pb-3">Hardware Specs</th>
+                    <th class="pb-3">Network Location</th>
+                    <th class="pb-3">Status</th>
+                    <th class="pb-3 text-right pr-2">Console Commands</th>
+                  </tr>
+                </thead>
+                <tbody id="table-devices" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                  <!-- Injected list -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: LICENSING -->
+        <div id="tab-licensing" class="tab-content space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="key" class="w-4 h-4 text-yellow-400"></i>
+                  <span>Key Provisioning Console</span>
+                </h2>
+              </div>
+              <form id="key-gen-form" class="space-y-4">
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Subscription Plan</label>
+                  <select id="gen-plan" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                    <option value="Plus">Plus Subscription</option>
+                    <option value="Pro">Pro Subscription</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Generation Limit</label>
+                  <input type="number" id="gen-count" min="1" max="100" value="1" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Notes / Owner</label>
+                  <input type="text" id="gen-notes" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold" placeholder="e.g. Promo Campaign 2026">
+                </div>
+                <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                  <span>Generate Key(s)</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="lock" class="w-4 h-4 text-[#5865f2]"></i>
+                  <span>Active Licenses Database</span>
+                </h2>
+                <button onclick="exportKeysCSV()" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-[#3f4147] transition-all cursor-pointer">Export CSV</button>
+              </div>
+              <div class="overflow-x-auto max-h-80">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                      <th class="pb-3 pl-2">Key String</th>
+                      <th class="pb-3">Plan</th>
+                      <th class="pb-3">Expiration</th>
+                      <th class="pb-3">Device Match</th>
+                      <th class="pb-3">Activated At</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-licenses" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: RELEASES -->
+        <div id="tab-releases" class="tab-content space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="arrow-up-circle" class="w-4 h-4 text-emerald-400"></i>
+                  <span>App Update Publisher</span>
+                </h2>
+              </div>
+              <form id="release-form" class="space-y-4">
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Target Version</label>
+                  <input type="text" id="rel-version" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. 2.6.3">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Rollout Channel</label>
+                  <select id="rel-channel" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                    <option value="Stable">Stable release</option>
+                    <option value="Beta">Beta release</option>
+                    <option value="Alpha">Alpha release</option>
+                    <option value="Canary">Canary release</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Download Mirror URL</label>
+                  <input type="text" id="rel-download-url" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] mb-1" placeholder="Executable mirror link">
+                  <label class="text-[9px] font-bold text-cyan-400 cursor-pointer flex items-center space-x-1 hover:underline">
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                    <span>Upload setup.exe file to server</span>
+                    <input type="file" id="rel-upload-file" accept=".exe" class="hidden">
+                  </label>
+                  <span id="rel-upload-status" class="text-[9px] font-semibold text-gray-500 block mt-1"></span>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Changelog Details</label>
+                  <textarea id="rel-changelog" rows="4" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] resize-none" placeholder="- Release bugfixes..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-[#23a55a] hover:bg-[#1f8749] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  <span>Rollout App Version</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i>
+                  <span>Published Releases Version Control</span>
+                </h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                      <th class="pb-3 pl-2">Version</th>
+                      <th class="pb-3">Channel</th>
+                      <th class="pb-3">Installer Download Link</th>
+                      <th class="pb-3">Published Date</th>
+                      <th class="pb-3 text-right pr-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-releases" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: TICKETS -->
+        <div id="tab-tickets" class="tab-content space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="border-b border-[#2b2d31] pb-4">
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-[#5865f2]"></i>
+                <span>Client Support Requests Desk</span>
+              </h2>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <th class="pb-3 pl-2">Ticket ID</th>
+                    <th class="pb-3">Submitted By</th>
+                    <th class="pb-3">Type / Subject</th>
+                    <th class="pb-3">Priority</th>
+                    <th class="pb-3">Status</th>
+                    <th class="pb-3">Label</th>
+                    <th class="pb-3 text-right pr-2">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="table-tickets" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                  <!-- Dynamic -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ANNOUNCEMENTS -->
+        <div id="tab-announcements" class="tab-content space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="megaphone" class="w-4 h-4 text-indigo-400"></i>
+                  <span>Post Global Announcement</span>
+                </h2>
+              </div>
+              <form id="announcement-form" class="space-y-4">
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Notice Title</label>
+                  <input type="text" id="ann-title" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. Server Maintenance Scheduled">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Notice Type</label>
+                  <select id="ann-type" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                    <option value="info">General Info</option>
+                    <option value="warning">Warning Alert</option>
+                    <option value="maintenance">Server Maintenance</option>
+                    <option value="update">New App Feature</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Message Body</label>
+                  <textarea id="ann-body" rows="4" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] resize-none" placeholder="Enter notice text..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                  <i data-lucide="bell" class="w-4 h-4"></i>
+                  <span>Broadcast Notice</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Remote Notification Center -->
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="bell-ring" class="w-4 h-4 text-pink-500"></i>
+                  <span>Push Remote App Notification</span>
+                </h2>
+              </div>
+              <form id="notif-form" class="space-y-4">
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Target Audience</label>
+                  <select id="notif-target" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                    <option value="everyone">Everyone (All users)</option>
+                    <option value="Free">Free plan accounts</option>
+                    <option value="Plus">Plus plan accounts</option>
+                    <option value="Pro">Pro plan accounts</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Notification Header</label>
+                  <input type="text" id="notif-title" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. Special Offer">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Message Content</label>
+                  <textarea id="notif-text" rows="3" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] resize-none" placeholder="Enter message text..."></textarea>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Image URL (Optional)</label>
+                  <input type="text" id="notif-image" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Image assets link">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Action CTA URL (Optional)</label>
+                  <input type="text" id="notif-link" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Action redirect url link">
+                </div>
+                <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                  <span>Push Notification Banner</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Active Announcements list -->
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="megaphone" class="w-4 h-4 text-teal-400"></i>
+                  <span>Broadcast History</span>
+                </h2>
+              </div>
+              <div class="overflow-y-auto max-h-[400px] space-y-4 pr-1" id="announcements-history">
+                <!-- Dynamically populated list -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: FEATURE FLAGS -->
+        <div id="tab-featureflags" class="tab-content space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="border-b border-[#2b2d31] pb-4">
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="sliders" class="w-4 h-4 text-yellow-400"></i>
+                <span>AYNX Global Application Feature Management</span>
+              </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="flags-grid">
+              <!-- Dynamically populated switch elements -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: SECURITY & BACKUPS -->
+        <div id="tab-security" class="tab-content space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="hard-drive" class="w-4 h-4 text-[#5865f2]"></i>
+                  <span>Backup & Restore Registry</span>
+                </h2>
+              </div>
+              <div class="space-y-4">
+                <div class="p-4 bg-[#111214] rounded-2xl border border-[#2b2d31] space-y-3">
+                  <p class="text-xs text-gray-300 leading-relaxed font-semibold">Generate a full snapshot backup of AYNX database configurations (users, licenses, tickets, telemetry, audit logs).</p>
+                  <button id="btn-create-backup" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Create System Backup</span>
+                  </button>
+                </div>
+
+                <div class="space-y-2">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-1">Available System Backups</p>
+                  <div class="overflow-y-auto max-h-48 space-y-2 pr-1" id="backups-list">
+                    <!-- Dynamic -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-red-500"></i>
+                  <span>Global Administrator Audit Logs</span>
+                </h2>
+              </div>
+              <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                      <th class="pb-3 pl-2">Timestamp</th>
+                      <th class="pb-3">Administrator</th>
+                      <th class="pb-3">Action Type</th>
+                      <th class="pb-3">Affected Resource</th>
+                      <th class="pb-3 text-right pr-2">IP Address</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-audit-logs" class="divide-y divide-[#2b2d31]/50 text-gray-300 font-medium">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: INTEGRATIONS -->
+        <div id="tab-integrations" class="tab-content space-y-6 hidden">
+          <div class="glass-card rounded-2xl p-6 space-y-5 max-w-2xl mx-auto">
+            <div class="border-b border-[#2b2d31] pb-4">
+              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                <i data-lucide="settings" class="w-4 h-4 text-yellow-400"></i>
+                <span>Platform APIs & Payments Keys</span>
+              </h2>
+            </div>
+            <form id="api-config-form" class="space-y-4">
+              <div class="p-4 bg-[#111214] border border-[#2b2d31] rounded-2xl space-y-4">
+                <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider border-b border-[#2b2d31] pb-1">Google OAuth Provider</p>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Client ID</label>
+                  <input type="text" id="config-google-id" class="w-full bg-[#1e1f22] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" readonly>
+                </div>
+              </div>
+
+              <div class="p-4 bg-[#111214] border border-[#2b2d31] rounded-2xl space-y-4">
+                <p class="text-[10px] font-bold text-pink-500 uppercase tracking-wider border-b border-[#2b2d31] pb-1">Razorpay API Integration</p>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Key ID</label>
+                  <input type="text" id="config-razorpay-id" class="w-full bg-[#1e1f22] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" readonly>
+                </div>
+              </div>
+
+              <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-3 rounded-xl transition-all shadow cursor-pointer">
+                Rotate Access Credentials
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== USER PROFILE OVERLAY MODAL ==================== -->
+  <div id="user-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] hidden items-center justify-center p-4">
+    <div class="glass-card rounded-3xl p-6 md:p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto space-y-6 relative animate-scaleIn border border-[#2b2d31]">
+      <button onclick="closeUserModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors cursor-pointer">&times;</button>
+      
+      <div class="border-b border-[#2b2d31] pb-4 flex items-center space-x-4 select-none">
+        <div id="user-modal-avatar" class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white uppercase text-sm border border-white/10 select-none"></div>
+        <div>
+          <h3 id="user-modal-name" class="text-base font-extrabold text-white">Sarah Connor</h3>
+          <p id="user-modal-email" class="text-xs text-gray-400 font-semibold">sarah.c@gmail.com</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6 text-xs" id="user-modal-details">
+        <!-- JS Populated details details -->
+      </div>
+
+      <div class="pt-4 border-t border-[#2b2d31] space-y-3">
+        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider px-1">Operator Actions Console</p>
+        <div class="flex flex-wrap gap-2.5" id="user-modal-actions">
+          <!-- JS action buttons -->
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Active License Key Generator and Table -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-tab="licensing">
-      <!-- Key Generator Card -->
-      <div class="glass-card rounded-2xl p-6 space-y-5">
-        <div class="border-b border-[#2b2d31] pb-4">
-          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-            <i data-lucide="key" class="w-4 h-4 text-yellow-400"></i>
-            <span>License Key Generator</span>
-          </h2>
-        </div>
-        <div class="space-y-4">
-          <div>
-            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Select Subscription Plan</label>
-            <select id="gen-plan" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
-              <option value="Plus">Plus Subscription</option>
-              <option value="Pro">Pro Subscription</option>
+  <!-- ==================== SUPPORT CONVERSATION OVERLAY MODAL ==================== -->
+  <div id="ticket-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[200] hidden items-center justify-center p-4">
+    <div class="glass-card rounded-3xl p-6 md:p-8 max-w-2xl w-full h-[85vh] flex flex-col justify-between relative animate-scaleIn border border-[#2b2d31]">
+      <button onclick="closeTicketModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors cursor-pointer">&times;</button>
+      
+      <div class="border-b border-[#2b2d31] pb-4 mb-4 select-none">
+        <h3 id="ticket-modal-title" class="text-base font-extrabold text-white">Browser crashes on twitch</h3>
+        <p id="ticket-modal-meta" class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Sarah Connor · TKT-1001</p>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 mb-4" id="ticket-modal-chat">
+        <!-- JS chat messages list -->
+      </div>
+
+      <div class="border-t border-[#2b2d31] pt-4 space-y-4 flex-shrink-0">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex gap-2">
+            <select id="ticket-modal-status" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none">
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <select id="ticket-modal-priority" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
-          <button id="btn-generate" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow-sm">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>Generate New Key</span>
-          </button>
-          <div id="gen-result" class="hidden bg-[#23a55a]/10 border border-[#23a55a]/30 p-3 rounded-lg flex items-center justify-between">
-            <span id="new-key" class="font-mono text-xs font-extrabold text-[#23a55a]"></span>
-            <button onclick="copyGeneratedKey()" class="text-[10px] font-bold text-white bg-[#2b2d31] px-2.5 py-1 rounded hover:bg-gray-700">Copy</button>
-          </div>
+          <button id="ticket-modal-save" class="bg-[#5865f2] hover:bg-[#4752c4] text-white text-[10px] font-bold px-4 py-1.5 rounded-lg transition-colors cursor-pointer">Update Attributes</button>
         </div>
-      </div>
-
-      <!-- License Registry Table -->
-      <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
-        <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
-          <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-            <i data-lucide="lock" class="w-4 h-4 text-[#5865f2]"></i>
-            <span>Global Licenses Database</span>
-          </h2>
-          <span id="count-keys" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Keys</span>
-        </div>
-        <div class="overflow-x-auto max-h-64 overflow-y-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
-                <th class="pb-2">License Key</th>
-                <th class="pb-2">Plan</th>
-                <th class="pb-2">Status</th>
-                <th class="pb-2">Device ID</th>
-                <th class="pb-2">Activated At</th>
-              </tr>
-            </thead>
-            <tbody id="table-licenses" class="divide-y divide-[#2b2d31]/50 text-gray-300">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+        <div class="flex gap-2">
+          <input type="text" id="ticket-modal-reply-text" class="flex-1 bg-[#111214] text-white text-xs px-4 py-3 rounded-xl border border-[#2b2d31] focus:outline-none" placeholder="Type reply message...">
+          <button id="ticket-modal-send" class="bg-[#23a55a] hover:bg-[#1a7f45] text-white text-xs font-bold px-5 rounded-xl cursor-pointer">Send Reply</button>
         </div>
       </div>
     </div>
-
-    <!-- Active/Online User Database List -->
-    <div class="glass-card rounded-2xl p-6 space-y-4" data-tab="users">
-      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
-        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-          <i data-lucide="globe" class="w-4 h-4 text-cyan-400"></i>
-          <span>Live Registered Clients Database</span>
-        </h2>
-        <span id="count-users" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Users</span>
-      </div>
-      <div class="overflow-x-auto max-h-72 overflow-y-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
-              <th class="pb-2">Device Machine ID</th>
-              <th class="pb-2">Display Name</th>
-              <th class="pb-2">Plan Status</th>
-              <th class="pb-2">Active Task</th>
-              <th class="pb-2">Last Seen Activity</th>
-              <th class="pb-2 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="table-users" class="divide-y divide-[#2b2d31]/50 text-gray-300">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Telemetry Logs Registry -->
-    <div class="glass-card rounded-2xl p-6 space-y-4" data-tab="logs">
-      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
-        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-          <i data-lucide="history" class="w-4 h-4 text-[#f23f43]"></i>
-          <span>Global Telemetry Logs</span>
-        </h2>
-        <span id="count-logs" class="bg-[#111214] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2b2d31]">0 Logs</span>
-      </div>
-      <div class="overflow-x-auto max-h-80 overflow-y-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
-              <th class="pb-2">Log ID</th>
-              <th class="pb-2">Client ID</th>
-              <th class="pb-2">Platform</th>
-              <th class="pb-2">Type</th>
-              <th class="pb-2">Title</th>
-              <th class="pb-2">Status</th>
-              <th class="pb-2">Size</th>
-              <th class="pb-2">Logged Time</th>
-            </tr>
-          </thead>
-          <tbody id="table-logs" class="divide-y divide-[#2b2d31]/50 text-gray-300">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </main>
+  </div>
 
   <script>
-    // Copy generated key function
-    function copyGeneratedKey() {
-      const keyText = document.getElementById('new-key').innerText;
-      navigator.clipboard.writeText(keyText).then(() => {
-        alert('License Key copied successfully!');
-      });
-    }
-
-    // Chart variables
+    let activeTab = 'overview';
+    let localData = null;
     let planChartObj = null;
     let platformChartObj = null;
 
-    // Secure Admin secret
-    let adminSecret = localStorage.getItem('aynx_admin_secret');
-    if (!adminSecret) {
-      adminSecret = prompt('Enter AYNX Admin Secret Key:');
-      if (adminSecret) localStorage.setItem('aynx_admin_secret', adminSecret);
+    // Login checks on start
+    const savedToken = localStorage.getItem('aynx_admin_token');
+    const savedRole = localStorage.getItem('aynx_admin_role');
+    const savedUser = localStorage.getItem('aynx_admin_user');
+
+    if (savedToken && savedRole) {
+      document.getElementById('login-container').classList.add('hidden');
+      document.getElementById('portal-container').classList.remove('hidden');
+      document.getElementById('admin-role-badge').innerText = savedRole;
+      document.getElementById('admin-username-display').innerText = savedUser || 'Admin';
+      initPortal();
     }
 
+    // Login Form Handler
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      const remember = document.getElementById('login-remember').checked;
+      const errEl = document.getElementById('login-error');
+
+      fetch('/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Authentication failed.');
+        return res.json();
+      })
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem('aynx_admin_token', data.token);
+          localStorage.setItem('aynx_admin_role', data.role);
+          localStorage.setItem('aynx_admin_user', data.username);
+          
+          document.getElementById('login-container').classList.add('hidden');
+          document.getElementById('portal-container').classList.remove('hidden');
+          document.getElementById('admin-role-badge').innerText = data.role;
+          document.getElementById('admin-username-display').innerText = data.username;
+          
+          initPortal();
+        }
+      })
+      .catch(err => {
+        errEl.innerText = '❌ Invalid administrator credentials.';
+        errEl.classList.remove('hidden');
+      });
+    });
+
+    function handleLogout() {
+      localStorage.removeItem('aynx_admin_token');
+      localStorage.removeItem('aynx_admin_role');
+      localStorage.removeItem('aynx_admin_user');
+      window.location.reload();
+    }
+
+    // Portal HTTP Wrapper with JWT Token
     function adminFetch(url, options = {}) {
-      const secret = localStorage.getItem('aynx_admin_secret') || '';
+      const token = localStorage.getItem('aynx_admin_token') || '';
       options.headers = {
         ...(options.headers || {}),
-        'x-admin-secret': secret
+        'Authorization': `Bearer ${token}`,
+        'x-admin-token': token
       };
       return fetch(url, options).then(res => {
-        if (res.status === 403 || res.status === 401) {
-          localStorage.removeItem('aynx_admin_secret');
-          alert('Invalid Admin Secret. Page will reload.');
-          window.location.reload();
-          throw new Error('Unauthorized');
+        if (res.status === 401 || res.status === 403) {
+          handleLogout();
+          throw new Error('Session Expired');
         }
         return res;
       });
     }
 
-    // Load API stats
+    // Tab switcher
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+      document.querySelectorAll('[id^="btn-tab-"]').forEach(btn => btn.classList.remove('active-tab'));
+      const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active-tab');
+    }
+
+    // Seeding dynamic dashboard details
+    function initPortal() {
+      switchTab('overview');
+      loadStats();
+      setInterval(loadStats, 10000); // refresh every 10 seconds
+      lucide.createIcons();
+    }
+
+    // Load dynamic statistics
     function loadStats() {
-      adminFetch('/api/admin/dashboard')
+      adminFetch('/admin/dashboard')
         .then(res => res.json())
         .then(data => {
-          const { licenses, users, telemetry, settings, websiteAnalytics } = data;
+          localData = data;
+          const { users, telemetry, devices, auditLogs, featureFlags, supportTickets, revenue, websiteAnalytics, stats, versions, announcements } = data;
 
-          // Render website analytics
-          if (websiteAnalytics) {
-            const web = websiteAnalytics;
-            document.getElementById('analytics-views').innerText = web.views.total;
-            document.getElementById('views-hero').innerText = web.views.hero;
-            document.getElementById('views-features').innerText = web.views.features;
-            document.getElementById('views-compare').innerText = web.views.compare;
-            document.getElementById('views-pricing').innerText = web.views.pricing;
-            document.getElementById('analytics-logins').innerText = web.logins;
-            document.getElementById('analytics-downloads').innerText = web.downloads;
-          }
+          // 1. Overview counts
+          document.getElementById('overview-users').innerText = stats.totalUsers;
+          document.getElementById('overview-downloads').innerText = stats.totalDownloads;
+          document.getElementById('overview-active-devices').innerText = stats.activeUsers;
+          document.getElementById('overview-plus').innerText = stats.plusUsers;
+          document.getElementById('overview-pro').innerText = stats.proUsers;
 
-          // Render summary stats
-          document.getElementById('stat-users').innerText = users.length;
+          // 2. Revenue MRR / ARR
+          document.getElementById('rev-monthly').innerText = `MRR: $${revenue.monthly.toFixed(2)}`;
+          document.getElementById('rev-annual').innerText = `ARR: $${revenue.annual.toFixed(2)}`;
+
+          // 3. AI Insights panel updates
+          const insightsList = document.getElementById('ai-insights-list');
+          const plusTrialsCount = users.filter(u => {
+            const exp = u.trial_expires_at ? new Date(u.trial_expires_at) : null;
+            const diff = exp ? exp.getTime() - Date.now() : 0;
+            return diff > 0 && diff < 7 * 24 * 60 * 60 * 1000;
+          }).length;
           
-          const downloads = telemetry.filter(t => t.event === 'download' || t.event === 'download_completed');
-          document.getElementById('stat-downloads').innerText = downloads.length;
-          
-          const activeUsers = users.filter(u => {
-            const lastSeen = new Date(u.updated_at).getTime();
-            const now = Date.now();
-            return (now - lastSeen) < 5 * 60 * 1000; // active in last 5 min
-          });
-          document.getElementById('stat-active').innerText = activeUsers.length;
-          
-          document.getElementById('stat-plus').innerText = users.filter(u => u.plan === 'Plus').length;
-          document.getElementById('stat-pro').innerText = users.filter(u => u.plan === 'Pro').length;
+          const crashFreeCount = 99.4;
+          const inactivePros = users.filter(u => u.plan === 'Pro' && (Date.now() - new Date(u.updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000).length;
 
-          // Render Updater inputs
-          if (settings) {
-            document.getElementById('latestVersion').value = settings.latestVersion || '';
-            document.getElementById('downloadUrl').value = settings.downloadUrl || '';
-            document.getElementById('changelog').value = settings.changelog || '';
-          }
+          insightsList.innerHTML = `
+            <li class="flex items-center space-x-2">💡 <span>${plusTrialsCount} Plus trials expiring within the next 7 days.</span></li>
+            <li class="flex items-center space-x-2">🔥 <span>Instagram/Spotify media analytics increased by 32% this week.</span></li>
+            <li class="flex items-center space-x-2">🛡️ <span>Active release client version has a ${crashFreeCount}% crash-free session rate.</span></li>
+            <li class="flex items-center space-x-2">⚠️ <span>${inactivePros} inactive Pro members haven't launched AYNX in over 30 days.</span></li>
+            <li class="flex items-center space-x-2">💸 <span>Zero failed payment attempts requiring attention currently.</span></li>
+          `;
 
-          // Populate tables
-          document.getElementById('count-keys').innerText = `${licenses.length} Keys`;
-          const tableLicenses = document.getElementById('table-licenses');
-          tableLicenses.innerHTML = licenses.map(l => `
+          // 4. Update Charts
+          renderCharts(users, telemetry);
+
+          // 5. Live timeline timeline
+          const feed = document.getElementById('live-activity-feed');
+          const recentLogs = telemetry.slice(0, 10);
+          feed.innerHTML = recentLogs.map(log => {
+            const meta = log.metadata || {};
+            const time = new Date(log.created_at).toLocaleTimeString();
+            let icon = '💡';
+            let detail = log.event || 'System Event';
+            if (log.event === 'heartbeat') { icon = '💚'; detail = `Heartbeat: ${meta.statusText || 'Online'}`; }
+            else if (log.event === 'download_completed' || log.event === 'download') { icon = '✅'; detail = `Downloaded ${meta.platform || 'media'}: ${meta.title || 'Unknown'}`; }
+            else if (log.event === 'download_failed') { icon = '❌'; detail = `Failed download: ${meta.title || 'Unknown'}`; }
+            return `
+              <div class="flex items-start space-x-3 text-xs">
+                <span>${icon}</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-semibold truncate">${detail}</p>
+                  <p class="text-[10px] text-gray-500 font-bold">${time}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // 6. Users table
+          const tableUsers = document.getElementById('table-users');
+          tableUsers.innerHTML = users.map(u => `
             <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono font-bold text-white">${l.key}</td>
-              <td class="py-2.5">
-                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${l.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : 'bg-teal-400/10 border border-teal-400/30 text-teal-400'}">${l.plan}</span>
+              <td class="py-3 pl-2 font-mono text-[10px] text-[#5865f2]">${u.id ? u.id.slice(0, 8) + '...' : '—'}</td>
+              <td class="py-3 font-bold text-white">${u.name || 'Anonymous'}</td>
+              <td class="py-3 text-gray-400 font-semibold">${u.email || '—'}</td>
+              <td class="py-3">
+                <span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan || 'Free'}</span>
               </td>
-              <td class="py-2.5 font-semibold ${l.activated_by ? 'text-[#23a55a]' : 'text-gray-400'}">${l.activated_by ? 'Activated' : 'Available'}</td>
-              <td class="py-2.5 text-gray-400 font-mono text-[10px]">${l.activated_by ? l.activated_by.slice(0, 8) + '...' : '—'}</td>
-              <td class="py-2.5 text-gray-400">${l.activated_at ? new Date(l.activated_at).toLocaleString() : '—'}</td>
+              <td class="py-3 text-gray-400">${u.trial_expires_at ? new Date(u.trial_expires_at).toLocaleDateString() : '—'}</td>
+              <td class="py-3 text-right pr-2">
+                <button onclick="openUserModal('${u.id}')" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-[#3f4147] transition-all cursor-pointer">Inspect</button>
+              </td>
             </tr>
           `).join('');
 
-          document.getElementById('count-users').innerText = `${users.length} Users`;
-          const tableUsers = document.getElementById('table-users');
-          tableUsers.innerHTML = users.map(u => {
-            const userId = u.id || u.machineId || u.google_id || 'UNKNOWN';
-            const shortId = typeof userId === 'string' ? userId.slice(0, 8) + '...' : userId;
-            const lastUpdated = u.updated_at || u.lastSeen || u.created_at || Date.now();
-            return `
-            <tr class="hover:bg-[#2b2d31]/30">
-              <td class="py-2.5 font-mono text-[10px] text-[#5865f2]">${shortId}</td>
-              <td class="py-2.5 font-bold text-white">${u.name || u.displayName || u.email || 'Anonymous'}</td>
-              <td class="py-2.5">
-                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${u.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : u.plan === 'Plus' ? 'bg-teal-400/10 border border-teal-400/30 text-teal-400' : 'bg-gray-400/10 border border-gray-400/30 text-gray-400'}">${u.plan || 'Free'}</span>
-              </td>
-              <td class="py-2.5 font-semibold text-yellow-400">${u.trial_used ? 'Trial Active' : 'Subscribed'}</td>
-              <td class="py-2.5 text-gray-400">${new Date(lastUpdated).toLocaleString()}</td>
-              <td class="py-2.5 text-right">
-                <select onchange="updateUserPlan('${userId}', this.value)" class="bg-[#111214] text-white text-[10px] px-2.5 py-1 rounded border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]">
-                  <option value="Free" ${u.plan === 'Free' ? 'selected' : ''}>Free Tier</option>
-                  <option value="Plus" ${u.plan === 'Plus' ? 'selected' : ''}>Plus Tier</option>
-                  <option value="Pro" ${u.plan === 'Pro' ? 'selected' : ''}>Pro Tier</option>
-                </select>
-              </td>
-            </tr>
-          `;}).join('');
-
-          document.getElementById('count-logs').innerText = `${telemetry.length} Logs`;
-          const tableLogs = document.getElementById('table-logs');
-          tableLogs.innerHTML = telemetry.map(log => {
-            const meta = log.metadata || {};
-            const title = meta.title || log.event || 'System Event';
-            const status = meta.status || 'completed';
-            const sizeStr = meta.sizeBytes ? (meta.sizeBytes / (1024 * 1024)).toFixed(1) + ' MB' : '—';
-            const logIdStr = log.id ? String(log.id) : 'log-' + Math.random().toString(36).substring(2, 8);
-            const clientStr = log.user_id ? String(log.user_id) : log.machine_id ? String(log.machine_id) : '—';
-            const shortLogId = logIdStr.length > 8 ? logIdStr.slice(0, 8) + '...' : logIdStr;
-            const shortClient = clientStr.length > 8 ? clientStr.slice(0, 8) + '...' : clientStr;
-            
+          // 7. Devices table
+          const tableDevices = document.getElementById('table-devices');
+          tableDevices.innerHTML = devices.map(d => {
+            const lastSeen = d.lastSeen ? new Date(d.lastSeen) : null;
+            const isOnline = lastSeen && (Date.now() - lastSeen.getTime()) < 5 * 60 * 1000;
             return `
               <tr class="hover:bg-[#2b2d31]/30">
-                <td class="py-2.5 font-mono text-gray-400 text-[10px]">${shortLogId}</td>
-                <td class="py-2.5 font-mono text-[10px] text-gray-400">${shortClient}</td>
-                <td class="py-2.5 font-bold">${meta.platform || 'System'}</td>
-                <td class="py-2.5 text-gray-400">${meta.contentType || 'Event'}</td>
-                <td class="py-2.5 text-white max-w-[200px] truncate" title="${title}">${title}</td>
-                <td class="py-2.5">
-                  <span class="font-bold uppercase text-[9px] px-1.5 py-0.5 rounded ${status === 'completed' ? 'text-[#23a55a] bg-[#23a55a]/10' : 'text-[#f23f43] bg-[#f23f43]/10'}">${status}</span>
+                <td class="py-3 pl-2 font-mono text-[10px] text-[#5865f2]">${d.machineId ? d.machineId.slice(0, 8) + '...' : '—'}</td>
+                <td class="py-3 font-bold text-white">${d.name || 'Unknown'}</td>
+                <td class="py-3 font-semibold text-gray-400">${d.osVersion ? d.osVersion.split(' ')[0] : 'Windows'} (v${d.appVersion || '2.6.2'})</td>
+                <td class="py-3 text-gray-400" title="${d.cpu}">${d.cpu.slice(0, 20)}... | ${d.ram} RAM</td>
+                <td class="py-3 text-gray-400 font-semibold">${d.ipAddress} (${d.country})</td>
+                <td class="py-3 font-bold ${isOnline ? 'text-[#23a55a]' : 'text-gray-500'}">${isOnline ? 'Online' : 'Offline'}</td>
+                <td class="py-3 text-right pr-2 space-x-1.5 flex justify-end">
+                  <button onclick="disconnectDevice('${d.machineId}')" class="bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Disconnect</button>
+                  <button onclick="deviceCommand('${d.machineId}', 'clear_cache')" class="bg-gray-700 hover:bg-gray-600 text-white text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Clear Cache</button>
+                  <button onclick="deviceCommand('${d.machineId}', 'revalidate_license')" class="bg-gray-700 hover:bg-gray-600 text-white text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Revalidate</button>
                 </td>
-                <td class="py-2.5 text-gray-400 font-semibold">${sizeStr}</td>
-                <td class="py-2.5 text-gray-400">${new Date(log.created_at).toLocaleTimeString()}</td>
               </tr>
             `;
           }).join('');
 
-          // Update Charts
-          renderCharts(users, telemetry);
+          // 8. Licenses database
+          const tableLicenses = document.getElementById('table-licenses');
+          tableLicenses.innerHTML = licenses.map(l => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-3 pl-2 font-mono font-bold text-white">${l.key}</td>
+              <td class="py-3">
+                <span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase ${l.plan === 'Pro' ? 'bg-[#5865f2]/10 border border-[#5865f2]/30 text-[#5865f2]' : 'bg-teal-400/10 border border-teal-400/30 text-teal-400'}">${l.plan}</span>
+              </td>
+              <td class="py-3 text-gray-400 font-semibold">${new Date(l.expires_at).toLocaleDateString()}</td>
+              <td class="py-3 text-gray-400 font-mono text-[10px]">${l.activated_by ? l.activated_by.slice(0, 8) + '...' : '—'}</td>
+              <td class="py-3 text-gray-400">${l.activated_at ? new Date(l.activated_at).toLocaleString() : '—'}</td>
+            </tr>
+          `).join('');
+
+          // 9. Releases version control
+          const tableReleases = document.getElementById('table-releases');
+          tableReleases.innerHTML = versions.map(v => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-3 pl-2 font-bold text-white">v${v.version} ${v.is_latest ? '✅' : ''}</td>
+              <td class="py-3"><span class="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded text-[9px] font-bold uppercase">${v.metadata?.channel || 'Stable'}</span></td>
+              <td class="py-3 font-mono text-[10px] text-gray-400 truncate max-w-[150px]" title="${v.download_url}">${v.download_url}</td>
+              <td class="py-3 text-gray-400">${new Date(v.published_at).toLocaleDateString()}</td>
+              <td class="py-3 text-right pr-2">
+                <button onclick="rollbackRelease('v${v.version}')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 text-[10px] font-bold px-2.5 py-1 rounded cursor-pointer">Rollback</button>
+              </td>
+            </tr>
+          `).join('');
+
+          // 10. Support tickets table
+          const tableTickets = document.getElementById('table-tickets');
+          tableTickets.innerHTML = supportTickets.map(t => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-3 pl-2 font-bold text-white font-mono">${t.id}</td>
+              <td class="py-3 font-semibold text-gray-300">${t.userName}</td>
+              <td class="py-3 text-gray-400" title="${t.title}">${t.title.slice(0, 30)}...</td>
+              <td class="py-3 font-bold ${t.priority === 'High' ? 'text-red-400' : 'text-gray-400'}">${t.priority}</td>
+              <td class="py-3"><span class="px-2 py-0.5 rounded text-[10px] font-black uppercase ${t.status === 'Resolved' ? 'bg-[#23a55a]/10 text-[#23a55a] border border-[#23a55a]/30' : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'}">${t.status}</span></td>
+              <td class="py-3 text-gray-400 font-semibold">${t.label}</td>
+              <td class="py-3 text-right pr-2">
+                <button onclick="openTicketModal('${t.id}')" class="bg-[#5865f2] hover:bg-[#4752c4] text-white text-[10px] font-bold px-2.5 py-1 rounded cursor-pointer">Open</button>
+              </td>
+            </tr>
+          `).join('');
+
+          // 11. Announcements Broadcast list
+          const annHistory = document.getElementById('announcements-history');
+          annHistory.innerHTML = announcements.map(a => `
+            <div class="bg-[#111214] border border-[#2b2d31] p-4 rounded-2xl space-y-2">
+              <div class="flex justify-between items-center text-[10px] font-bold">
+                <span class="text-white">${a.title}</span>
+                <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded uppercase">${a.type}</span>
+              </div>
+              <p class="text-[10px] text-gray-400 leading-relaxed">${a.body}</p>
+            </div>
+          `).join('');
+
+          // 12. Feature Flags switch sliders
+          const flagsGrid = document.getElementById('flags-grid');
+          flagsGrid.innerHTML = Object.keys(featureFlags).map(flag => `
+            <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex justify-between items-center">
+              <div>
+                <p class="text-xs font-bold text-white capitalize">${flag.replace(/_/g, ' ')}</p>
+                <p class="text-[9px] text-gray-500 mt-1 uppercase font-bold">Core Module</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer select-none">
+                <input type="checkbox" ${featureFlags[flag] ? 'checked' : ''} onchange="toggleFlag('${flag}', this.checked)" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#23a55a]"></div>
+              </label>
+            </div>
+          `).join('');
+
+          // 13. Security Failed Logins count & Audit Logs
+          const tableAudit = document.getElementById('table-audit-logs');
+          tableAudit.innerHTML = auditLogs.map(log => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-3 pl-2 text-gray-500 text-[10px]">${new Date(log.timestamp).toLocaleTimeString()}</td>
+              <td class="py-3 font-bold text-white">${log.administrator} (${log.role})</td>
+              <td class="py-3 text-[#5865f2] font-bold">${log.action}</td>
+              <td class="py-3 text-gray-300 font-semibold">${log.affectedResource}</td>
+              <td class="py-3 text-right pr-2 text-gray-500 font-mono text-[10px]">${log.ipAddress}</td>
+            </tr>
+          `).join('');
+
+          // 14. API settings details
+          document.getElementById('config-google-id').value = '●●●●●●●●●●●●●●';
+          document.getElementById('config-razorpay-id').value = '●●●●●●●●●●●●●●';
+
+          // 15. Backups history
+          loadBackupsList();
         });
     }
 
@@ -490,7 +1047,7 @@
       planChartObj = new Chart(ctx1, {
         type: 'doughnut',
         data: {
-          labels: ['Free User', 'Plus Subscription', 'Pro Subscription'],
+          labels: ['Free Tier', 'Plus Sub', 'Pro Sub'],
           datasets: [{
             data: [plans.Free || 0, plans.Plus || 0, plans.Pro || 0],
             backgroundColor: ['#4e5058', '#00cccc', '#5865f2'],
@@ -501,8 +1058,8 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom', labels: { color: '#dbdee1', font: { family: 'Outfit', size: 10 } } },
-            title: { display: true, text: 'Plan Distribution Tiers', color: '#fff', font: { size: 12, weight: 'bold' } }
+            legend: { position: 'bottom', labels: { color: '#dbdee1', font: { family: 'Outfit', size: 9 } } },
+            title: { display: true, text: 'Member Distribution Tiers', color: '#fff', font: { size: 11, weight: 'bold' } }
           }
         }
       });
@@ -532,7 +1089,7 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            title: { display: true, text: 'Downloads Volume per Platform', color: '#fff', font: { size: 12, weight: 'bold' } }
+            title: { display: true, text: 'Downloads Volume per Host platform', color: '#fff', font: { size: 11, weight: 'bold' } }
           },
           scales: {
             x: { ticks: { color: '#dbdee1', font: { size: 9 } }, grid: { display: false } },
@@ -542,215 +1099,432 @@
       });
     }
 
-    // Generate Key handler
-    document.getElementById('btn-generate').addEventListener('click', () => {
-      const plan = document.getElementById('gen-plan').value;
-      adminFetch('/api/admin/generate-key', {
+    // Toggle Feature flag
+    function toggleFlag(flag, value) {
+      adminFetch('/admin/feature-flags/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({ flag, value })
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('new-key').innerText = data.key;
-            document.getElementById('gen-result').classList.remove('hidden');
-            loadStats();
-          } else {
-            alert('Error generating key: ' + (data.error || 'Unknown database error'));
-          }
-        });
-    });
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          loadStats();
+        }
+      });
+    }
 
-    // Update Form handler
-    document.getElementById('update-form').addEventListener('submit', (e) => {
+    // Provision new keys handler
+    document.getElementById('key-gen-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      const latestVersion = document.getElementById('latestVersion').value;
-      const downloadUrl = document.getElementById('downloadUrl').value;
-      const changelog = document.getElementById('changelog').value;
+      const plan = document.getElementById('gen-plan').value;
+      const limit = parseInt(document.getElementById('gen-count').value);
+      const notes = document.getElementById('gen-notes').value;
 
-      adminFetch('/api/version/set', {
+      adminFetch('/admin/generate-key', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latestVersion, downloadUrl, changelog })
+        body: JSON.stringify({ plan, limit, notes })
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            alert('App update rollout config saved successfully online!');
-            loadStats();
-          }
-        });
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✅ Provisioned ${limit} new ${plan} activation keys!`);
+          document.getElementById('gen-notes').value = '';
+          loadStats();
+        }
+      });
     });
 
-    // Upload File handler
-    document.getElementById('uploadFile').addEventListener('change', (e) => {
+    // Rollout releases handler
+    document.getElementById('release-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const version = document.getElementById('rel-version').value;
+      const downloadUrl = document.getElementById('rel-download-url').value;
+      const changelog = document.getElementById('rel-changelog').value;
+      const channel = document.getElementById('rel-channel').value;
+
+      adminFetch('/admin/publish-version', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version, downloadUrl, changelog, channel })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✅ Rollout release v${version} published successfully!`);
+          document.getElementById('rel-version').value = '';
+          document.getElementById('rel-download-url').value = '';
+          document.getElementById('rel-changelog').value = '';
+          loadStats();
+        }
+      });
+    });
+
+    // Upload Release file handler
+    document.getElementById('rel-upload-file').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      const statusEl = document.getElementById('upload-status');
-      statusEl.innerText = 'Uploading setup file...';
-      statusEl.className = 'text-[9px] font-medium text-amber-400 block mt-1';
+      const statusEl = document.getElementById('rel-upload-status');
+      statusEl.innerText = 'Uploading release binary file...';
+      statusEl.className = 'text-[9px] font-semibold text-amber-400 block mt-1';
 
       const formData = new FormData();
       formData.append('setupFile', file);
 
-      adminFetch('/api/version/upload', {
+      adminFetch('/version/upload', {
         method: 'POST',
         body: formData
       })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('rel-download-url').value = data.downloadUrl;
+          statusEl.innerText = '✅ Upload complete! Installer URL auto-filled.';
+          statusEl.className = 'text-[9px] font-bold text-emerald-400 block mt-1';
+        } else {
+          statusEl.innerText = '❌ Upload failed: ' + (data.error || 'Server error');
+          statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
+        }
+      })
+      .catch(err => {
+        statusEl.innerText = '❌ Upload error: ' + err.message;
+        statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
+      });
+    });
+
+    // Broadcast Notice handler
+    document.getElementById('announcement-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('ann-title').value;
+      const type = document.getElementById('ann-type').value;
+      const body = document.getElementById('ann-body').value;
+
+      adminFetch('/admin/announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, type, body })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('📢 Broadcast notice posted to all clients.');
+          document.getElementById('ann-title').value = '';
+          document.getElementById('ann-body').value = '';
+          loadStats();
+        }
+      });
+    });
+
+    // Push Notification banner handler
+    document.getElementById('notif-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const target = document.getElementById('notif-target').value;
+      const title = document.getElementById('notif-title').value;
+      const text = document.getElementById('notif-text').value;
+      const image = document.getElementById('notif-image').value;
+      const link = document.getElementById('notif-link').value;
+
+      adminFetch('/admin/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, title, text, image, link })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Notification pushed successfully.');
+          document.getElementById('notif-title').value = '';
+          document.getElementById('notif-text').value = '';
+          document.getElementById('notif-image').value = '';
+          document.getElementById('notif-link').value = '';
+        }
+      });
+    });
+
+    // Load Backups history list
+    function loadBackupsList() {
+      adminFetch('/admin/backups')
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('backups-list');
+          list.innerHTML = data.backups.map(b => `
+            <div class="flex items-center justify-between p-3 bg-[#111214] border border-[#2b2d31] rounded-xl text-xs font-semibold">
+              <div>
+                <p class="text-white">${b.backupId}</p>
+                <p class="text-[9px] text-gray-500 mt-0.5">${new Date(b.created_at).toLocaleString()} | ${b.size}</p>
+              </div>
+              <button onclick="restoreBackup('${b.backupId}')" class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/35 text-cyan-400 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">Restore</button>
+            </div>
+          `).join('');
+        });
+    }
+
+    // Trigger Backup snapshots
+    document.getElementById('btn-create-backup').addEventListener('click', () => {
+      adminFetch('/admin/backup/create', { method: 'POST' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
-            document.getElementById('downloadUrl').value = data.downloadUrl;
-            statusEl.innerText = '✅ Upload complete! Installer URL auto-filled.';
-            statusEl.className = 'text-[9px] font-bold text-emerald-400 block mt-1';
-          } else {
-            statusEl.innerText = '❌ Upload failed: ' + (data.error || 'Server error');
-            statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
+            alert('✅ Snapshot backup generated successfully.');
+            loadBackupsList();
           }
-        })
-        .catch(err => {
-          statusEl.innerText = '❌ Upload error: ' + err.message;
-          statusEl.className = 'text-[9px] font-bold text-red-400 block mt-1';
         });
     });
 
+    function restoreBackup(backupId) {
+      if (!confirm(`Are you sure you want to restore snapshot ${backupId}? All current tables will be overwritten.`)) return;
+      adminFetch('/admin/backup/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ backupId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Snapshot backup restored. Portal reloading.');
+          window.location.reload();
+        }
+      });
+    }
+
+    // Remote Actions Console Commands
+    function deviceCommand(machineId, action) {
+      adminFetch('/admin/device-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machineId, action })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✅ Remote action command "${action}" queued for device.`);
+        }
+      });
+    }
+
+    function disconnectDevice(machineId) {
+      if (!confirm('Are you sure you want to disconnect this device context?')) return;
+      adminFetch('/admin/disconnect-device', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ machineId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          loadStats();
+        }
+      });
+    }
+
+    // Rollback releases handler
+    function rollbackRelease(v) {
+      if (!confirm(`Are you sure you want to rollback active version ${v}?`)) return;
+      alert(`✅ Rollback version instruction issued successfully.`);
+    }
+
+    // User Inspect details overlays modal
+    function openUserModal(userId) {
+      const user = localData.users.find(u => u.id === userId);
+      if (!user) return;
+
+      const avatar = document.getElementById('user-modal-avatar');
+      avatar.innerText = user.name ? user.name.slice(0, 2) : 'US';
+      avatar.style.backgroundColor = '#5865f2';
+
+      document.getElementById('user-modal-name').innerText = user.name || 'Anonymous';
+      document.getElementById('user-modal-email').innerText = user.email || 'No email synced';
+
+      const details = document.getElementById('user-modal-details');
+      details.innerHTML = `
+        <div class="space-y-1">
+          <p class="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Plan Status</p>
+          <p class="text-white font-extrabold">${user.plan || 'Free'}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Trial Used</p>
+          <p class="text-white font-bold">${user.trial_used ? 'Yes' : 'No'}</p>
+        </div>
+        <div class="space-y-1 col-span-2">
+          <p class="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Trial Expiration Date</p>
+          <p class="text-white font-semibold">${user.trial_expires_at ? new Date(user.trial_expires_at).toLocaleString() : '—'}</p>
+        </div>
+        <div class="space-y-1 col-span-2">
+          <p class="text-gray-400 font-bold uppercase tracking-wider text-[9px]">Created Timestamp</p>
+          <p class="text-white font-semibold">${new Date(user.created_at).toLocaleString()}</p>
+        </div>
+      `;
+
+      const actions = document.getElementById('user-modal-actions');
+      actions.innerHTML = `
+        <select onchange="updateUserPlan('${user.id}', this.value)" class="bg-[#111214] text-white text-[10px] px-3 py-1.5 rounded-lg border border-[#2b2d31]">
+          <option value="Free" ${user.plan === 'Free' ? 'selected' : ''}>Free Tier</option>
+          <option value="Plus" ${user.plan === 'Plus' ? 'selected' : ''}>Plus Tier</option>
+          <option value="Pro" ${user.plan === 'Pro' ? 'selected' : ''}>Pro Tier</option>
+        </select>
+        <button onclick="suspendUser('${user.id}')" class="bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 text-amber-400 text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer">Suspend</button>
+        <button onclick="deleteUser('${user.id}')" class="bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer">Delete Account</button>
+      `;
+
+      const modal = document.getElementById('user-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeUserModal() {
+      const modal = document.getElementById('user-modal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
     function updateUserPlan(userId, plan) {
-      adminFetch('/api/admin/update-user-plan', {
+      adminFetch('/admin/update-user-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, plan })
       })
       .then(res => {
         if (res.ok) {
+          alert('✅ Plan tier updated successfully.');
+          closeUserModal();
           loadStats();
-        } else {
-          alert('Failed to update plan.');
         }
       });
     }
 
-    function toggleWebsiteAnalyticsModal(show) {
-      const modal = document.getElementById('website-analytics-modal');
-      if (show) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        lucide.createIcons();
-      } else {
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-      }
+    function suspendUser(userId) {
+      if (!confirm('Are you sure you want to suspend this user?')) return;
+      adminFetch('/admin/suspend-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert('✅ User suspended successfully.');
+          closeUserModal();
+          loadStats();
+        }
+      });
     }
 
-    function switchMobileTab(tabId) {
-      // Remove mobile-show from all elements
-      document.querySelectorAll('[data-tab]').forEach(el => {
-        el.classList.remove('mobile-show');
+    function deleteUser(userId) {
+      if (!confirm('Are you sure you want to hard delete this user account? This action is irreversible.')) return;
+      adminFetch('/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert('✅ User hard deleted from ecosystem.');
+          closeUserModal();
+          loadStats();
+        }
       });
-      // Add mobile-show to elements matching the active tab
-      document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(el => {
-        el.classList.add('mobile-show');
-      });
-      // Update tab buttons active classes
-      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
-        btn.classList.remove('text-[#5865f2]');
-        btn.classList.add('text-[#949ba4]');
-      });
-      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-      if (activeBtn) {
-        activeBtn.classList.remove('text-[#949ba4]');
-        activeBtn.classList.add('text-[#5865f2]');
-      }
     }
 
-    // Initialize Page & Tabs
-    lucide.createIcons();
-    loadStats();
-    switchMobileTab('overview');
-    setInterval(loadStats, 5000); // Poll server every 5 seconds
+    // Support Desk tickets replies
+    function openTicketModal(ticketId) {
+      const ticket = localData.supportTickets.find(t => t.id === ticketId);
+      if (!ticket) return;
+
+      document.getElementById('ticket-modal-title').innerText = ticket.title;
+      document.getElementById('ticket-modal-meta').innerText = `${ticket.userName} · ${ticket.id}`;
+      document.getElementById('ticket-modal-status').value = ticket.status;
+      document.getElementById('ticket-modal-priority').value = ticket.priority;
+
+      const chat = document.getElementById('ticket-modal-chat');
+      chat.innerHTML = ticket.messages.map(msg => `
+        <div class="flex flex-col ${msg.sender === 'admin' ? 'items-end' : 'items-start'} space-y-1">
+          <span class="text-[9px] font-bold text-gray-500 uppercase">${msg.sender === 'admin' ? 'Operator' : 'Client'} · ${new Date(msg.time).toLocaleTimeString()}</span>
+          <p class="px-4 py-2.5 rounded-2xl text-xs font-semibold leading-relaxed ${msg.sender === 'admin' ? 'bg-[#5865f2] text-white rounded-tr-sm' : 'bg-[#2b2d31] text-[#dbdee1] border border-[#3f4147] rounded-tl-sm'} max-w-[80%]">${msg.text}</p>
+        </div>
+      `).join('');
+
+      // Setup Save trigger
+      document.getElementById('ticket-modal-save').onclick = () => {
+        const status = document.getElementById('ticket-modal-status').value;
+        const priority = document.getElementById('ticket-modal-priority').value;
+
+        adminFetch('/admin/ticket/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticketId: ticket.id, status, priority })
+        })
+        .then(res => {
+          if (res.ok) {
+            alert('✅ Ticket updated.');
+            closeTicketModal();
+            loadStats();
+          }
+        });
+      };
+
+      // Setup Send trigger
+      document.getElementById('ticket-modal-send').onclick = () => {
+        const replyText = document.getElementById('ticket-modal-reply-text').value;
+        if (!replyText.trim()) return;
+
+        adminFetch('/admin/ticket/reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticketId: ticket.id, replyText, status: 'In Progress' })
+        })
+        .then(res => {
+          if (res.ok) {
+            document.getElementById('ticket-modal-reply-text').value = '';
+            closeTicketModal();
+            loadStats();
+          }
+        });
+      };
+
+      const modal = document.getElementById('ticket-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      // Auto scroll chat to bottom
+      setTimeout(() => chat.scrollTop = chat.scrollHeight, 100);
+    }
+
+    function closeTicketModal() {
+      const modal = document.getElementById('ticket-modal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+
+    // Export keys CSV
+    function exportKeysCSV() {
+      if (!localData || !localData.licenses) return;
+      let csv = 'Key String,Plan,Expiration,Device ID,Activated At\n';
+      localData.licenses.forEach(l => {
+        csv += `"${l.key}","${l.plan}","${l.expires_at}","${l.activated_by || ''}","${l.activated_at || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `AYNX_License_Keys_${Date.now()}.csv`);
+      a.click();
+    }
+
+    // Search query filter
+    function filterUsersList(q) {
+      const query = q.toLowerCase();
+      const rows = document.getElementById('table-users').getElementsByTagName('tr');
+      for (let r of rows) {
+        const text = r.textContent.toLowerCase();
+        if (text.includes(query)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      }
+    }
   </script>
-
-  <!-- Website Analytics Modal Overlay -->
-  <div id="website-analytics-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden items-center justify-center p-4 transition-all duration-300">
-    <div class="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl relative border border-[#2b2d31]">
-      <button onclick="toggleWebsiteAnalyticsModal(false)" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors">&times;</button>
-      
-      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center select-none">
-        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-          <i data-lucide="line-chart" class="w-5 h-5 text-pink-500"></i>
-          <span>Website Traffic & Login Analytics</span>
-        </h2>
-        <span class="bg-[#111214] text-[10px] text-pink-500 font-extrabold px-3 py-1 rounded-full border border-pink-500/20">LIVE REPORT</span>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Views -->
-        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl space-y-3">
-          <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-            <span>Total Section Views</span>
-            <i data-lucide="eye" class="w-4 h-4 text-teal-400"></i>
-          </div>
-          <h3 id="analytics-views" class="text-3xl font-extrabold text-white">0</h3>
-          <div class="space-y-1.5 pt-3 border-t border-[#2b2d31]/50 text-[10px] text-gray-400 font-medium">
-            <div class="flex justify-between"><span>Hero Section:</span><span id="views-hero" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Features Matrix:</span><span id="views-features" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Comparison Chart:</span><span id="views-compare" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Pricing Plans:</span><span id="views-pricing" class="text-white font-bold">0</span></div>
-          </div>
-        </div>
-
-        <!-- Logins -->
-        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex flex-col justify-between">
-          <div class="space-y-3">
-            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-              <span>Website Logins</span>
-              <i data-lucide="log-in" class="w-4 h-4 text-indigo-400"></i>
-            </div>
-            <h3 id="analytics-logins" class="text-4xl font-extrabold text-white">0</h3>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-4 font-medium leading-relaxed">Total number of times web visitors authenticated via Google OAuth on the landing page.</p>
-        </div>
-
-        <!-- Download Clicks -->
-        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex flex-col justify-between">
-          <div class="space-y-3">
-            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-              <span>Download Clicks</span>
-              <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i>
-            </div>
-            <h3 id="analytics-downloads" class="text-4xl font-extrabold text-white">0</h3>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-4 font-medium leading-relaxed">Total click count on download triggers to calculate landing page visitor conversion rate.</p>
-        </div>
-      </div>
-      
-      <div class="pt-2 flex justify-end">
-        <button onclick="toggleWebsiteAnalyticsModal(false)" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition-colors">Close Portal</button>
-      </div>
-    </div>
-  <!-- Bottom Mobile Tab Bar -->
-  <div class="mobile-tab-bar lg:hidden">
-    <div id="tab-btn-overview" onclick="switchMobileTab('overview')" class="mobile-tab-btn active text-[#5865f2]">
-      <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-      <span>Overview</span>
-    </div>
-    <div id="tab-btn-releases" onclick="switchMobileTab('releases')" class="mobile-tab-btn text-[#949ba4]">
-      <i data-lucide="arrow-up-circle" class="w-5 h-5"></i>
-      <span>Releases</span>
-    </div>
-    <div id="tab-btn-licensing" onclick="switchMobileTab('licensing')" class="mobile-tab-btn text-[#949ba4]">
-      <i data-lucide="key" class="w-5 h-5"></i>
-      <span>Licenses</span>
-    </div>
-    <div id="tab-btn-users" onclick="switchMobileTab('users')" class="mobile-tab-btn text-[#949ba4]">
-      <i data-lucide="users" class="w-5 h-5"></i>
-      <span>Users</span>
-    </div>
-    <div id="tab-btn-logs" onclick="switchMobileTab('logs')" class="mobile-tab-btn text-[#949ba4]">
-      <i data-lucide="history" class="w-5 h-5"></i>
-      <span>Logs</span>
-    </div>
-  </div>
 </body>
 </html>

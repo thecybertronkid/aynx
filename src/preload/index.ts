@@ -7,7 +7,51 @@ const api = {
   toggleFavorite: (id: string) => ipcRenderer.invoke('db:toggle-favorite', id),
 
   getSettings: () => ipcRenderer.invoke('db:get-settings'),
+  getFeatureFlags: () => ipcRenderer.invoke('db:get-feature-flags'),
+  getAnnouncements: () => ipcRenderer.invoke('db:get-announcements'),
   saveSetting: (key: string, value: string) => ipcRenderer.invoke('db:save-setting', key, value),
+
+  onFeatureFlagsUpdated: (callback: (event: any, flags: any) => void) => {
+    ipcRenderer.on('feature-flags-updated', callback);
+    return () => {
+      ipcRenderer.removeListener('feature-flags-updated', callback);
+    };
+  },
+
+  onAnnouncementsUpdated: (callback: (event: any, list: any) => void) => {
+    ipcRenderer.on('announcements-updated', callback);
+    return () => {
+      ipcRenderer.removeListener('announcements-updated', callback);
+    };
+  },
+
+  onRemoteNotification: (callback: (event: any, notification: any) => void) => {
+    ipcRenderer.on('remote-notification', callback);
+    return () => {
+      ipcRenderer.removeListener('remote-notification', callback);
+    };
+  },
+
+  onAuthLogout: (callback: () => void) => {
+    ipcRenderer.on('auth-logout', callback);
+    return () => {
+      ipcRenderer.removeListener('auth-logout', callback);
+    };
+  },
+
+  onAuthRefresh: (callback: () => void) => {
+    ipcRenderer.on('auth-refresh', callback);
+    return () => {
+      ipcRenderer.removeListener('auth-refresh', callback);
+    };
+  },
+
+  onUploadLogsRequest: (callback: (event: any, machineId: string) => void) => {
+    ipcRenderer.on('upload-logs-request', callback);
+    return () => {
+      ipcRenderer.removeListener('upload-logs-request', callback);
+    };
+  },
 
   getAccounts: () => ipcRenderer.invoke('db:get-accounts'),
   saveAccount: (acc: any) => ipcRenderer.invoke('db:save-account', acc),
