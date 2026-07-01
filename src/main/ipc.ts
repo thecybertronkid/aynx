@@ -245,14 +245,33 @@ export function setupIpcListeners(mainWindow: any) {
 
     console.log(`[AYNX AutoUpdater] Starting update download: ${downloadUrl}`);
     
+    // Rewrite Google Drive URLs to direct download links with virus warning bypass parameters
+    let finalUrl = downloadUrl;
+    if (downloadUrl.includes('drive.google.com/file/d/')) {
+      const match = downloadUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        finalUrl = `https://drive.usercontent.google.com/download?id=${match[1]}&export=download&confirm=t`;
+      }
+    } else if (downloadUrl.includes('drive.google.com/uc?')) {
+      const match = downloadUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        finalUrl = `https://drive.usercontent.google.com/download?id=${match[1]}&export=download&confirm=t`;
+      }
+    } else if (downloadUrl.includes('drive.google.com/open?')) {
+      const match = downloadUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        finalUrl = `https://drive.usercontent.google.com/download?id=${match[1]}&export=download&confirm=t`;
+      }
+    }
+
     try {
-      if (downloadUrl.startsWith('file:///')) {
-        const sourcePath = decodeURIComponent(downloadUrl.replace('file:///', ''));
+      if (finalUrl.startsWith('file:///')) {
+        const sourcePath = decodeURIComponent(finalUrl.replace('file:///', ''));
         event.sender.send('update-download-progress', { progress: 30 });
         fs.copyFileSync(sourcePath, tempPath);
         event.sender.send('update-download-progress', { progress: 100 });
       } else {
-        const res = await fetch(downloadUrl);
+        const res = await fetch(finalUrl);
         if (!res.ok) throw new Error(`Server returned status ${res.status}`);
 
         const fileStream = fs.createWriteStream(tempPath);
