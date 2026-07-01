@@ -4,6 +4,8 @@ import {
   Home, Search, Settings, Globe, Shield, 
   Download, Moon, Sun, Bookmark, Trash2 
 } from 'lucide-react';
+import { useSettingsStore } from '../store/settingsStore';
+import { useAuthStore } from '../store/authStore';
 
 interface Tab {
   id: string;
@@ -19,6 +21,10 @@ const WebviewComponent = (props: any) => {
 };
 
 const Browser: React.FC = () => {
+  const { user } = useAuthStore();
+  const { settings } = useSettingsStore();
+  const plan = user?.plan || settings.plan || 'Free';
+
   const [tabs, setTabs] = useState<Tab[]>([
     {
       id: 'default',
@@ -34,12 +40,37 @@ const Browser: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showDirectDownload, setShowDirectDownload] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<'MP4' | 'MP3'>('MP4');
-  const [selectedQuality, setSelectedQuality] = useState<string>('Best Available');
+  const [selectedQuality, setSelectedQuality] = useState<string>(
+    plan === 'Free' ? '1080p' : (plan === 'Plus' ? '2160p' : 'Best Available')
+  );
+
+  // Sync default quality when format changes, factoring in plan limits
+  useEffect(() => {
+    if (selectedFormat === 'MP4') {
+      setSelectedQuality(plan === 'Free' ? '1080p' : (plan === 'Plus' ? '2160p' : 'Best Available'));
+    } else {
+      setSelectedQuality(plan === 'Free' ? '192kbps Medium' : '320kbps High');
+    }
+  }, [selectedFormat, plan]);
 
   const handleDirectDownload = async (format: 'MP4' | 'MP3', quality: string) => {
     const url = activeTab.url;
     const isAudio = format === 'MP3';
     const id = `${url}_${Date.now()}`;
+
+    let finalQuality = quality;
+    if (plan === 'Free') {
+      if (!isAudio && (quality === 'Best Available' || quality === '2160p' || quality === '1440p')) {
+        finalQuality = '1080p';
+      }
+      if (isAudio && (quality === '320kbps High' || quality === 'Best Available')) {
+        finalQuality = '192kbps Medium';
+      }
+    } else if (plan === 'Plus') {
+      if (!isAudio && quality === 'Best Available') {
+        finalQuality = '2160p'; // Fallback to 4K max
+      }
+    }
     
     try {
       await window.api.queueDownload({
@@ -48,10 +79,10 @@ const Browser: React.FC = () => {
         title: activeTab.title || 'Browser Download',
         platform: getPlatformName(url),
         contentType: isAudio ? 'audio' : 'video',
-        quality: quality,
+        quality: finalQuality,
         format: format
       });
-      alert(`Download started successfully!\n[Type: ${isAudio ? 'Audio' : 'Video'}, Quality: ${quality}]`);
+      alert(`Download started successfully!\n[Type: ${isAudio ? 'Audio' : 'Video'}, Quality: ${finalQuality}]`);
       setShowDirectDownload(false);
     } catch (e: any) {
       alert(`Failed to start download: ${e.message || 'Unknown error'}`);
@@ -391,14 +422,15 @@ const Browser: React.FC = () => {
                       >
                         {selectedFormat === 'MP4' ? (
                           <>
-                            <option value="Best Available">Best Available Quality</option>
+                            {plan === 'Pro' && <option value="Best Available">Best Available Quality</option>}
+                            {(plan === 'Pro' || plan === 'Plus') && <option value="2160p">4K Ultra HD</option>}
                             <option value="1080p">1080p Full HD</option>
                             <option value="720p">720p HD</option>
                             <option value="480p">480p SD</option>
                           </>
                         ) : (
                           <>
-                            <option value="320kbps High">320kbps High Fidelity</option>
+                            {(plan === 'Pro' || plan === 'Plus') && <option value="320kbps High">320kbps High Fidelity</option>}
                             <option value="192kbps Medium">192kbps Medium Quality</option>
                             <option value="128kbps Standard">128kbps Standard Quality</option>
                           </>
