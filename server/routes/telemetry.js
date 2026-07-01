@@ -102,19 +102,53 @@ router.post('/heartbeat', optionalAuth, async (req, res) => {
 
     // 4. Load announcements
     let announcements = [];
-    if (supabase) {
-      const { data: dbAnnouncements } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('active', true)
-        .order('created_at', { ascending: false });
-      if (dbAnnouncements) {
-        announcements = dbAnnouncements;
+    try {
+      if (supabase) {
+        const { data: dbAnnouncements } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('active', true)
+          .order('created_at', { ascending: false });
+        if (dbAnnouncements) {
+          announcements = dbAnnouncements;
+        }
       }
+    } catch (e) {
+      console.warn('[Supabase Fallback] Heartbeat load announcements failed:', e.message);
+    }
+    
+    // Fallback if announcements empty or query failed
+    if (announcements.length === 0) {
+      const localAnns = readJSON('announcements.json', []);
+      announcements = localAnns.filter(a => a.active);
     }
 
-    // 5. Load feature flags
-    const featureFlags = readJSON('feature_flags.json', {});
+    // 5. Load feature flags mapping & compute for user plan
+    const RANKS = { 'Free': 0, 'Plus': 1, 'Pro': 2 };
+    const rawFlags = readJSON('feature_flags.json', {
+      built_in_browser: 'Plus',
+      scheduler: 'Pro',
+      clipboard_monitor: 'Free',
+      cloud_sync: 'Pro',
+      themes: 'Plus',
+      dashboard_widgets: 'Free',
+      ai_assistant: 'Plus',
+      browser_extension: 'Plus',
+      media_converter: 'Pro',
+      favorites: 'Plus'
+    });
+
+    const userRank = RANKS[currentPlan] || 0;
+    const computedFlags = {};
+    Object.keys(rawFlags).forEach(flag => {
+      const requiredPlan = rawFlags[flag];
+      if (requiredPlan === 'Disabled') {
+        computedFlags[flag] = false;
+      } else {
+        const requiredRank = RANKS[requiredPlan] !== undefined ? RANKS[requiredPlan] : 0;
+        computedFlags[flag] = userRank >= requiredRank;
+      }
+    });
 
     // 6. Check for remote commands queued for this machine
     let commands = [];
@@ -144,12 +178,13 @@ router.post('/heartbeat', optionalAuth, async (req, res) => {
       success: true,
       plan: currentPlan,
       expiresAt: trialExpiresAt,
-      featureFlags,
+      featureFlags: computedFlags,
       announcements,
       commands,
       notifications: userNotifications
     });
   } catch (err) {
+    console.error('[Heartbeat Error]:', err);
     res.json({ success: true, plan: plan || 'Free', featureFlags: {}, announcements: [], commands: [], notifications: [] });
   }
 });

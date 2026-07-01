@@ -3,6 +3,9 @@ const router = express.Router();
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { supabase } = require('../db/supabase');
 const { signToken } = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
+const DATA_DIR = path.join(__dirname, '..', 'data');
 
 // POST /license/activate (and legacy /api/license/activate)
 router.post('/activate', optionalAuth, async (req, res) => {
@@ -148,6 +151,82 @@ router.post('/verify', optionalAuth, async (req, res) => {
     }
 
     res.json({ valid: false, plan: 'Free' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /ticket/create — Create new ticket from client app
+router.post('/ticket/create', optionalAuth, (req, res) => {
+  try {
+    const { title, priority, message, email, name, category = 'General' } = req.body;
+    if (!title || !message || !email) {
+      return res.status(400).json({ error: 'Title, message, and email are required.' });
+    }
+
+    const ticketsFile = path.join(DATA_DIR, 'support_tickets.json');
+    let tickets = [];
+    if (fs.existsSync(ticketsFile)) {
+      try {
+        tickets = JSON.parse(fs.readFileSync(ticketsFile, 'utf8'));
+      } catch (e) {
+        tickets = [];
+      }
+    }
+
+    const ticketId = `TKT-${Date.now()}`;
+    const newTicket = {
+      id: ticketId,
+      userId: req.user?.id || 'guest',
+      userName: name || email.split('@')[0],
+      email: email, // add email field
+      type: category,
+      title,
+      priority: priority || 'Medium',
+      status: 'Open',
+      label: category,
+      assignee: 'Unassigned',
+      messages: [
+        {
+          sender: 'user',
+          text: message,
+          time: new Date().toISOString()
+        }
+      ],
+      created_at: new Date().toISOString()
+    };
+
+    tickets.unshift(newTicket);
+    fs.writeFileSync(ticketsFile, JSON.stringify(tickets, null, 2), 'utf8');
+
+    res.json({ success: true, ticketId, ticket: newTicket });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /tickets — Retrieve user's tickets
+router.post('/tickets', optionalAuth, (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+    const ticketsFile = path.join(DATA_DIR, 'support_tickets.json');
+    let tickets = [];
+    if (fs.existsSync(ticketsFile)) {
+      try {
+        tickets = JSON.parse(fs.readFileSync(ticketsFile, 'utf8'));
+      } catch (e) {}
+    }
+
+    // Filter tickets where email matches or userName matches
+    const userTickets = tickets.filter(t => 
+      (t.email && t.email.toLowerCase() === email.toLowerCase()) || 
+      t.userName.toLowerCase() === email.toLowerCase() ||
+      t.userId === req.user?.id
+    );
+    
+    res.json({ success: true, tickets: userTickets });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

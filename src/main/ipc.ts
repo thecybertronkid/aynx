@@ -499,4 +499,53 @@ export function setupIpcListeners(mainWindow: any) {
     if (result.canceled || !result.filePaths.length) return null;
     return result.filePaths[0];
   });
+
+  // ─── Support Tickets ──────────────────────────────────────────────────────────
+  ipcMain.handle('ticket:create', async (_, data: any) => {
+    try {
+      const settings = await import('./database').then(m => m.getSettings());
+      const token = settings.authToken;
+      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+
+      const res = await fetch(`${apiBase}/license/ticket/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        return { success: false, error: err.error };
+      }
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('ticket:get-list', async (_, email: string) => {
+    try {
+      const settings = await import('./database').then(m => m.getSettings());
+      const token = settings.authToken;
+      const apiBase = process.env.API_BASE_URL || 'https://aynx-api.onrender.com';
+
+      const res = await fetch(`${apiBase}/license/tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        return { success: false, error: err.error };
+      }
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  });
 }

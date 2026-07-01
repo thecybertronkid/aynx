@@ -59,7 +59,7 @@ const HeroScreen: React.FC<{ onNext: () => void }> = ({ onNext }) => (
       <h1 className="text-5xl font-black text-white tracking-tight">
         Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5865f2] to-[#7c3aed]">AYNX</span>
       </h1>
-      <p className="text-lg font-semibold text-[#b5bac1]">Universal Media Downloader · v2.6.3</p>
+      <p className="text-lg font-semibold text-[#b5bac1]">Universal Media Downloader · v2.7.0</p>
     </motion.div>
 
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-1">
@@ -570,7 +570,7 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete }) => {
       </div>
 
       <p className="absolute bottom-4 text-center text-[10px] text-[#4e5058] font-bold">
-        AYNX v2.6.3 — Universal Media Downloader
+        AYNX v2.7.0 — Universal Media Downloader
       </p>
     </div>
   );

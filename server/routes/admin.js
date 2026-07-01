@@ -190,19 +190,36 @@ router.get('/verify', requireAdminAuth, (req, res) => {
   res.json({ success: true, username: req.adminUser.username, role: req.adminUser.role });
 });
 
+// Helper: Query tables safely with local JSON file fallback
+async function safeGetTable(tableName, orderField, ascending, localFilename, defaultValue = []) {
+  try {
+    if (!supabase) return readDataFile(localFilename, defaultValue);
+    
+    let query = supabase.from(tableName).select('*');
+    if (orderField) {
+      query = query.order(orderField, { ascending });
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  } catch (err) {
+    console.warn(`[Supabase Fallback] Query to ${tableName} failed, falling back to local file. Error:`, err.message);
+    return readDataFile(localFilename, defaultValue);
+  }
+}
+
 // GET /dashboard — Extended Dashboard Data
 router.get('/dashboard', requireAdminAuth, async (req, res) => {
   try {
-    if (!supabase) return res.json({ users: [], subscriptions: [], licenses: [], telemetry: [], versions: [] });
-
-    // Fetch database tables in parallel
     const [users, subscriptions, licenses, telemetry, versions, announcements] = await Promise.all([
-      supabase.from('users').select('*').order('created_at', { ascending: false }),
-      supabase.from('subscriptions').select('*').order('created_at', { ascending: false }),
-      supabase.from('license_keys').select('*').order('created_at', { ascending: false }),
-      supabase.from('telemetry').select('*').order('created_at', { ascending: false }),
-      supabase.from('app_versions').select('*').order('published_at', { ascending: false }),
-      supabase.from('announcements').select('*').order('created_at', { ascending: false })
+      safeGetTable('users', 'created_at', false, 'users.json'),
+      safeGetTable('subscriptions', 'created_at', false, 'subscriptions.json'),
+      safeGetTable('license_keys', 'created_at', false, 'license_keys.json'),
+      safeGetTable('telemetry', 'created_at', false, 'telemetry.json'),
+      safeGetTable('app_versions', 'published_at', false, 'app_versions.json', [
+        { version: '2.7.0', is_latest: true, published_at: new Date().toISOString(), download_url: 'https://drive.usercontent.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: 'v2.7.0-stable' }
+      ]),
+      safeGetTable('announcements', 'created_at', false, 'announcements.json')
     ]);
 
     // Fetch Local Fallback lists
@@ -219,15 +236,15 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
     }).length;
 
     // Plan count aggregation
-    const plusUsers = users.data?.filter(u => u.plan === 'Plus').length || 0;
-    const proUsers = users.data?.filter(u => u.plan === 'Pro').length || 0;
-    const freeUsers = users.data?.filter(u => !u.plan || u.plan === 'Free').length || 0;
+    const plusUsers = users.filter(u => u.plan === 'Plus').length || 0;
+    const proUsers = users.filter(u => u.plan === 'Pro').length || 0;
+    const freeUsers = users.filter(u => !u.plan || u.plan === 'Free').length || 0;
 
     // Revenue calculations
     let monthlyRev = 0;
     let annualRev = 0;
-    if (subscriptions.data) {
-      subscriptions.data.forEach(sub => {
+    if (subscriptions) {
+      subscriptions.forEach(sub => {
         if (sub.status === 'active' && sub.amount_paise) {
           const amount = sub.amount_paise / 100;
           if (sub.billing_period === 'yearly') {
@@ -246,7 +263,7 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
       downloads: 0
     };
 
-    const webEvents = telemetry.data?.filter(t => t.event && t.event.startsWith('website_')) || [];
+    const webEvents = telemetry.filter(t => t.event && t.event.startsWith('website_')) || [];
     webEvents.forEach(evt => {
       if (evt.event === 'website_view') {
         websiteAnalytics.views.total++;
@@ -262,12 +279,12 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
     });
 
     res.json({
-      users: users.data || [],
-      subscriptions: subscriptions.data || [],
-      licenses: licenses.data || [],
-      telemetry: telemetry.data || [],
-      versions: versions.data || [],
-      announcements: announcements.data || [],
+      users,
+      subscriptions,
+      licenses,
+      telemetry,
+      versions,
+      announcements,
       devices: devicesList,
       auditLogs,
       featureFlags,
@@ -275,11 +292,11 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
       revenue: { monthly: monthlyRev, annual: annualRev },
       stats: {
         activeUsers: activeDevicesCount,
-        totalDownloads: telemetry.data?.filter(t => t.event === 'download' || t.event === 'download_completed').length || 0,
+        totalDownloads: telemetry.filter(t => t.event === 'download' || t.event === 'download_completed').length || 0,
         plusUsers,
         proUsers,
         freeUsers,
-        totalUsers: users.data?.length || 0
+        totalUsers: users.length || 0
       },
       websiteAnalytics
     });
@@ -288,31 +305,78 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
   }
 });
 
-// GET /api-settings — API Integrations (Super Admin only)
-router.get('/api-settings', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
-  res.json({
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID ? '●●●●●●●●●●●●●●' : '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ? '●●●●●●●●●●●●●●' : '',
-      callbackUrl: process.env.GOOGLE_CALLBACK_URL || ''
-    },
-    razorpay: {
-      keyId: process.env.RAZORPAY_KEY_ID ? '●●●●●●●●●●●●●●' : '',
-      keySecret: process.env.RAZORPAY_KEY_SECRET ? '●●●●●●●●●●●●●●' : ''
-    },
-    supabase: {
-      url: process.env.SUPABASE_URL || '',
-      key: process.env.SUPABASE_SERVICE_ROLE_KEY ? '●●●●●●●●●●●●●●' : ''
-    }
-  });
+// GET /admin/sub-admins — Get all sub admins (Super Admin only)
+router.get('/sub-admins', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
+  const admins = readDataFile(ADMINS_FILE, []);
+  // Remove password hashes for safety
+  const list = admins.map(a => ({ username: a.username, role: a.role }));
+  res.json({ success: true, admins: list });
 });
 
-// POST /api-settings/update — Update Integration details (Super Admin only)
-router.post('/api-settings/update', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
-  const { googleClientId, razorpayKeyId } = req.body;
-  // Dynamic config update simulation
-  logAudit(req.adminUser, 'Updated API configurations', 'Google OAuth / Razorpay', req);
-  res.json({ success: true, message: 'Settings saved temporarily on memory' });
+// POST /admin/sub-admins/create — Add new sub admin (Super Admin only)
+router.post('/sub-admins/create', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
+  const { username, password, role } = req.body;
+  if (!username || !password || !role) {
+    return res.status(400).json({ error: 'Username, password, and role required.' });
+  }
+  if (!['Manager', 'Analytics'].includes(role)) {
+    return res.status(400).json({ error: 'Invalid sub-admin role.' });
+  }
+
+  const admins = readDataFile(ADMINS_FILE, []);
+  const exists = admins.some(a => a.username.toLowerCase() === username.toLowerCase());
+  if (exists) {
+    return res.status(400).json({ error: 'Sub-admin username already exists.' });
+  }
+
+  admins.push({
+    username,
+    passwordHash: sha256(password),
+    role
+  });
+  writeDataFile(ADMINS_FILE, admins);
+
+  logAudit(req.adminUser, `Created sub-admin account: ${username}`, `Role: ${role}`, req);
+  res.json({ success: true, message: 'Sub-admin created successfully.' });
+});
+
+// POST /admin/sub-admins/delete — Remove a sub admin (Super Admin only)
+router.post('/sub-admins/delete', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Username required.' });
+
+  if (username.toLowerCase() === 'ayankashyap') {
+    return res.status(400).json({ error: 'Cannot delete primary Super Administrator.' });
+  }
+
+  const admins = readDataFile(ADMINS_FILE, []);
+  const filtered = admins.filter(a => a.username.toLowerCase() !== username.toLowerCase());
+  
+  if (admins.length === filtered.length) {
+    return res.status(404).json({ error: 'Sub-admin not found.' });
+  }
+
+  writeDataFile(ADMINS_FILE, filtered);
+  logAudit(req.adminUser, `Deleted sub-admin account: ${username}`, 'Credentials Registry', req);
+  res.json({ success: true, message: 'Sub-admin deleted successfully.' });
+});
+
+// POST /admin/sub-admins/reset-password — Reset password (Super Admin only)
+router.post('/sub-admins/reset-password', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
+  const { username, newPassword } = req.body;
+  if (!username || !newPassword) {
+    return res.status(400).json({ error: 'Username and new password required.' });
+  }
+
+  const admins = readDataFile(ADMINS_FILE, []);
+  const admin = admins.find(a => a.username.toLowerCase() === username.toLowerCase());
+  if (!admin) return res.status(404).json({ error: 'Sub-admin not found.' });
+
+  admin.passwordHash = sha256(newPassword);
+  writeDataFile(ADMINS_FILE, admins);
+
+  logAudit(req.adminUser, `Reset password for sub-admin: ${username}`, 'Credentials Registry', req);
+  res.json({ success: true, message: 'Password reset successfully.' });
 });
 
 // POST /update-user-plan — Change subscription tier
@@ -322,31 +386,45 @@ router.post('/update-user-plan', requireAdminAuth, requireRole(['Super Admin', '
     if (!['Free', 'Plus', 'Pro'].includes(plan)) {
       return res.status(400).json({ error: 'Invalid plan.' });
     }
-    if (!supabase) return res.json({ success: true });
 
     const expiresAt = plan === 'Free'
       ? new Date(Date.now() - 1000).toISOString()
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    await supabase.from('users').update({
-      plan,
-      trial_expires_at: expiresAt,
-      updated_at: new Date().toISOString()
-    }).eq('id', userId);
+    try {
+      if (supabase) {
+        await supabase.from('users').update({
+          plan,
+          trial_expires_at: expiresAt,
+          updated_at: new Date().toISOString()
+        }).eq('id', userId);
 
-    if (plan !== 'Free') {
-      await supabase.from('subscriptions').insert({
-        user_id: userId,
-        plan,
-        starts_at: new Date().toISOString(),
-        expires_at: expiresAt,
-        status: 'active',
-        amount_paise: 0
-      });
+        if (plan !== 'Free') {
+          await supabase.from('subscriptions').insert({
+            user_id: userId,
+            plan,
+            starts_at: new Date().toISOString(),
+            expires_at: expiresAt,
+            status: 'active',
+            amount_paise: 0
+          });
+        }
+      }
+    } catch (dbErr) {
+      console.warn('[Supabase Fallback] Update user plan failed:', dbErr.message);
+    }
+
+    // Mirror to local JSON
+    const localUsers = readDataFile('users.json', []);
+    const uIdx = localUsers.findIndex(u => u.id === userId);
+    if (uIdx !== -1) {
+      localUsers[uIdx].plan = plan;
+      localUsers[uIdx].trial_expires_at = expiresAt;
+      localUsers[uIdx].updated_at = new Date().toISOString();
+      writeDataFile('users.json', localUsers);
     }
 
     logAudit(req.adminUser, `Updated plan to ${plan}`, `User ID: ${userId}`, req);
-
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -357,9 +435,22 @@ router.post('/update-user-plan', requireAdminAuth, requireRole(['Super Admin', '
 router.post('/suspend-user', requireAdminAuth, requireRole(['Super Admin']), async (req, res) => {
   try {
     const { userId } = req.body;
-    if (supabase) {
-      await supabase.from('users').update({ plan: 'Free', trial_expires_at: new Date().toISOString() }).eq('id', userId);
+    try {
+      if (supabase) {
+        await supabase.from('users').update({ plan: 'Free', trial_expires_at: new Date().toISOString() }).eq('id', userId);
+      }
+    } catch (dbErr) {
+      console.warn('[Supabase Fallback] Suspend user failed:', dbErr.message);
     }
+
+    const localUsers = readDataFile('users.json', []);
+    const uIdx = localUsers.findIndex(u => u.id === userId);
+    if (uIdx !== -1) {
+      localUsers[uIdx].plan = 'Free';
+      localUsers[uIdx].trial_expires_at = new Date().toISOString();
+      writeDataFile('users.json', localUsers);
+    }
+
     logAudit(req.adminUser, 'Suspended User Accounts', `User ID: ${userId}`, req);
     res.json({ success: true });
   } catch (err) {
@@ -371,11 +462,19 @@ router.post('/suspend-user', requireAdminAuth, requireRole(['Super Admin']), asy
 router.post('/delete-user', requireAdminAuth, requireRole(['Super Admin']), async (req, res) => {
   try {
     const { userId } = req.body;
-    if (supabase) {
-      await supabase.from('users').delete().eq('id', userId);
-      await supabase.from('subscriptions').delete().eq('user_id', userId);
-      await supabase.from('telemetry').delete().eq('user_id', userId);
+    try {
+      if (supabase) {
+        await supabase.from('users').delete().eq('id', userId);
+        await supabase.from('subscriptions').delete().eq('user_id', userId);
+        await supabase.from('telemetry').delete().eq('user_id', userId);
+      }
+    } catch (dbErr) {
+      console.warn('[Supabase Fallback] Delete user failed:', dbErr.message);
     }
+
+    const localUsers = readDataFile('users.json', []);
+    writeDataFile('users.json', localUsers.filter(u => u.id !== userId));
+
     logAudit(req.adminUser, 'Hard Deleted User Account', `User ID: ${userId}`, req);
     res.json({ success: true });
   } catch (err) {
@@ -424,17 +523,35 @@ router.post('/generate-key', requireAdminAuth, requireRole(['Super Admin', 'Mana
 
     const generated = [];
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const localLicenses = readDataFile('license_keys.json', []);
 
     for (let i = 0; i < limit; i++) {
       const randHex = () => Math.random().toString(16).substring(2, 6).toUpperCase();
       const key = `AYNX-${plan.toUpperCase()}-${randHex()}-${randHex()}`;
       
-      if (supabase) {
-        await supabase.from('license_keys').insert({ key, plan, expires_at: expiresAt, notes: notes || null });
+      const licObj = {
+        key,
+        plan,
+        expires_at: expiresAt,
+        notes: notes || null,
+        activated_by: null,
+        activated_at: null,
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        if (supabase) {
+          await supabase.from('license_keys').insert(licObj);
+        }
+      } catch (dbErr) {
+        console.warn('[Supabase Fallback] Insert license key failed:', dbErr.message);
       }
+
+      localLicenses.unshift(licObj);
       generated.push(key);
     }
 
+    writeDataFile('license_keys.json', localLicenses);
     logAudit(req.adminUser, `Generated ${limit} license key(s) (${plan})`, notes || 'Standard Generation', req);
     res.json({ success: true, key: generated[0], keys: generated, plan });
   } catch (err) {
@@ -444,12 +561,12 @@ router.post('/generate-key', requireAdminAuth, requireRole(['Super Admin', 'Mana
 
 // POST /feature-flags/toggle — Toggle Feature slider
 router.post('/feature-flags/toggle', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
-  const { flag, value } = req.body;
+  const { flag, value } = req.body; // value is now plan string like "Free", "Plus", "Pro", "Disabled"
   const flags = readDataFile('feature_flags.json', {});
   flags[flag] = value;
   writeDataFile('feature_flags.json', flags);
 
-  logAudit(req.adminUser, `Toggled feature flag "${flag}" to ${value}`, 'Global Features', req);
+  logAudit(req.adminUser, `Changed feature plan mapping of "${flag}" to ${value}`, 'Global Features', req);
   res.json({ success: true, flags });
 });
 
@@ -496,7 +613,7 @@ router.post('/ticket/update-status', requireAdminAuth, requireRole(['Super Admin
 // POST /backup/create — Export system tables backup
 router.post('/backup/create', requireAdminAuth, requireRole(['Super Admin']), (req, res) => {
   const backupId = `BKP-${Date.now()}`;
-  const files = ['users.json', 'subscriptions.json', 'license_keys.json', 'telemetry.json', 'feature_flags.json', 'support_tickets.json', 'devices.json', 'audit_logs.json'];
+  const files = ['users.json', 'subscriptions.json', 'license_keys.json', 'telemetry.json', 'feature_flags.json', 'support_tickets.json', 'devices.json', 'audit_logs.json', 'admins.json', 'announcements.json'];
   const data = {};
 
   files.forEach(f => {
@@ -554,9 +671,27 @@ router.get('/backups', requireAdminAuth, requireRole(['Super Admin']), (req, res
 router.post('/announcement', requireAdminAuth, requireRole(['Super Admin', 'Manager']), async (req, res) => {
   try {
     const { title, body, type, active } = req.body;
-    if (supabase) {
-      await supabase.from('announcements').insert({ title, body, type: type || 'info', active: active !== false });
+    const annObj = {
+      id: `ANN-${Date.now()}`,
+      title,
+      body,
+      type: type || 'info',
+      active: active !== false,
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      if (supabase) {
+        await supabase.from('announcements').insert(annObj);
+      }
+    } catch (err) {
+      console.warn('[Supabase Fallback] Insert announcement failed:', err.message);
     }
+
+    const localAnns = readDataFile('announcements.json', []);
+    localAnns.unshift(annObj);
+    writeDataFile('announcements.json', localAnns);
+
     logAudit(req.adminUser, 'Published Announcement', title, req);
     res.json({ success: true });
   } catch (err) {
@@ -589,9 +724,13 @@ router.post('/send-notification', requireAdminAuth, requireRole(['Super Admin', 
 router.post('/publish-version', requireAdminAuth, requireRole(['Super Admin', 'Manager']), async (req, res) => {
   try {
     const { version, downloadUrl, changelog, channel = 'Stable' } = req.body;
-    if (supabase) {
-      await supabase.from('app_versions').update({ is_latest: false }).eq('is_latest', true);
-      await supabase.from('app_versions').insert({ version, download_url: downloadUrl, changelog, is_latest: true, metadata: { channel } });
+    try {
+      if (supabase) {
+        await supabase.from('app_versions').update({ is_latest: false }).eq('is_latest', true);
+        await supabase.from('app_versions').insert({ version, download_url: downloadUrl, changelog, is_latest: true, metadata: { channel } });
+      }
+    } catch (dbErr) {
+      console.warn('[Supabase Fallback] Publish version failed:', dbErr.message);
     }
     
     // Save locally
@@ -600,6 +739,19 @@ router.post('/publish-version', requireAdminAuth, requireRole(['Super Admin', 'M
     settings.downloadUrl = downloadUrl;
     settings.changelog = changelog;
     writeDataFile('settings.json', settings);
+
+    // Save to versions list locally
+    const localVersions = readDataFile('app_versions.json', []);
+    localVersions.forEach(v => v.is_latest = false);
+    localVersions.unshift({
+      version,
+      download_url: downloadUrl,
+      changelog,
+      is_latest: true,
+      published_at: new Date().toISOString(),
+      metadata: { channel }
+    });
+    writeDataFile('app_versions.json', localVersions);
 
     logAudit(req.adminUser, `Published App Release version ${version} (${channel})`, `Installer URL: ${downloadUrl}`, req);
     res.json({ success: true, version, downloadUrl, changelog });

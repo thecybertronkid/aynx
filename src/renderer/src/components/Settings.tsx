@@ -86,10 +86,20 @@ const Settings: React.FC = () => {
   const { settings, loading: settingsLoading, updateSetting } = useSettingsStore();
   const { downloads, activeDownloads } = useDownloadStore();
 
-  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'performance' | 'platforms' | 'system' | 'update'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'performance' | 'platforms' | 'system' | 'update' | 'support'>('general');
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
   const { user } = useAuthStore();
   const plan = user?.plan || settings.plan || 'Free';
+
+  // Support state
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [ticketSubject, setTicketSubject] = useState('');
+  const [ticketPriority, setTicketPriority] = useState('Medium');
+  const [ticketCategory, setTicketCategory] = useState('General');
+  const [ticketMessage, setTicketMessage] = useState('');
+  const [ticketSubmitStatus, setTicketSubmitStatus] = useState<'idle' | 'submitting' | 'submitted' | 'error'>('idle');
+  const [supportEmail, setSupportEmail] = useState(user?.email || '');
+  const [supportName, setSupportName] = useState(user?.name || '');
 
   // Form states
   const [downloadFolder, setDownloadFolder] = useState('');
@@ -150,6 +160,70 @@ const Settings: React.FC = () => {
       setRememberCloseChoice(settings.rememberCloseChoice || 'false');
     }
   }, [settings]);
+
+  // Load support details from active auth profile
+  useEffect(() => {
+    if (user?.email) {
+      setSupportEmail(user.email);
+    }
+    if (user?.name) {
+      setSupportName(user.name);
+    }
+  }, [user]);
+
+  const fetchUserTickets = async () => {
+    try {
+      const emailToQuery = supportEmail || user?.email || '';
+      if (!emailToQuery) return;
+      const res = await (window.api as any).getUserTickets(emailToQuery);
+      if (res && res.success) {
+        setTickets(res.tickets || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch user tickets:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'support') {
+      fetchUserTickets();
+    }
+  }, [activeTab, supportEmail, user]);
+
+  const handleRaiseTicket = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ticketSubject.trim() || !ticketMessage.trim()) {
+      alert('Please fill out the subject and message fields.');
+      return;
+    }
+    const emailToUse = supportEmail || user?.email || '';
+    if (!emailToUse) {
+      alert('An email address is required to raise a ticket.');
+      return;
+    }
+    setTicketSubmitStatus('submitting');
+    try {
+      const res = await (window.api as any).submitSupportTicket({
+        title: ticketSubject.trim(),
+        priority: ticketPriority,
+        category: ticketCategory,
+        message: ticketMessage.trim(),
+        email: emailToUse,
+        name: supportName || user?.name || emailToUse.split('@')[0]
+      });
+      if (res && res.success) {
+        setTicketSubmitStatus('submitted');
+        setTicketSubject('');
+        setTicketMessage('');
+        fetchUserTickets();
+        setTimeout(() => setTicketSubmitStatus('idle'), 3000);
+      } else {
+        setTicketSubmitStatus('error');
+      }
+    } catch (err) {
+      setTicketSubmitStatus('error');
+    }
+  };
 
   // Sync preset from quality & format selection
   useEffect(() => {
@@ -526,6 +600,17 @@ Install Location: ${systemInfo.installDir}
         >
           <ArrowUpCircle className="w-4 h-4" />
           <span>Update Center</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('support')}
+          type="button"
+          className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+            activeTab === 'support' ? 'bg-discord-accent text-white shadow-md' : 'text-discord-textNormal hover:bg-discord-hover/50'
+          }`}
+        >
+          <HelpCircle className="w-4 h-4" />
+          <span>Help & Support Desk</span>
         </button>
       </div>
 
@@ -1411,6 +1496,183 @@ Install Location: ${systemInfo.installDir}
                   >
                     View Changelog
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: SUPPORT */}
+          {activeTab === 'support' && (
+            <div className="space-y-6 animate-scaleIn">
+              <div className="glass-panel rounded-2xl border border-discord-border p-6 space-y-4 shadow-md">
+                <div>
+                  <h3 className="text-xs font-bold text-discord-textMuted uppercase tracking-wider">
+                    Ecosystem Support Desk
+                  </h3>
+                  <p className="text-[10px] text-[#b5bac1] font-semibold mt-0.5">
+                    Submit help tickets and interact directly with AYNX support administrators
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Create Ticket Form */}
+                  <div className="space-y-4 bg-discord-secondary/20 p-5 rounded-2xl border border-discord-border">
+                    <h4 className="text-[10px] font-bold text-discord-textNormal uppercase tracking-wider">
+                      Raise Support Ticket
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          value={supportEmail}
+                          onChange={(e) => setSupportEmail(e.target.value)}
+                          required
+                          placeholder="your.email@example.com"
+                          className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3.5 py-2.5 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                          Your Name (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={supportName}
+                          onChange={(e) => setSupportName(e.target.value)}
+                          placeholder="John Doe"
+                          className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3.5 py-2.5 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                            Category
+                          </label>
+                          <select
+                            value={ticketCategory}
+                            onChange={(e) => setTicketCategory(e.target.value)}
+                            className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3 py-2.5 rounded-xl border border-discord-border focus:outline-none font-semibold"
+                          >
+                            <option value="General">General</option>
+                            <option value="Technical">Technical</option>
+                            <option value="Billing">Billing</option>
+                            <option value="Feature Request">Feature Request</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                            Priority
+                          </label>
+                          <select
+                            value={ticketPriority}
+                            onChange={(e) => setTicketPriority(e.target.value)}
+                            className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3 py-2.5 rounded-xl border border-discord-border focus:outline-none font-semibold"
+                          >
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                          Subject
+                        </label>
+                        <input
+                          type="text"
+                          value={ticketSubject}
+                          onChange={(e) => setTicketSubject(e.target.value)}
+                          required
+                          placeholder="Brief summary of the issue..."
+                          className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3.5 py-2.5 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-discord-textMuted uppercase tracking-wider block mb-1">
+                          Detailed Description
+                        </label>
+                        <textarea
+                          value={ticketMessage}
+                          onChange={(e) => setTicketMessage(e.target.value)}
+                          required
+                          rows={4}
+                          placeholder="Provide all details, platform error notices, or steps to reproduce..."
+                          className="w-full bg-discord-secondary text-discord-textNormal text-xs px-3.5 py-2.5 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold resize-none"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRaiseTicket}
+                        className="w-full bg-discord-accent hover:bg-discord-accent/90 text-white text-xs font-bold py-3 rounded-xl transition-all shadow flex items-center justify-center space-x-1.5 cursor-pointer"
+                      >
+                        {ticketSubmitStatus === 'submitting' ? (
+                          <span>Submitting...</span>
+                        ) : ticketSubmitStatus === 'submitted' ? (
+                          <span>✓ Ticket Raised Successfully!</span>
+                        ) : (
+                          <span>Submit Ticket</span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Previous Tickets List */}
+                  <div className="space-y-4">
+                    <h4 className="text-[10px] font-bold text-discord-textNormal uppercase tracking-wider flex items-center justify-between">
+                      <span>Your Support History</span>
+                      <button
+                        type="button"
+                        onClick={fetchUserTickets}
+                        className="text-[9px] text-[#5865f2] font-bold hover:underline cursor-pointer flex items-center space-x-1"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Refresh</span>
+                      </button>
+                    </h4>
+                    
+                    <div className="space-y-3 overflow-y-auto max-h-[380px] pr-1">
+                      {tickets.length === 0 ? (
+                        <div className="text-center py-10 text-discord-textMuted bg-discord-secondary/10 border border-discord-border rounded-2xl">
+                          <HelpCircle className="w-8 h-8 mx-auto text-discord-textMuted opacity-50 mb-2" />
+                          <p className="text-xs font-bold">No active support tickets found</p>
+                          <p className="text-[10px] mt-0.5">Fill the form to raise a ticket.</p>
+                        </div>
+                      ) : (
+                        tickets.map((t) => (
+                          <div key={t.id} className="bg-discord-secondary/25 border border-discord-border p-4 rounded-xl space-y-2 text-xs relative">
+                            <div className="flex justify-between items-start">
+                              <span className="font-bold text-white truncate max-w-[70%]" title={t.title}>{t.title}</span>
+                              <span className={`px-2 py-0.5 rounded text-[8px] font-extrabold uppercase ${
+                                t.status === 'Resolved' || t.status === 'Closed'
+                                  ? 'bg-discord-success/10 text-discord-success border border-discord-success/30'
+                                  : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30'
+                              }`}>{t.status}</span>
+                            </div>
+                            <p className="text-[10px] text-discord-textMuted uppercase font-bold tracking-wider">
+                              ID: {t.id} · Priority: {t.priority} · {new Date(t.created_at).toLocaleDateString()}
+                            </p>
+                            <div className="mt-2.5 border-t border-discord-border pt-2.5 space-y-2">
+                              {t.messages.map((m: any, idx: number) => (
+                                <div key={idx} className={`p-2.5 rounded-lg text-[11px] leading-relaxed ${
+                                  m.sender === 'admin'
+                                    ? 'bg-discord-accent/15 border border-discord-accent/35 text-[#dbdee1]'
+                                    : 'bg-discord-secondary/50 text-[#b5bac1]'
+                                }`}>
+                                  <p className="text-[9px] font-bold text-discord-textMuted uppercase mb-1">
+                                    {m.sender === 'admin' ? 'Operator' : 'You'} · {new Date(m.time).toLocaleTimeString()}
+                                  </p>
+                                  <p className="font-semibold">{m.text}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

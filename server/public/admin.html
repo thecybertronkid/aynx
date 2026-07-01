@@ -81,8 +81,12 @@
   <!-- ==================== MAIN PORTAL ==================== -->
   <div id="portal-container" class="hidden flex-1 flex flex-col">
     <!-- Header -->
-    <header class="bg-[#111214] border-b border-[#2b2d31] px-4 md:px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-50 select-none">
+    <header class="bg-[#111214] border-b border-[#2b2d31] px-4 md:px-8 py-3.5 flex items-center justify-between gap-4 sticky top-0 z-50 select-none">
       <div class="flex items-center space-x-3">
+        <!-- Mobile menu toggle -->
+        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-[#2b2d31]/50 border border-[#2b2d31] text-gray-400 hover:text-white cursor-pointer mr-1">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5865f2] to-[#7c3aed] flex items-center justify-center text-white font-black text-lg shadow-md shadow-[#5865f2]/20">
           AY
         </div>
@@ -95,12 +99,12 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-4 flex-wrap">
-        <div class="text-center md:text-right">
+      <div class="flex items-center gap-4">
+        <div class="text-right hidden md:block">
           <span class="text-[9px] text-[#23a55a] font-bold uppercase tracking-wider block" id="admin-role-badge">Super Admin</span>
           <span class="text-xs font-extrabold text-white" id="admin-username-display">ayankashyap</span>
         </div>
-        <div class="h-8 w-[1px] bg-[#2b2d31]"></div>
+        <div class="h-8 w-[1px] bg-[#2b2d31] hidden md:block"></div>
         <button onclick="handleLogout()" class="p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer" title="Log Out Session">
           <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
@@ -108,10 +112,19 @@
     </header>
 
     <!-- App Body Content -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden relative">
+      <!-- Sidebar Drawer Backdrop (Mobile only) -->
+      <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
+
       <!-- Sidebar Tabs Menu -->
-      <aside class="w-64 bg-[#111214] border-r border-[#2b2d31] p-4 flex flex-col justify-between hidden lg:flex select-none">
-        <div class="space-y-1">
+      <aside id="sidebar-menu" class="w-64 bg-[#111214] border-r border-[#2b2d31] p-4 flex flex-col justify-between fixed inset-y-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 select-none">
+        <div class="space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+          <div class="flex justify-between items-center px-3 mb-3 lg:hidden">
+            <span class="text-[10px] font-black text-gray-400 uppercase">Navigation</span>
+            <button onclick="toggleMobileSidebar(false)" class="text-gray-400 hover:text-white">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
           <p class="text-[9px] font-black text-[#5865f2] uppercase tracking-wider px-3 mb-2">Systems Console</p>
           <button onclick="switchTab('overview')" id="btn-tab-overview" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
@@ -149,12 +162,12 @@
             <i data-lucide="shield" class="w-4 h-4"></i>
             <span>Security & Backups</span>
           </button>
-          <button onclick="switchTab('integrations')" id="btn-tab-integrations" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            <span>API & Integrations</span>
+          <button onclick="switchTab('subadmins')" id="btn-tab-subadmins" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-[#2b2d31]/30 transition-all cursor-pointer">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            <span>Manage Sub-Admins</span>
           </button>
         </div>
-        <div class="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-3 text-center">
+        <div class="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-3 text-center mt-4">
           <p class="text-[9px] font-bold text-gray-400">AYNX OPERATIONS v3.0</p>
           <p class="text-[8px] text-gray-500 mt-1">Compiled Stable build</p>
         </div>
@@ -183,7 +196,7 @@
 
         <!-- TAB: OVERVIEW -->
         <div id="tab-overview" class="tab-content space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
             <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
               <div class="flex justify-between items-start">
                 <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Registered Users</span>
@@ -193,7 +206,7 @@
             </div>
             <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
               <div class="flex justify-between items-start">
-                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Downloads volume</span>
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Downloads Volume</span>
                 <i data-lucide="download-cloud" class="w-4 h-4 text-[#23a55a]"></i>
               </div>
               <div class="mt-4"><h3 id="overview-downloads" class="text-3xl font-extrabold text-white">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Logs completed</p></div>
@@ -212,8 +225,8 @@
               </div>
               <div class="mt-4"><h3 id="overview-plus" class="text-3xl font-extrabold text-teal-400">0</h3><p class="text-[9px] text-gray-500 font-bold uppercase mt-0.5">Activated Keys</p></div>
             </div>
-            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-              <div class="glass-card flex justify-between items-start">
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between shadow-sm col-span-2 md:col-span-1">
+              <div class="flex justify-between items-start">
                 <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pro Licenses</span>
                 <i data-lucide="shield-check" class="w-4 h-4 text-purple-400"></i>
               </div>
@@ -223,7 +236,7 @@
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-6">
-              <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
+              <div class="border-b border-[#2b2d31] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
                   <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#5865f2]"></i>
                   <span>Revenue & Platform Metrics</span>
@@ -257,20 +270,20 @@
         <!-- TAB: USERS -->
         <div id="tab-users" class="tab-content space-y-6 hidden">
           <div class="glass-card rounded-2xl p-6 space-y-4">
-            <div class="border-b border-[#2b2d31] pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="border-b border-[#2b2d31] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
                 <i data-lucide="users" class="w-4 h-4 text-[#5865f2]"></i>
                 <span>Registered Users Registry</span>
               </h2>
-              <div class="relative w-full md:w-80">
+              <div class="relative w-full sm:w-80">
                 <i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-3"></i>
                 <input type="text" id="user-search" oninput="filterUsersList(this.value)" class="w-full bg-[#111214] text-white text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold" placeholder="Search Users by Machine ID, Name, Email...">
               </div>
             </div>
-            <div class="overflow-x-auto max-h-96">
+            <div class="overflow-x-auto max-h-[500px]">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                     <th class="pb-3 pl-2">Client ID</th>
                     <th class="pb-3">Display Name</th>
                     <th class="pb-3">Email Address</th>
@@ -299,7 +312,7 @@
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                     <th class="pb-3 pl-2">Machine ID</th>
                     <th class="pb-3">Device Name</th>
                     <th class="pb-3">OS / App Version</th>
@@ -358,10 +371,10 @@
                 </h2>
                 <button onclick="exportKeysCSV()" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-[#3f4147] transition-all cursor-pointer">Export CSV</button>
               </div>
-              <div class="overflow-x-auto max-h-80">
+              <div class="overflow-x-auto max-h-[350px]">
                 <table class="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                       <th class="pb-3 pl-2">Key String</th>
                       <th class="pb-3">Plan</th>
                       <th class="pb-3">Expiration</th>
@@ -391,7 +404,7 @@
               <form id="release-form" class="space-y-4">
                 <div>
                   <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Target Version</label>
-                  <input type="text" id="rel-version" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. 2.6.3">
+                  <input type="text" id="rel-version" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. 2.7.0">
                 </div>
                 <div>
                   <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Rollout Channel</label>
@@ -433,7 +446,7 @@
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                       <th class="pb-3 pl-2">Version</th>
                       <th class="pb-3">Channel</th>
                       <th class="pb-3">Installer Download Link</th>
@@ -453,16 +466,17 @@
         <!-- TAB: TICKETS -->
         <div id="tab-tickets" class="tab-content space-y-6 hidden">
           <div class="glass-card rounded-2xl p-6 space-y-4">
-            <div class="border-b border-[#2b2d31] pb-4">
+            <div class="border-b border-[#2b2d31] pb-4 flex items-center justify-between">
               <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
                 <i data-lucide="help-circle" class="w-4 h-4 text-[#5865f2]"></i>
                 <span>Client Support Requests Desk</span>
               </h2>
+              <span class="text-[9px] font-bold text-[#f0a232] bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded uppercase" id="tickets-badge">0 Open</span>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                  <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                     <th class="pb-3 pl-2">Ticket ID</th>
                     <th class="pb-3">Submitted By</th>
                     <th class="pb-3">Type / Subject</th>
@@ -543,11 +557,11 @@
                 </div>
                 <div>
                   <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Image URL (Optional)</label>
-                  <input type="text" id="notif-image" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Image assets link">
+                  <input type="text" id="notif-image" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" placeholder="Image assets link">
                 </div>
                 <div>
                   <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Action CTA URL (Optional)</label>
-                  <input type="text" id="notif-link" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="Action redirect url link">
+                  <input type="text" id="notif-link" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" placeholder="Action redirect url link">
                 </div>
                 <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
                   <i data-lucide="send" class="w-4 h-4"></i>
@@ -577,11 +591,11 @@
             <div class="border-b border-[#2b2d31] pb-4">
               <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
                 <i data-lucide="sliders" class="w-4 h-4 text-yellow-400"></i>
-                <span>AYNX Global Application Feature Management</span>
+                <span>AYNX Global Plan-based Feature Matrix</span>
               </h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="flags-grid">
-              <!-- Dynamically populated switch elements -->
+              <!-- Dynamically populated select dropdown elements -->
             </div>
           </div>
         </div>
@@ -624,7 +638,7 @@
               <div class="overflow-x-auto max-h-96">
                 <table class="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px] whitespace-nowrap">
                       <th class="pb-3 pl-2">Timestamp</th>
                       <th class="pb-3">Administrator</th>
                       <th class="pb-3">Action Type</th>
@@ -641,36 +655,61 @@
           </div>
         </div>
 
-        <!-- TAB: INTEGRATIONS -->
-        <div id="tab-integrations" class="tab-content space-y-6 hidden">
-          <div class="glass-card rounded-2xl p-6 space-y-5 max-w-2xl mx-auto">
-            <div class="border-b border-[#2b2d31] pb-4">
-              <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-                <i data-lucide="settings" class="w-4 h-4 text-yellow-400"></i>
-                <span>Platform APIs & Payments Keys</span>
-              </h2>
+        <!-- TAB: SUB-ADMINS -->
+        <div id="tab-subadmins" class="tab-content space-y-6 hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="user-plus" class="w-4 h-4 text-indigo-400"></i>
+                  <span>Provision Sub-Admin</span>
+                </h2>
+              </div>
+              <form id="subadmin-create-form" class="space-y-4">
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Username</label>
+                  <input type="text" id="sub-username" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. janesmith">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Default Password</label>
+                  <input type="password" id="sub-password" required class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2]" placeholder="e.g. password123">
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Administrative Role</label>
+                  <select id="sub-role" class="w-full bg-[#111214] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none focus:border-[#5865f2] font-semibold">
+                    <option value="Manager">Manager (Edit subscriptions, support tickets)</option>
+                    <option value="Analytics">Analytics (Read-only access, charts view)</option>
+                  </select>
+                </div>
+                <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-2.5 rounded-lg transition-colors flex items-center justify-center space-x-1.5 shadow cursor-pointer">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                  <span>Create Sub-Admin</span>
+                </button>
+              </form>
             </div>
-            <form id="api-config-form" class="space-y-4">
-              <div class="p-4 bg-[#111214] border border-[#2b2d31] rounded-2xl space-y-4">
-                <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider border-b border-[#2b2d31] pb-1">Google OAuth Provider</p>
-                <div>
-                  <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Client ID</label>
-                  <input type="text" id="config-google-id" class="w-full bg-[#1e1f22] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" readonly>
-                </div>
-              </div>
 
-              <div class="p-4 bg-[#111214] border border-[#2b2d31] rounded-2xl space-y-4">
-                <p class="text-[10px] font-bold text-pink-500 uppercase tracking-wider border-b border-[#2b2d31] pb-1">Razorpay API Integration</p>
-                <div>
-                  <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Key ID</label>
-                  <input type="text" id="config-razorpay-id" class="w-full bg-[#1e1f22] text-white text-xs px-4 py-2.5 rounded-lg border border-[#2b2d31] focus:outline-none" readonly>
-                </div>
+            <div class="glass-card rounded-2xl p-6 lg:col-span-2 space-y-4">
+              <div class="border-b border-[#2b2d31] pb-4">
+                <h2 class="text-xs font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+                  <i data-lucide="user-check" class="w-4 h-4 text-[#5865f2]"></i>
+                  <span>Active Ecosystem Sub-Administrators</span>
+                </h2>
               </div>
-
-              <button type="submit" class="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white text-xs font-bold py-3 rounded-xl transition-all shadow cursor-pointer">
-                Rotate Access Credentials
-              </button>
-            </form>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="text-gray-400 border-b border-[#2b2d31] font-bold uppercase text-[9px]">
+                      <th class="pb-3 pl-2">Username</th>
+                      <th class="pb-3">Assigned Role</th>
+                      <th class="pb-3 text-right pr-2">Credentials Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-subadmins" class="divide-y divide-[#2b2d31]/50 text-gray-300">
+                    <!-- Dynamic sub admins list -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -767,7 +806,6 @@
       e.preventDefault();
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
-      const remember = document.getElementById('login-remember').checked;
       const errEl = document.getElementById('login-error');
 
       fetch('/admin/login', {
@@ -823,6 +861,19 @@
       });
     }
 
+    // Toggle Mobile Sidebar Drawer
+    function toggleMobileSidebar(show = true) {
+      const sidebar = document.getElementById('sidebar-menu');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (show) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
     // Tab switcher
     function switchTab(tabId) {
       activeTab = tabId;
@@ -832,6 +883,13 @@
       document.querySelectorAll('[id^="btn-tab-"]').forEach(btn => btn.classList.remove('active-tab'));
       const activeBtn = document.getElementById(`btn-tab-${tabId}`);
       if (activeBtn) activeBtn.classList.add('active-tab');
+      
+      // Close mobile drawer on tab select
+      toggleMobileSidebar(false);
+
+      if (tabId === 'subadmins') {
+        loadSubAdmins();
+      }
     }
 
     // Seeding dynamic dashboard details
@@ -848,7 +906,7 @@
         .then(res => res.json())
         .then(data => {
           localData = data;
-          const { users, telemetry, devices, auditLogs, featureFlags, supportTickets, revenue, websiteAnalytics, stats, versions, announcements } = data;
+          const { users, telemetry, licenses, devices, auditLogs, featureFlags, supportTickets, revenue, websiteAnalytics, stats, versions, announcements } = data;
 
           // 1. Overview counts
           document.getElementById('overview-users').innerText = stats.totalUsers;
@@ -870,7 +928,7 @@
           }).length;
           
           const crashFreeCount = 99.4;
-          const inactivePros = users.filter(u => u.plan === 'Pro' && (Date.now() - new Date(u.updated_at).getTime()) > 30 * 24 * 60 * 60 * 1000).length;
+          const inactivePros = users.filter(u => u.plan === 'Pro' && (Date.now() - new Date(u.updated_at || u.created_at).getTime()) > 30 * 24 * 60 * 60 * 1000).length;
 
           insightsList.innerHTML = `
             <li class="flex items-center space-x-2">💡 <span>${plusTrialsCount} Plus trials expiring within the next 7 days.</span></li>
@@ -931,9 +989,9 @@
               <tr class="hover:bg-[#2b2d31]/30">
                 <td class="py-3 pl-2 font-mono text-[10px] text-[#5865f2]">${d.machineId ? d.machineId.slice(0, 8) + '...' : '—'}</td>
                 <td class="py-3 font-bold text-white">${d.name || 'Unknown'}</td>
-                <td class="py-3 font-semibold text-gray-400">${d.osVersion ? d.osVersion.split(' ')[0] : 'Windows'} (v${d.appVersion || '2.6.2'})</td>
+                <td class="py-3 font-semibold text-gray-400">${d.osVersion ? d.osVersion.split(' ')[0] : 'Windows'} (v${d.appVersion || '2.6.3'})</td>
                 <td class="py-3 text-gray-400" title="${d.cpu}">${d.cpu.slice(0, 20)}... | ${d.ram} RAM</td>
-                <td class="py-3 text-gray-400 font-semibold">${d.ipAddress} (${d.country})</td>
+                <td class="py-3 text-gray-400 font-semibold">${d.ipAddress || '—'} (${d.country || '—'})</td>
                 <td class="py-3 font-bold ${isOnline ? 'text-[#23a55a]' : 'text-gray-500'}">${isOnline ? 'Online' : 'Offline'}</td>
                 <td class="py-3 text-right pr-2 space-x-1.5 flex justify-end">
                   <button onclick="disconnectDevice('${d.machineId}')" class="bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Disconnect</button>
@@ -974,6 +1032,8 @@
 
           // 10. Support tickets table
           const tableTickets = document.getElementById('table-tickets');
+          const openTicketsCount = supportTickets.filter(t => t.status === 'Open').length;
+          document.getElementById('tickets-badge').innerText = `${openTicketsCount} Open`;
           tableTickets.innerHTML = supportTickets.map(t => `
             <tr class="hover:bg-[#2b2d31]/30">
               <td class="py-3 pl-2 font-bold text-white font-mono">${t.id}</td>
@@ -1000,18 +1060,20 @@
             </div>
           `).join('');
 
-          // 12. Feature Flags switch sliders
+          // 12. Feature Flags Plan selectors matrix
           const flagsGrid = document.getElementById('flags-grid');
           flagsGrid.innerHTML = Object.keys(featureFlags).map(flag => `
             <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex justify-between items-center">
               <div>
                 <p class="text-xs font-bold text-white capitalize">${flag.replace(/_/g, ' ')}</p>
-                <p class="text-[9px] text-gray-500 mt-1 uppercase font-bold">Core Module</p>
+                <p class="text-[9px] text-gray-500 mt-1 uppercase font-bold">Tier Requirement</p>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer select-none">
-                <input type="checkbox" ${featureFlags[flag] ? 'checked' : ''} onchange="toggleFlag('${flag}', this.checked)" class="sr-only peer">
-                <div class="w-9 h-5 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#23a55a]"></div>
-              </label>
+              <select onchange="updateFlagPlan('${flag}', this.value)" class="bg-[#1e1f22] text-white text-[11px] px-2.5 py-1.5 rounded-lg border border-[#2b2d31] focus:outline-none">
+                <option value="Free" ${featureFlags[flag] === 'Free' ? 'selected' : ''}>Free (Everyone)</option>
+                <option value="Plus" ${featureFlags[flag] === 'Plus' ? 'selected' : ''}>Plus Plan</option>
+                <option value="Pro" ${featureFlags[flag] === 'Pro' ? 'selected' : ''}>Pro Plan</option>
+                <option value="Disabled" ${featureFlags[flag] === 'Disabled' ? 'selected' : ''}>Disabled</option>
+              </select>
             </div>
           `).join('');
 
@@ -1027,11 +1089,7 @@
             </tr>
           `).join('');
 
-          // 14. API settings details
-          document.getElementById('config-google-id').value = '●●●●●●●●●●●●●●';
-          document.getElementById('config-razorpay-id').value = '●●●●●●●●●●●●●●';
-
-          // 15. Backups history
+          // 14. Backups history
           loadBackupsList();
         });
     }
@@ -1099,8 +1157,8 @@
       });
     }
 
-    // Toggle Feature flag
-    function toggleFlag(flag, value) {
+    // Update Feature flag plan matrix
+    function updateFlagPlan(flag, value) {
       adminFetch('/admin/feature-flags/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1289,6 +1347,86 @@
       });
     }
 
+    // Sub-Admins Management
+    function loadSubAdmins() {
+      adminFetch('/admin/sub-admins')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('table-subadmins');
+          tbody.innerHTML = data.admins.map(a => `
+            <tr class="hover:bg-[#2b2d31]/30">
+              <td class="py-3 pl-2 font-bold text-white">${a.username}</td>
+              <td class="py-3 font-semibold text-gray-400">${a.role}</td>
+              <td class="py-3 text-right pr-2 space-x-2">
+                <button onclick="resetSubAdminPass('${a.username}')" class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/25 text-cyan-400 text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Reset Pass</button>
+                <button onclick="deleteSubAdmin('${a.username}')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 text-[10px] font-bold px-2 py-1 rounded cursor-pointer">Delete</button>
+              </td>
+            </tr>
+          `).join('');
+        });
+    }
+
+    document.getElementById('subadmin-create-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('sub-username').value;
+      const password = document.getElementById('sub-password').value;
+      const role = document.getElementById('sub-role').value;
+
+      adminFetch('/admin/sub-admins/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✅ Created sub-admin: ${username}`);
+          document.getElementById('sub-username').value = '';
+          document.getElementById('sub-password').value = '';
+          loadSubAdmins();
+        } else {
+          alert(`❌ Failed to create sub-admin: ` + (data.error || 'Server error'));
+        }
+      });
+    });
+
+    function deleteSubAdmin(username) {
+      if (!confirm(`Are you sure you want to delete sub-admin ${username}?`)) return;
+      adminFetch('/admin/sub-admins/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Sub-admin deleted.');
+          loadSubAdmins();
+        } else {
+          alert('❌ Error: ' + (data.error || ''));
+        }
+      });
+    }
+
+    function resetSubAdminPass(username) {
+      const newPassword = prompt(`Enter new password for sub-admin ${username}:`);
+      if (!newPassword) return;
+
+      adminFetch('/admin/sub-admins/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, newPassword })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Password reset successfully.');
+        } else {
+          alert('❌ Error: ' + (data.error || ''));
+        }
+      });
+    }
+
     // Remote Actions Console Commands
     function deviceCommand(machineId, action) {
       adminFetch('/admin/device-action', {
@@ -1410,8 +1548,9 @@
       });
     }
 
+    // User Delete
     function deleteUser(userId) {
-      if (!confirm('Are you sure you want to hard delete this user account? This action is irreversible.')) return;
+      if (!confirm('Are you sure you want to delete this user?')) return;
       adminFetch('/admin/delete-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1419,7 +1558,7 @@
       })
       .then(res => {
         if (res.ok) {
-          alert('✅ User hard deleted from ecosystem.');
+          alert('✅ User deleted successfully.');
           closeUserModal();
           loadStats();
         }
@@ -1432,7 +1571,7 @@
       if (!ticket) return;
 
       document.getElementById('ticket-modal-title').innerText = ticket.title;
-      document.getElementById('ticket-modal-meta').innerText = `${ticket.userName} · ${ticket.id}`;
+      document.getElementById('ticket-modal-meta').innerText = `${ticket.userName} (${ticket.email || 'Guest'}) · ${ticket.id}`;
       document.getElementById('ticket-modal-status').value = ticket.status;
       document.getElementById('ticket-modal-priority').value = ticket.priority;
 

@@ -161,7 +161,11 @@ const api = {
   },
 
   // ─── Native Dialog ───────────────────────────────────────────────────────────
-  selectDirectory: () => ipcRenderer.invoke('dialog:select-directory')
+  selectDirectory: () => ipcRenderer.invoke('dialog:select-directory'),
+
+  // ─── Support Tickets ──────────────────────────────────────────────────────────
+  submitSupportTicket: (data: any) => ipcRenderer.invoke('ticket:create', data),
+  getUserTickets: (email: string) => ipcRenderer.invoke('ticket:get-list', email)
 };
 
 contextBridge.exposeInMainWorld('api', api);
