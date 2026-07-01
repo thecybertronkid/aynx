@@ -38,6 +38,11 @@
     </div>
 
     <div class="flex items-center space-x-6">
+      <button onclick="toggleWebsiteAnalyticsModal(true)" class="flex items-center space-x-1.5 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-pink-500 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm">
+        <i data-lucide="line-chart" class="w-4 h-4"></i>
+        <span>Website Analytics</span>
+      </button>
+      <div class="h-8 w-[1px] bg-[#2b2d31]"></div>
       <div class="text-right">
         <span class="text-[10px] text-gray-400 font-bold uppercase block">Current Operator</span>
         <span class="text-xs font-extrabold text-white">Ayan Kashyap</span>
@@ -164,56 +169,6 @@
               <span>Publish Release Details</span>
             </button>
           </form>
-        </div>
-      </div>
-    <!-- Website Analytics & Traffic Card -->
-    <div class="glass-card rounded-2xl p-6 space-y-4">
-      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center">
-        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
-          <i data-lucide="line-chart" class="w-4 h-4 text-pink-500"></i>
-          <span>Website Traffic & Login Analytics</span>
-        </h2>
-        <span class="bg-[#111214] text-[10px] text-pink-500 font-extrabold px-3 py-1 rounded-full border border-pink-500/20">LIVE REPORT</span>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-        <!-- Views -->
-        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl space-y-2">
-          <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-            <span>Total Section Views</span>
-            <i data-lucide="eye" class="w-4 h-4 text-teal-400"></i>
-          </div>
-          <h3 id="analytics-views" class="text-2xl font-extrabold text-white">0</h3>
-          <div class="space-y-1 pt-2 border-t border-[#2b2d31]/50 text-[10px] text-gray-400 font-medium">
-            <div class="flex justify-between"><span>Hero Section:</span><span id="views-hero" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Features Matrix:</span><span id="views-features" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Comparison Chart:</span><span id="views-compare" class="text-white font-bold">0</span></div>
-            <div class="flex justify-between"><span>Pricing Plans:</span><span id="views-pricing" class="text-white font-bold">0</span></div>
-          </div>
-        </div>
-
-        <!-- Logins -->
-        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl flex flex-col justify-between">
-          <div class="space-y-2">
-            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-              <span>Website Logins</span>
-              <i data-lucide="log-in" class="w-4 h-4 text-indigo-400"></i>
-            </div>
-            <h3 id="analytics-logins" class="text-3xl font-extrabold text-white">0</h3>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-2 font-medium leading-relaxed">Counts the total number of times visitors authenticated via Google OAuth on the website.</p>
-        </div>
-
-        <!-- Download Clicks -->
-        <div class="bg-[#111214]/60 border border-[#2b2d31] p-4.5 rounded-xl flex flex-col justify-between">
-          <div class="space-y-2">
-            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
-              <span>Website Download Clicks</span>
-              <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i>
-            </div>
-            <h3 id="analytics-downloads" class="text-3xl font-extrabold text-white">0</h3>
-          </div>
-          <p class="text-[10px] text-gray-400 mt-2 font-medium leading-relaxed">Counts clicks on the download buttons (Hero, Nav, Modal) to track conversion rate.</p>
         </div>
       </div>
     </div>
@@ -639,10 +594,82 @@
       });
     }
 
+    function toggleWebsiteAnalyticsModal(show) {
+      const modal = document.getElementById('website-analytics-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        lucide.createIcons();
+      } else {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+    }
+
     // Initialize Page
     lucide.createIcons();
     loadStats();
     setInterval(loadStats, 5000); // Poll server every 5 seconds
   </script>
+
+  <!-- Website Analytics Modal Overlay -->
+  <div id="website-analytics-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden items-center justify-center transition-all duration-300">
+    <div class="glass-card rounded-3xl p-8 max-w-2xl w-full mx-4 space-y-6 shadow-2xl relative border border-[#2b2d31]">
+      <button onclick="toggleWebsiteAnalyticsModal(false)" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl transition-colors">&times;</button>
+      
+      <div class="border-b border-[#2b2d31] pb-4 flex justify-between items-center select-none">
+        <h2 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center space-x-2">
+          <i data-lucide="line-chart" class="w-5 h-5 text-pink-500"></i>
+          <span>Website Traffic & Login Analytics</span>
+        </h2>
+        <span class="bg-[#111214] text-[10px] text-pink-500 font-extrabold px-3 py-1 rounded-full border border-pink-500/20">LIVE REPORT</span>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Views -->
+        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+            <span>Total Section Views</span>
+            <i data-lucide="eye" class="w-4 h-4 text-teal-400"></i>
+          </div>
+          <h3 id="analytics-views" class="text-3xl font-extrabold text-white">0</h3>
+          <div class="space-y-1.5 pt-3 border-t border-[#2b2d31]/50 text-[10px] text-gray-400 font-medium">
+            <div class="flex justify-between"><span>Hero Section:</span><span id="views-hero" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Features Matrix:</span><span id="views-features" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Comparison Chart:</span><span id="views-compare" class="text-white font-bold">0</span></div>
+            <div class="flex justify-between"><span>Pricing Plans:</span><span id="views-pricing" class="text-white font-bold">0</span></div>
+          </div>
+        </div>
+
+        <!-- Logins -->
+        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+              <span>Website Logins</span>
+              <i data-lucide="log-in" class="w-4 h-4 text-indigo-400"></i>
+            </div>
+            <h3 id="analytics-logins" class="text-4xl font-extrabold text-white">0</h3>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-4 font-medium leading-relaxed">Total number of times web visitors authenticated via Google OAuth on the landing page.</p>
+        </div>
+
+        <!-- Download Clicks -->
+        <div class="bg-[#111214] border border-[#2b2d31] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-[10px] text-gray-400 font-bold uppercase">
+              <span>Download Clicks</span>
+              <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i>
+            </div>
+            <h3 id="analytics-downloads" class="text-4xl font-extrabold text-white">0</h3>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-4 font-medium leading-relaxed">Total click count on download triggers to calculate landing page visitor conversion rate.</p>
+        </div>
+      </div>
+      
+      <div class="pt-2 flex justify-end">
+        <button onclick="toggleWebsiteAnalyticsModal(false)" class="bg-[#2b2d31] hover:bg-gray-700 text-white text-xs font-bold px-5 py-2 rounded-xl transition-colors">Close Portal</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
