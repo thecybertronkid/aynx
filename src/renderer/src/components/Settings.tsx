@@ -415,32 +415,7 @@ Install Location: ${systemInfo.installDir}
   };
 
   const handleInstallUpdate = async () => {
-    if (!latestVersionData?.downloadUrl) return;
-    setIsUpdating(true);
-    setUpdateDownloadProgress(0);
-
-    // Listen to download progress
-    let unsubscribeProgress: (() => void) | undefined;
-    if ((window.api as any).onUpdateProgress) {
-      unsubscribeProgress = (window.api as any).onUpdateProgress((_event: any, data: any) => {
-        setUpdateDownloadProgress(data.progress);
-      });
-    }
-
-    try {
-      const res = await (window.api as any).installUpdate(latestVersionData.downloadUrl);
-      if (res && !res.success) {
-        alert(`Update installation failed: ${res.error || 'Unknown error'}`);
-        setIsUpdating(false);
-        setUpdateDownloadProgress(null);
-      }
-    } catch (e: any) {
-      alert(`Update installation error: ${e.message || 'Unknown error'}`);
-      setIsUpdating(false);
-      setUpdateDownloadProgress(null);
-    } finally {
-      if (unsubscribeProgress) unsubscribeProgress();
-    }
+    alert("Our update servers are temporarily busy. Please update directly from our website.");
   };
 
   // Compute theme names for display
