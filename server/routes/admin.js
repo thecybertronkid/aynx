@@ -236,7 +236,7 @@ router.get('/dashboard', requireAdminAuth, async (req, res) => {
       safeGetTable('license_keys', 'created_at', false, 'license_keys.json'),
       safeGetTable('telemetry', 'created_at', false, 'telemetry.json'),
       safeGetTable('app_versions', 'published_at', false, 'app_versions.json', [
-        { version: '2.7.1', is_latest: true, published_at: new Date().toISOString(), download_url: 'https://drive.usercontent.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: 'v2.7.1-stable' }
+        { version: '2.7.1', is_latest: true, published_at: new Date().toISOString(), download_url: 'https://drive.usercontent.com/download?id=15k0kio17i_9TYzCsTiovI3Ok_wcVW6zA&export=download&confirm=t', changelog: 'v2.7.1-stable' }
       ]),
       safeGetTable('announcements', 'created_at', false, 'announcements.json')
     ]);

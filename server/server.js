@@ -51,9 +51,9 @@ if (!fs.existsSync(LICENSES_FILE)) {
 
 if (!fs.existsSync(SETTINGS_FILE)) {
   const initialSettings = {
-    latestVersion: '2.6.3',
-    downloadUrl: 'https://drive.google.com/file/d/1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8/view?usp=sharing',
-    changelog: 'v2.6.3 Release Notes:\n- Fixed progress downloading metrics bug (stuck speed & ETA)\n- Implemented dynamic global feature flags checks\n- Rolled out AYNX Operations Portal Admin Console v3.0\n- Enhanced AI Insights automatic highlights center'
+    latestVersion: '2.7.1',
+    downloadUrl: 'https://drive.google.com/file/d/15k0kio17i_9TYzCsTiovI3Ok_wcVW6zA/view?usp=sharing',
+    changelog: 'v2.7.1 Release Notes:\n- Fixed persistent push notifications closing behavior\n- Fixed recurring download progress overlay notifications\n- Implemented plan feature matrices migration seeding\n- Added local dev API base heartbeats fallbacks'
   };
   writeJSON(SETTINGS_FILE, initialSettings);
 }
