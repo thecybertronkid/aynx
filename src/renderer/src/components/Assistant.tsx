@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Sparkles, Send, Download, Globe, Star, Settings,
@@ -286,8 +286,6 @@ const Assistant: React.FC<AssistantProps> = ({ onNavigate }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  if (plan === "Free") return null;
-
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 200);
   }, [open]);
@@ -320,6 +318,8 @@ const Assistant: React.FC<AssistantProps> = ({ onNavigate }) => {
   };
 
   const showQuickPrompts = messages.length <= 1;
+
+  if (plan === "Free") return null;
 
   return (
     <>
