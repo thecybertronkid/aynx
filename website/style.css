@@ -1027,22 +1027,10 @@ body {
 }
 
 .platforms-showcase {
-  text-align: center;
-  margin-bottom: 4.5rem;
+  margin-top: 1.5rem;
 }
 
-.trust-label {
-  font-family: var(--font-heading);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  font-weight: 800;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-  display: block;
-  margin-bottom: 2rem;
-}
-
-.platforms-logo-grid {
+.premium-sponsors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1.25rem;
@@ -1050,41 +1038,46 @@ body {
   margin: 0 auto;
 }
 
-.platform-logo-card {
+.premium-logo-card {
   background: rgba(255, 255, 255, 0.012);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 16px;
-  padding: 1.1rem 1.6rem;
+  padding: 1.2rem 1.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   cursor: default;
 }
 
-.platform-logo-card:hover {
+.premium-logo-card:hover {
   background: rgba(255, 255, 255, 0.035);
   border-color: rgba(255, 255, 255, 0.09);
   transform: translateY(-4px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 25px rgba(255, 255, 255, 0.02);
 }
 
-.platform-logo-card svg {
-  width: 20px;
-  height: 20px;
+.premium-logo-card svg {
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   opacity: 0.55;
   transition: all 0.3s ease;
 }
 
-.platform-logo-card:hover svg {
+.premium-logo-card:hover svg {
   opacity: 1;
   filter: drop-shadow(0 0 8px currentColor);
 }
 
-.platform-logo-card span {
+/* Specific drop-shadow glow details */
+.premium-logo-card.google-trust-card:hover svg {
+  filter: drop-shadow(0 0 10px rgba(66, 133, 244, 0.3));
+}
+
+.premium-logo-card span {
   font-family: var(--font-heading);
   font-size: 0.95rem;
   font-weight: 800;
@@ -1093,80 +1086,68 @@ body {
   transition: all 0.3s ease;
 }
 
-.platform-logo-card:hover span {
+.premium-logo-card:hover span {
   opacity: 0.95;
 }
 
-/* Trust Badges Row Styling */
-.trust-badges-wrapper {
-  max-width: 950px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 3rem;
-  background: rgba(17, 18, 20, 0.45);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 2.2rem 3rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-}
-
-.trust-badge-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.2rem;
-  flex: 1;
-}
-
-.badge-icon-shield {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
-}
-
-.badge-text-block h4 {
+.trust-divider-heading {
   font-family: var(--font-heading);
-  font-size: 1rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-align: center;
+  margin: 4.5rem 0 2rem 0;
+  opacity: 0.65;
+}
+
+/* Trust Badges Card layout styles */
+.trust-partners-row {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.premium-logo-card.google-trust-card,
+.premium-logo-card.razorpay-trust-card {
+  justify-content: flex-start;
+  padding: 1.3rem 1.8rem;
+  gap: 16px;
+}
+
+.trust-badge-card-text {
+  text-align: left;
+}
+
+.trust-badge-card-text h4 {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
   font-weight: 800;
   color: var(--text-white);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.2rem;
+  opacity: 0.8;
+  transition: all 0.3s ease;
 }
 
-.badge-text-block p {
-  font-size: 0.8rem;
+.premium-logo-card:hover .trust-badge-card-text h4 {
+  opacity: 1;
+}
+
+.trust-badge-card-text p {
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-weight: 500;
-  line-height: 1.5;
-}
-
-.trust-badge-divider {
-  width: 1px;
-  height: 80px;
-  background: var(--border-color);
-  align-self: center;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {
-  .trust-badges-wrapper {
-    flex-direction: column;
-    padding: 2rem;
-    gap: 2rem;
+  .premium-sponsors-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
   }
-  .trust-badge-divider {
-    width: 100%;
-    height: 1px;
-    display: block;
-  }
-  .platforms-logo-grid {
-    gap: 2rem;
+  .trust-partners-row {
+    grid-template-columns: 1fr;
+    max-width: 100%;
   }
 }
