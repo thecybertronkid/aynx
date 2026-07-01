@@ -1156,6 +1156,45 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+  .compare-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 16px;
+  }
+  .compare-table {
+    min-width: 650px;
+  }
+  .compare-table th, .compare-table td {
+    padding: 0.8rem 1.2rem;
+  }
+  .features-section {
+    padding: 60px 0;
+  }
+  .features-grid {
+    gap: 1.25rem;
+    margin-top: 2rem;
+  }
+  .feature-card {
+    padding: 2rem 1.5rem;
+  }
+  .pricing-section {
+    padding: 60px 0;
+  }
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+    margin: 2rem auto 0 auto;
+    gap: 1.5rem;
+  }
+  .pricing-card {
+    padding: 2.2rem 1.8rem;
+  }
+}
+
 @media (max-width: 600px) {
   .premium-sponsors-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1163,5 +1202,30 @@ body {
   .trust-partners-row {
     grid-template-columns: 1fr;
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.1rem;
+    line-height: 1.2;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+  .hero-buttons {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  .hero-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 0 1rem;
   }
 }
