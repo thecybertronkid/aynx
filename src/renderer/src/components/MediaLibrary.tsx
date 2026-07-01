@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useDownloadStore, DownloadItem } from '../store/downloadStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { FeatureCard } from './FeatureCard';
 
 interface MediaLibraryProps {
   favoriteOnly?: boolean;
@@ -113,6 +114,17 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({ favoriteOnly = false, onPla
             ? 'Access your starred download files instantly.' 
             : 'Access, search, filter, and preview all your downloaded files.'}
         </p>
+        {/* Feature Discovery Tip */}
+        {!favoriteOnly && (
+          <FeatureCard storageKey="aynx-feature-media-library" icon={FolderDown} title="Your Media Library" color="blue">
+            Every file you download is catalogued here. Click the play button to preview in AYNX's built-in media player, or star a file to save it to Favorites.
+          </FeatureCard>
+        )}
+        {favoriteOnly && (
+          <FeatureCard storageKey="aynx-feature-favorites" icon={Heart} title="Favorites" color="pink">
+            Files you star will appear here for instant access. Click the heart icon on any download to add it to your favorites.
+          </FeatureCard>
+        )}
       </div>
 
       {/* Filter and search toolbar */}

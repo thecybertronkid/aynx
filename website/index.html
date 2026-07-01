@@ -39,7 +39,7 @@
       </nav>
       <div class="nav-actions">
         <span id="user-nav" class="user-auth-zone"></span>
-        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="nav-download-btn" class="btn btn-primary btn-glow">
+        <a href="https://aynx-api.onrender.com/api/version/latest/download" id="nav-download-btn" class="btn btn-primary btn-glow">
           <i data-lucide="download"></i>
           <span>Download</span>
         </a>
@@ -64,7 +64,7 @@
       </p>
       
       <div class="hero-cta">
-        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" id="hero-download-btn" class="btn btn-primary btn-glow">
+        <a href="https://aynx-api.onrender.com/api/version/latest/download" id="hero-download-btn" class="btn btn-primary btn-glow">
           <i data-lucide="download"></i>
           <span>Download for Windows</span>
         </a>
@@ -778,10 +778,19 @@
               if (url.startsWith('file:///')) {
                 const parts = url.split('/');
                 const filename = parts[parts.length - 1];
-                url = `https://aynx-api.onrender.com/uploads/${filename}`;
+                url = `https://aynx-api.onrender.com/release/${filename}`;
               }
               dlBtnNav.href = url;
               dlBtnHero.href = url;
+
+              const modalDlBtn = document.getElementById('modal-download-btn');
+              if (modalDlBtn) modalDlBtn.href = url;
+              const modalFilenameBox = document.getElementById('modal-filename-box');
+              if (modalFilenameBox) {
+                const parts = url.split('/');
+                const filename = decodeURIComponent(parts[parts.length - 1]);
+                modalFilenameBox.innerText = filename;
+              }
             }
           }
         })
@@ -997,13 +1006,13 @@
       </div>
       <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff; margin-bottom: 0.8rem; font-weight:900;">Download AYNX Setup</h3>
       <p style="font-size: 0.85rem; color: var(--text-normal); margin-bottom: 1.2rem; line-height: 1.6;">
-        You can download the stable Windows installer directly from our secure Google Drive cloud mirrors:
+        You can download the stable Windows installer directly from our secure server:
       </p>
-      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 0.8rem 1rem; border-radius: 12px; font-family: monospace; font-size: 0.8rem; color: var(--plus-color); margin-bottom: 1.2rem; word-break: break-all; font-weight:700;">
-        AYNX 2.6.0.stable.exe (145 MB)
+      <div id="modal-filename-box" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 0.8rem 1rem; border-radius: 12px; font-family: monospace; font-size: 0.8rem; color: var(--plus-color); margin-bottom: 1.2rem; word-break: break-all; font-weight:700;">
+        AYNX 2.6.1.stable.exe
       </div>
       <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
-        <a href="https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing" target="_blank" class="btn btn-primary" style="padding:0.6rem 1.5rem;">Download from Google Drive</a>
+        <a id="modal-download-btn" href="https://aynx-api.onrender.com/api/version/latest/download" class="btn btn-primary" style="padding:0.6rem 1.5rem;">Download Installer</a>
         <button onclick="closeDownloadModal()" class="btn btn-secondary" style="padding:0.6rem 1.5rem;">Close</button>
       </div>
     </div>

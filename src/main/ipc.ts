@@ -1,4 +1,4 @@
-import { ipcMain, shell, app } from 'electron';
+import { ipcMain, shell, app, dialog } from 'electron';
 import { openGoogleAuthWindow, openRazorpayWindow, storeAuthData, getStoredAuth, clearAuth, verifyTokenOnline, refreshToken as refreshJWT } from './auth';
 import * as os from 'os';
 import { 
@@ -240,7 +240,8 @@ export function setupIpcListeners(mainWindow: any) {
     const { spawn } = require('child_process');
 
     const tempDir = app.getPath('temp');
-    const tempPath = path.join(tempDir, 'aynx_setup_update.exe');
+    // Use timestamped unique filename to avoid locking collisions with previous downloads
+    const tempPath = path.join(tempDir, `aynx_setup_update_${Date.now()}.exe`);
 
     console.log(`[AYNX AutoUpdater] Starting update download: ${downloadUrl}`);
     
@@ -255,8 +256,14 @@ export function setupIpcListeners(mainWindow: any) {
         if (!res.ok) throw new Error(`Server returned status ${res.status}`);
 
         const fileStream = fs.createWriteStream(tempPath);
-        const reader = res.body!.getReader();
+        
+        // Wrap write stream completion in a promise to ensure it's fully closed
+        const streamFinished = new Promise<void>((resolve, reject) => {
+          fileStream.on('finish', resolve);
+          fileStream.on('error', reject);
+        });
 
+        const reader = res.body!.getReader();
         let totalBytes = parseInt(res.headers.get('content-length') || '0', 10);
         let downloadedBytes = 0;
 
@@ -270,17 +277,36 @@ export function setupIpcListeners(mainWindow: any) {
           const progress = totalBytes > 0 ? Math.round((downloadedBytes / totalBytes) * 100) : 50;
           event.sender.send('update-download-progress', { progress });
         }
+        
         fileStream.end();
+        await streamFinished;
       }
 
       console.log(`[AYNX AutoUpdater] Launching silent setup: ${tempPath}`);
 
-      // NSIS silent flag: /S
-      const installer = spawn(tempPath, ['/S'], {
-        detached: true,
-        stdio: 'ignore'
-      });
-      installer.unref();
+      // Wait 500ms to allow OS/Antivirus scanning locks to release
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      let installer;
+      let retries = 5;
+      while (retries > 0) {
+        try {
+          installer = spawn(tempPath, ['/S'], {
+            detached: true,
+            stdio: 'ignore'
+          });
+          installer.unref();
+          break; // Success
+        } catch (spawnErr: any) {
+          if ((spawnErr.code === 'EBUSY' || spawnErr.code === 'EACCES') && retries > 1) {
+            console.warn(`[AYNX AutoUpdater] Spawn failed with ${spawnErr.code}, retrying in 500ms...`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            retries--;
+          } else {
+            throw spawnErr;
+          }
+        }
+      }
       
       // Delay exit slightly to let process detach
       setTimeout(() => {
@@ -294,10 +320,29 @@ export function setupIpcListeners(mainWindow: any) {
     }
   });
 
-  // Set callback to push progress updates to the renderer
+  // Set callback to push progress updates to the renderer + taskbar
   setProgressCallback((id, data) => {
     if (!mainWindow.isDestroyed()) {
       mainWindow.webContents.send('download-progress', { id, ...data });
+
+      // ── Taskbar progress bar ──────────────────────────────────────────
+      const active = getActiveDownloads();
+      const items = Object.values(active) as any[];
+      const inProgress = items.filter(d => d.status === 'downloading');
+
+      if (inProgress.length === 0) {
+        // All done – clear the taskbar progress bar
+        mainWindow.setProgressBar(-1);
+        if (data.status === 'completed') {
+          // Flash taskbar to draw attention
+          mainWindow.flashFrame(true);
+          setTimeout(() => mainWindow.flashFrame(false), 3000);
+        }
+      } else {
+        // Show average progress across all active downloads
+        const avg = inProgress.reduce((sum: number, d: any) => sum + (d.progress ?? 0), 0) / inProgress.length;
+        mainWindow.setProgressBar(avg / 100);
+      }
     }
   });
 
@@ -415,5 +460,15 @@ export function setupIpcListeners(mainWindow: any) {
     } catch (err: any) {
       return { success: false, error: err.message };
     }
+  });
+
+  // ─── Native Directory Picker ─────────────────────────────────────────────────
+  ipcMain.handle('dialog:select-directory', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory', 'createDirectory'],
+      title: 'Choose Download Folder'
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    return result.filePaths[0];
   });
 }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, net } from 'electron';
+import { app, BrowserWindow, protocol, net, Tray, Menu, shell } from 'electron';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
@@ -16,6 +16,16 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let isQuitting = false;
+
+function handleJumpListArg(commandLine: string[]) {
+  const actionArg = commandLine.find(arg => arg.startsWith('--action='));
+  if (actionArg && mainWindow) {
+    const action = actionArg.split('=')[1];
+    mainWindow.webContents.send('jump-list-action', action);
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -46,9 +56,146 @@ function createWindow() {
     console.log(`[RENDERER CONSOLE] (${level}) ${message} [${sourceId}:${line}]`);
   });
 
+  mainWindow.webContents.on('did-finish-load', () => {
+    handleJumpListArg(process.argv);
+  });
+
+  mainWindow.on('close', async (e) => {
+    if (!isQuitting) {
+      try {
+        const { getSettings } = require('./database');
+        const settings = await getSettings();
+        if (settings.closeToTray === 'false') {
+          isQuitting = true;
+          app.quit();
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to query closeToTray settings:', err);
+      }
+      e.preventDefault();
+      mainWindow?.hide();
+    }
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+}
+
+function createTray() {
+  const iconPath = path.join(__dirname, '../../resources/icon.png');
+  tray = new Tray(iconPath);
+  tray.setToolTip('AYNX \u2013 Download Manager');
+
+  const updateMenu = () => {
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Open AYNX',
+        click: () => {
+          if (!mainWindow) return;
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Quick Download (Paste URL)',
+        click: () => {
+          if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
+          mainWindow?.webContents.send('jump-list-action', 'paste-url');
+        }
+      },
+      {
+        label: 'Open Built-in Browser',
+        click: () => {
+          if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
+          mainWindow?.webContents.send('jump-list-action', 'open-browser');
+        }
+      },
+      {
+        label: 'Recent Downloads',
+        click: () => {
+          if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
+          mainWindow?.webContents.send('jump-list-action', 'recent-downloads');
+        }
+      },
+      {
+        label: 'Settings',
+        click: () => {
+          if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
+          mainWindow?.webContents.send('jump-list-action', 'open-settings');
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Quit AYNX',
+        click: () => {
+          isQuitting = true;
+          app.quit();
+        }
+      }
+    ]);
+    tray?.setContextMenu(contextMenu);
+  };
+
+  tray.on('click', () => {
+    if (!mainWindow) return;
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+
+  updateMenu();
+}
+
+function setupJumpList() {
+  app.setJumpList([
+    {
+      type: 'tasks',
+      items: [
+        {
+          type: 'task',
+          title: 'Quick Download (Paste URL)',
+          description: 'Paste a URL and start downloading immediately',
+          program: process.execPath,
+          args: '--action=paste-url',
+          iconPath: process.execPath,
+          iconIndex: 0
+        },
+        {
+          type: 'task',
+          title: 'Open Built-in Browser',
+          description: 'Launch the AYNX built-in browser',
+          program: process.execPath,
+          args: '--action=open-browser',
+          iconPath: process.execPath,
+          iconIndex: 0
+        },
+        {
+          type: 'task',
+          title: 'Recent Downloads',
+          description: 'View your recent downloads',
+          program: process.execPath,
+          args: '--action=recent-downloads',
+          iconPath: process.execPath,
+          iconIndex: 0
+        },
+        {
+          type: 'task',
+          title: 'Open Settings',
+          description: 'Configure AYNX preferences',
+          program: process.execPath,
+          args: '--action=open-settings',
+          iconPath: process.execPath,
+          iconIndex: 0
+        }
+      ]
+    }
+  ]);
 }
 
 app.whenReady().then(async () => {
@@ -73,6 +220,8 @@ app.whenReady().then(async () => {
   await initDatabase(userDataPath);
 
   createWindow();
+  createTray();
+  setupJumpList();
 
   if (mainWindow) {
     setupIpcListeners(mainWindow);
@@ -91,13 +240,16 @@ app.whenReady().then(async () => {
 app.on('second-instance', (_event, commandLine) => {
   if (mainWindow) {
     if (mainWindow.isMinimized()) mainWindow.restore();
+    if (!mainWindow.isVisible()) mainWindow.show();
     mainWindow.focus();
   }
-  // commandLine last arg is the deep link URL
+  // Handle deep links
   const deepLink = commandLine.find(arg => arg.startsWith('aynx://'));
   if (deepLink) {
     mainWindow?.webContents.send('deep-link', deepLink);
   }
+  // Handle jump list actions
+  handleJumpListArg(commandLine);
 });
 
 // Handle aynx:// deep link on macOS
@@ -107,7 +259,13 @@ app.on('open-url', (event, url) => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  // When tray is active we don't quit on close — tray keeps the app alive.
+  if (isQuitting || process.platform === 'darwin') {
+    tray?.destroy();
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  isQuitting = true;
 });

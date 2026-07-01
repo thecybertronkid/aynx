@@ -5,6 +5,7 @@ import {
   Link, Download, FileText, Repeat, RefreshCw
 } from 'lucide-react';
 import { useSchedulerStore, ScheduledItem } from '../store/schedulerStore';
+import { FeatureCard } from './FeatureCard';
 
 const Scheduler: React.FC = () => {
   const { scheduled, fetchScheduled, saveScheduled, deleteScheduled } = useSchedulerStore();
@@ -118,7 +119,12 @@ const Scheduler: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 w-full max-w-6xl mx-auto flex flex-col md:flex-row h-full gap-6 select-none animate-fadeIn py-2">
+    <div className="flex-1 w-full max-w-6xl mx-auto flex flex-col h-full gap-6 select-none animate-fadeIn py-2">
+      {/* Feature Discovery Card */}
+      <FeatureCard storageKey="aynx-feature-scheduler" icon={Clock} title="Automate Your Downloads" color="emerald">
+        The Scheduler lets you set a specific date &amp; time for downloads to start — great for off-peak downloading or timed media releases. Set it and forget it!
+      </FeatureCard>
+      <div className="flex-1 w-full flex flex-col md:flex-row gap-6">
       {/* Left: Create Schedule Form */}
       <div className="w-full md:w-[420px] bg-discord-card border border-discord-border rounded-2xl p-5 flex flex-col h-fit shrink-0 shadow-sm space-y-4">
         <div className="border-b border-discord-border pb-3">
@@ -362,6 +368,7 @@ const Scheduler: React.FC = () => {
             ))
           )}
         </div>
+      </div>
       </div>
     </div>
   );

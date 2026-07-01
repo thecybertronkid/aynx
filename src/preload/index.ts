@@ -106,7 +106,18 @@ const api = {
     return () => {
       ipcRenderer.removeListener('deep-link', callback);
     };
-  }
+  },
+
+  // ─── Jump List / Tray Actions ─────────────────────────────────────────────────
+  onJumpListAction: (callback: (event: any, action: string) => void) => {
+    ipcRenderer.on('jump-list-action', callback);
+    return () => {
+      ipcRenderer.removeListener('jump-list-action', callback);
+    };
+  },
+
+  // ─── Native Dialog ───────────────────────────────────────────────────────────
+  selectDirectory: () => ipcRenderer.invoke('dialog:select-directory')
 };
 
 contextBridge.exposeInMainWorld('api', api);

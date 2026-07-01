@@ -602,10 +602,20 @@ https://www.youtube.com/watch?ewRjZoRtu0Y
             <textarea
               value={batchInput}
               onChange={(e) => setBatchInput(e.target.value)}
-              placeholder="Paste list of URLs here (one link per line) e.g.,&#10;https://www.youtube.com/watch?dQw4w9WgXcQ&#10;https://open.spotify.com/track/4PTG3Z6ehGkBF3zIqYQGSy"
+              placeholder={"Paste list of URLs here (one link per line) e.g.,\nhttps://www.youtube.com/watch?dQw4w9WgXcQ\nhttps://open.spotify.com/track/4PTG3Z6ehGkBF3zIqYQGSy\n\nOr drag & drop a URL directly here →"}
               rows={5}
               disabled={batchParsing}
-              className="w-full bg-discord-secondary text-[#dbdee1] text-xs px-4 py-3 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold leading-relaxed resize-none font-mono placeholder:opacity-50 select-text"
+              onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-discord-accent'); }}
+              onDragLeave={(e) => { e.currentTarget.classList.remove('border-discord-accent'); }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-discord-accent');
+                const droppedText = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '';
+                if (droppedText.trim()) {
+                  setBatchInput((prev) => prev ? prev + '\n' + droppedText.trim() : droppedText.trim());
+                }
+              }}
+              className="w-full bg-discord-secondary text-[#dbdee1] text-xs px-4 py-3 rounded-xl border border-discord-border focus:outline-none focus:border-discord-accent font-semibold leading-relaxed resize-none font-mono placeholder:opacity-50 select-text transition-colors duration-150"
             />
 
             <div className="flex items-center justify-between gap-4">

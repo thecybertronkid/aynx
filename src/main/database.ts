@@ -34,7 +34,9 @@ async function getStore() {
         ffmpegPath: '',
         hwAcceleration: 'false',
         bgProcessing: 'true',
-        autoResume: 'true'
+        autoResume: 'true',
+        onboardingCompleted: 'false',
+        closeToTray: 'true'
       },
       downloads: [] as DownloadRecord[],
       accounts: [] as AccountRecord[],

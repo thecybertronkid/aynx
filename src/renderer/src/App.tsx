@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import QueueManager from './components/QueueManager';
@@ -15,10 +15,10 @@ import { useSettingsStore } from './store/settingsStore';
 import { useDownloadStore } from './store/downloadStore';
 import { useAuthStore } from './store/authStore';
 import Welcome from './components/Welcome';
+import Assistant from './components/Assistant';
 import { ToastProvider } from './components/UpgradeToast';
 import { DownloadNotifications } from './components/DownloadNotifications';
 import ErrorBoundary from './components/ErrorBoundary';
-
 import { Github, RefreshCw, AlertCircle, FileText } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -28,7 +28,9 @@ const App: React.FC = () => {
   
   // Auth Store
   const { user, token, isLoading, initialize } = useAuthStore();
+  const settings = useSettingsStore((state) => state.settings);
   const [welcomeCompleted, setWelcomeCompleted] = useState(false);
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
   
   // Media Viewer state
   const [viewerItem, setViewerItem] = useState<{
@@ -65,15 +67,71 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Once settings load, check onboardingCompleted flag
+  useEffect(() => {
+    if (!onboardingChecked && settings) {
+      if ((settings as any).onboardingCompleted === 'true') {
+        setWelcomeCompleted(true);
+      }
+      setOnboardingChecked(true);
+    }
+  }, [settings, onboardingChecked]);
+
   const isBrowserWindow = window.location.hash.includes('/browser');
-  const showWelcome = !isLoading && !token && !welcomeCompleted && !isBrowserWindow;
+  // Show onboarding if not logged in AND onboarding not yet completed
+  const showWelcome = !isLoading && onboardingChecked && !token && !welcomeCompleted && !isBrowserWindow;
 
 
   return (
     <ToastProvider>
     <HashRouter>
       <ErrorBoundary>
-        <div className="flex h-screen w-screen overflow-hidden bg-discord-tertiary font-sans antialiased text-discord-textNormal">
+        <AppInner
+          isBrowserWindow={isBrowserWindow}
+          showWelcome={showWelcome}
+          welcomeCompleted={welcomeCompleted}
+          setWelcomeCompleted={setWelcomeCompleted}
+          viewerItem={viewerItem}
+          setViewerItem={setViewerItem}
+          accountsCenterOpen={accountsCenterOpen}
+          setAccountsCenterOpen={setAccountsCenterOpen}
+        />
+      </ErrorBoundary>
+    </HashRouter>
+    </ToastProvider>
+  );
+};
+
+// ─── Inner component with router context access ───────────────────────────────
+const AppInner: React.FC<{
+  isBrowserWindow: boolean;
+  showWelcome: boolean;
+  welcomeCompleted: boolean;
+  setWelcomeCompleted: (v: boolean) => void;
+  viewerItem: { filePath: string; title: string; contentType: 'video' | 'audio' | 'image' } | null;
+  setViewerItem: (v: any) => void;
+  accountsCenterOpen: boolean;
+  setAccountsCenterOpen: (v: boolean) => void;
+}> = ({ isBrowserWindow, showWelcome, welcomeCompleted, setWelcomeCompleted, viewerItem, setViewerItem, accountsCenterOpen, setAccountsCenterOpen }) => {
+  const navigate = useNavigate();
+
+  // Handle jump list / tray actions from main process
+  useEffect(() => {
+    if (!(window.api as any).onJumpListAction) return;
+    const unsub = (window.api as any).onJumpListAction((_: any, action: string) => {
+      switch (action) {
+        case 'paste-url':        navigate('/'); break;
+        case 'open-browser':     navigate('/browser'); break;
+        case 'recent-downloads': navigate('/downloads'); break;
+        case 'open-settings':    navigate('/settings'); break;
+        default: break;
+      }
+    });
+    return () => { if (unsub) unsub(); };
+  }, [navigate]);
+
+  return (
+    <div className="flex h-screen w-screen overflow-hidden bg-discord-tertiary font-sans antialiased text-discord-textNormal">
           {/* Sidebar */}
           {!isBrowserWindow && <Sidebar onOpenAccountsCenter={() => setAccountsCenterOpen(true)} />}
 
@@ -254,12 +312,14 @@ const App: React.FC = () => {
           <Welcome onComplete={() => setWelcomeCompleted(true)} />
         )}
 
+        {/* AYNX Assistant */}
+        {!isBrowserWindow && !showWelcome && (
+          <Assistant onNavigate={(route) => navigate(route)} />
+        )}
+
         {/* Global Progress Notifications overlay (gated to Plus+) */}
         <DownloadNotifications />
       </div>
-      </ErrorBoundary>
-    </HashRouter>
-    </ToastProvider>
   );
 };
 
