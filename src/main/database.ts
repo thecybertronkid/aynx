@@ -36,7 +36,8 @@ async function getStore() {
         bgProcessing: 'true',
         autoResume: 'true',
         onboardingCompleted: 'false',
-        closeToTray: 'true'
+        closeToTray: 'true',
+        rememberCloseChoice: 'false'
       },
       downloads: [] as DownloadRecord[],
       accounts: [] as AccountRecord[],
@@ -230,11 +231,31 @@ export async function getSettings(): Promise<Record<string, string>> {
   return store.get('settings') as Record<string, string>;
 }
 
+export function getSettingsSync(): Record<string, string> {
+  if (_store) {
+    return _store.get('settings') as Record<string, string>;
+  }
+  return {
+    theme: 'dark',
+    displayName: 'Local Service',
+    closeToTray: 'true',
+    rememberCloseChoice: 'false'
+  };
+}
+
 export async function saveSetting(key: string, value: string) {
   const store = await getStore();
   const settings = store.get('settings') as Record<string, string>;
   settings[key] = value;
   store.set('settings', settings);
+}
+
+export function saveSettingSync(key: string, value: string) {
+  if (_store) {
+    const settings = _store.get('settings') as Record<string, string>;
+    settings[key] = value;
+    _store.set('settings', settings);
+  }
 }
 
 // Downloads

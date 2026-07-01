@@ -1,6 +1,6 @@
 {
   "name": "aynx",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Universal Media Downloader",
   "author": "Ayan Kashyap",
   "main": "dist/main/index.js",

@@ -13,16 +13,9 @@ router.get('/check', async (req, res) => {
         .single();
 
       if (data) {
-        let downloadUrl = data.download_url;
-        if (downloadUrl && downloadUrl.startsWith('file:///')) {
-          const parts = downloadUrl.split('/');
-          const filename = parts[parts.length - 1];
-          const serverUrl = `${req.protocol}://${req.get('host')}`;
-          downloadUrl = `${serverUrl}/release/${filename}`;
-        }
         return res.json({
           latestVersion: data.version,
-          downloadUrl: downloadUrl,
+          downloadUrl: data.download_url,
           changelog: data.changelog,
           publishedAt: data.published_at
         });
@@ -30,41 +23,11 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.5.4', downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.google.com/file/d/1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi/view?usp=sharing', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.5.4', downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing', changelog: '' });
+    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.google.com/file/d/1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi/view?usp=sharing', changelog: '' });
   }
 });
-
-// GET /version/latest/download (legacy: /api/version/latest/download) — direct download redirect
-router.get('/latest/download', async (req, res) => {
-  try {
-    let downloadUrl = 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing';
-    if (supabase) {
-      const { data } = await supabase
-        .from('app_versions')
-        .select('*')
-        .eq('is_latest', true)
-        .single();
-      if (data && data.download_url) {
-        downloadUrl = data.download_url;
-      }
-    }
-
-    // Convert file:/// path to absolute download route on this server
-    if (downloadUrl.startsWith('file:///')) {
-      const parts = downloadUrl.split('/');
-      const filename = parts[parts.length - 1];
-      const serverUrl = `${req.protocol}://${req.get('host')}`;
-      downloadUrl = `${serverUrl}/release/${filename}`;
-    }
-
-    res.redirect(downloadUrl);
-  } catch (err) {
-    res.redirect('https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing');
-  }
-});
-
 
 // POST /version/set (legacy: /api/version/set) — admin only
 router.post('/set', async (req, res) => {

@@ -164,7 +164,7 @@ const AppInner: React.FC<{
                     <div className="bg-discord-secondary/40 border border-discord-border rounded-xl p-4 space-y-2.5 text-left text-xs">
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Version</span>
-                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.6.0</span>
+                        <span className="font-semibold text-discord-textNormal bg-discord-secondary px-2 py-0.5 rounded border border-discord-border">2.6.2</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-discord-textMuted">Created & Maintained by</span>
@@ -193,7 +193,7 @@ const AppInner: React.FC<{
                       </a>
                       <button
                         onClick={() => {
-                          alert("You are running the latest version of AYNX (v2.6.0).");
+                          alert("You are running the latest version of AYNX (v2.6.2).");
                         }}
                         className="btn-secondary text-[11px] py-2.5 flex items-center justify-center gap-1.5 rounded-lg border border-discord-border hover:bg-discord-secondary/60 transition-colors"
                       >

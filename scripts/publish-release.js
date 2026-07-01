@@ -42,7 +42,7 @@ console.log(`[AYNX Publisher] Registering build v${version} on backend...`);
 const adminSecret = process.env.ADMIN_SECRET || '12345';
 const req = require('http').request(
   {
-    hostname: 'localhost',
+    hostname: '127.0.0.1',
     port: 5000,
     path: '/api/version/set',
     method: 'POST',

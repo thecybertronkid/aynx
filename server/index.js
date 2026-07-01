@@ -144,7 +144,6 @@ app.get('/health', (req, res) => {
 
 // ─── Static Uploads serving ───────────────────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-app.use('/release', express.static(path.join(__dirname, '..', 'release')));
 
 // ─── Admin Portal Static Files ────────────────────────────────────────────────
 app.use('/admin-portal', express.static(path.join(__dirname, 'public')));

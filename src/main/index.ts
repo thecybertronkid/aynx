@@ -2,6 +2,13 @@ import { app, BrowserWindow, protocol, net, Tray, Menu, shell } from 'electron';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 
+// Request single instance lock to prevent duplicate processes
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+  process.exit(0);
+}
+
 // Load root .env variables in development mode
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -60,21 +67,62 @@ function createWindow() {
     handleJumpListArg(process.argv);
   });
 
-  mainWindow.on('close', async (e) => {
+  mainWindow.on('close', (e) => {
     if (!isQuitting) {
+      e.preventDefault();
+
       try {
-        const { getSettings } = require('./database');
-        const settings = await getSettings();
-        if (settings.closeToTray === 'false') {
-          isQuitting = true;
-          app.quit();
-          return;
+        const { getSettingsSync, saveSettingSync } = require('./database');
+        const settings = getSettingsSync();
+
+        if (settings.rememberCloseChoice === 'true') {
+          if (settings.closeToTray === 'true') {
+            mainWindow?.hide();
+          } else {
+            isQuitting = true;
+            app.quit();
+          }
+        } else {
+          const { dialog } = require('electron');
+          dialog.showMessageBox(mainWindow!, {
+            type: 'question',
+            buttons: ['Minimize to Tray', 'Close App', 'Cancel'],
+            defaultId: 0,
+            cancelId: 2,
+            title: 'Close AYNX',
+            message: 'Do you want to minimize the app to the system tray or close it fully?',
+            checkboxLabel: 'Remember my choice',
+            checkboxChecked: false
+          }).then((result: { response: number; checkboxChecked: boolean }) => {
+            const { response, checkboxChecked } = result;
+            if (response === 2) {
+              // Cancel
+              return;
+            }
+
+            const shouldMinimize = response === 0;
+            if (checkboxChecked) {
+              saveSettingSync('rememberCloseChoice', 'true');
+              saveSettingSync('closeToTray', shouldMinimize ? 'true' : 'false');
+            }
+
+            if (shouldMinimize) {
+              mainWindow?.hide();
+            } else {
+              isQuitting = true;
+              app.quit();
+            }
+          }).catch((err: any) => {
+            console.error('Failed to show close option dialog:', err);
+            isQuitting = true;
+            app.quit();
+          });
         }
       } catch (err) {
-        console.error('Failed to query closeToTray settings:', err);
+        console.error('Failed to handle close event:', err);
+        isQuitting = true;
+        app.quit();
       }
-      e.preventDefault();
-      mainWindow?.hide();
     }
   });
 

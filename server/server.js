@@ -51,9 +51,9 @@ if (!fs.existsSync(LICENSES_FILE)) {
 
 if (!fs.existsSync(SETTINGS_FILE)) {
   const initialSettings = {
-    latestVersion: '2.6.0',
-    downloadUrl: 'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing',
-    changelog: 'v2.6.0 Release Notes:\n- Added supported platforms and trust partners indicators\n- Expanded features comparison table\n- Implemented mobile-first responsive dashboard layout\n- Upgraded UI/UX style grid layouts'
+    latestVersion: '2.6.2',
+    downloadUrl: 'https://drive.google.com/file/d/1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi/view?usp=sharing',
+    changelog: 'v2.6.2 Release Notes:\n- Added close confirmation settings tray options dialog prompt\n- Fixed spawn EBUSY auto-updater installation bug\n- Implemented single instance process lock\n- Refined premium system options'
   };
   writeJSON(SETTINGS_FILE, initialSettings);
 }

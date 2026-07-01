@@ -87,9 +87,9 @@ CREATE TABLE IF NOT EXISTS announcements (
 -- ─── Seed: Initial version ────────────────────────────────────────────────────
 INSERT INTO app_versions (version, download_url, changelog, is_latest)
 VALUES (
-  '2.5.4',
-  'https://drive.google.com/file/d/1qa0OX00tfQ2j5psqXa1zLfvU8l0uZ-hd/view?usp=sharing',
-  'v2.5.4 - Clean non-elevated NSIS setup (no Defender flags), Razorpay payment diagnostics, Supabase cloud architecture.',
+  '2.6.2',
+  'https://drive.google.com/file/d/1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi/view?usp=sharing',
+  'v2.6.2 - Added close tray dialog option prompt, fixed spawn EBUSY updater bugs, single instance process lock',
   true
 )
 ON CONFLICT DO NOTHING;

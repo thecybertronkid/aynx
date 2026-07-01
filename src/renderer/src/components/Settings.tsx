@@ -105,6 +105,8 @@ const Settings: React.FC = () => {
   const [hwAcceleration, setHwAcceleration] = useState('false');
   const [bgProcessing, setBgProcessing] = useState('true');
   const [autoResume, setAutoResume] = useState('true');
+  const [closeToTray, setCloseToTray] = useState('true');
+  const [rememberCloseChoice, setRememberCloseChoice] = useState('false');
 
   // Preset state
   const [selectedPreset, setSelectedPreset] = useState('Custom');
@@ -144,6 +146,8 @@ const Settings: React.FC = () => {
       setHwAcceleration(settings.hwAcceleration || 'false');
       setBgProcessing(settings.bgProcessing || 'true');
       setAutoResume(settings.autoResume || 'true');
+      setCloseToTray(settings.closeToTray || 'true');
+      setRememberCloseChoice(settings.rememberCloseChoice || 'false');
     }
   }, [settings]);
 
@@ -218,7 +222,9 @@ const Settings: React.FC = () => {
     maxBandwidth !== (settings.maxBandwidth || '') ||
     hwAcceleration !== (settings.hwAcceleration || '') ||
     bgProcessing !== (settings.bgProcessing || '') ||
-    autoResume !== (settings.autoResume || '');
+    autoResume !== (settings.autoResume || '') ||
+    closeToTray !== (settings.closeToTray || '') ||
+    rememberCloseChoice !== (settings.rememberCloseChoice || '');
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,6 +243,8 @@ const Settings: React.FC = () => {
       await updateSetting('hwAcceleration', hwAcceleration);
       await updateSetting('bgProcessing', bgProcessing);
       await updateSetting('autoResume', autoResume);
+      await updateSetting('closeToTray', closeToTray);
+      await updateSetting('rememberCloseChoice', rememberCloseChoice);
       
       // Log Activity
       await window.api.addActivity({
@@ -964,6 +972,38 @@ Install Location: ${systemInfo.installDir}
                       type="checkbox"
                       checked={autoResume === 'true'}
                       onChange={(e) => setAutoResume(e.target.checked ? 'true' : 'false')}
+                      className="w-4 h-4 cursor-pointer accent-discord-accent"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-discord-border/50 pt-3">
+                    <div>
+                      <p className="text-xs font-bold text-discord-textNormal">
+                        Minimize to Tray on Close
+                        <Tooltip content="When you close the app window, keep it running in the system tray." recommended="Enabled" />
+                      </p>
+                      <p className="text-[10px] text-discord-textMuted font-semibold mt-0.5">Allows downloads to run in background instead of fully exiting.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={closeToTray === 'true'}
+                      onChange={(e) => setCloseToTray(e.target.checked ? 'true' : 'false')}
+                      className="w-4 h-4 cursor-pointer accent-discord-accent"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-discord-border/50 pt-3">
+                    <div>
+                      <p className="text-xs font-bold text-discord-textNormal">
+                        Prompt on Close Action
+                        <Tooltip content="Ask whether to close directly or minimize to system tray each time you close the window." recommended="Disabled (Remembered)" />
+                      </p>
+                      <p className="text-[10px] text-discord-textMuted font-semibold mt-0.5">If disabled, the application uses the choice saved above.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={rememberCloseChoice === 'false'}
+                      onChange={(e) => setRememberCloseChoice(e.target.checked ? 'false' : 'true')}
                       className="w-4 h-4 cursor-pointer accent-discord-accent"
                     />
                   </div>
