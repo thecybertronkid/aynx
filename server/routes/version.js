@@ -28,9 +28,9 @@ router.get('/check', async (req, res) => {
     }
 
     // Fallback
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.3', downloadUrl: 'https://drive.usercontent.google.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: '' });
   } catch (err) {
-    res.json({ latestVersion: '2.6.2', downloadUrl: 'https://drive.usercontent.google.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: '' });
+    res.json({ latestVersion: '2.6.3', downloadUrl: 'https://drive.usercontent.google.com/download?id=1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8&export=download&confirm=t', changelog: '' });
   }
 });
 

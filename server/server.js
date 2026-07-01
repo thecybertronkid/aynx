@@ -51,9 +51,9 @@ if (!fs.existsSync(LICENSES_FILE)) {
 
 if (!fs.existsSync(SETTINGS_FILE)) {
   const initialSettings = {
-    latestVersion: '2.6.2',
-    downloadUrl: 'https://drive.google.com/file/d/1-uk8TGzGYUnpfCSpC9wwAhtKA_IP4azi/view?usp=sharing',
-    changelog: 'v2.6.2 Release Notes:\n- Added close confirmation settings tray options dialog prompt\n- Fixed spawn EBUSY auto-updater installation bug\n- Implemented single instance process lock\n- Refined premium system options'
+    latestVersion: '2.6.3',
+    downloadUrl: 'https://drive.google.com/file/d/1dGqW-BhAk9fJc37JKXB6QeAU6_FlLjR8/view?usp=sharing',
+    changelog: 'v2.6.3 Release Notes:\n- Fixed progress downloading metrics bug (stuck speed & ETA)\n- Implemented dynamic global feature flags checks\n- Rolled out AYNX Operations Portal Admin Console v3.0\n- Enhanced AI Insights automatic highlights center'
   };
   writeJSON(SETTINGS_FILE, initialSettings);
 }

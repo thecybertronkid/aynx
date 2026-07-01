@@ -36,7 +36,7 @@ async function build() {
   });
 
   console.log('Building React renderer for production...');
-  execSync('powershell -ExecutionPolicy Bypass -Command "pnpm vite build"', {
+  execSync('node node_modules/vite/bin/vite.js build', {
     cwd: path.join(__dirname, '..'),
     stdio: 'inherit'
   });

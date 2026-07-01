@@ -182,7 +182,7 @@ function startTelemetryHeartbeat() {
   let storage = '—';
   let windowsVersion = 'Windows';
   let deviceName = 'AYNX Device';
-  let appVersion = '2.6.2';
+  let appVersion = '2.6.3';
   let ffmpegVersion = '—';
 
   try {

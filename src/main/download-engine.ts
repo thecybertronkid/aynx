@@ -338,11 +338,15 @@ async function startDownloadJob(ad: ActiveDownload) {
     const chunk = data.toString();
     stdoutBuffer += chunk;
 
-    const lines = stdoutBuffer.split('\n');
+    // Split by carriage return (\r) or newline (\n) to capture terminal in-place updates
+    const lines = stdoutBuffer.split(/[\r\n]+/);
     stdoutBuffer = lines.pop() || '';
 
     for (const line of lines) {
-      const progMatch = line.match(/\[download\]\s+(\d+\.\d+)%\s+of\s+([^\s]+)\s+at\s+([^\s]+)\s+ETA\s+([^\s]+)/);
+      // Strip ANSI escape codes
+      const cleanLine = line.replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '').trim();
+
+      const progMatch = cleanLine.match(/\[download\]\s+(\d+(?:\.\d+)?)%\s+of\s+~?\s*([^\s]+)\s+at\s+([^\s]+)\s+ETA\s+([^\s]+)/);
       if (progMatch) {
         ad.progress = parseFloat(progMatch[1]);
         ad.speed = progMatch[3];
@@ -356,7 +360,7 @@ async function startDownloadJob(ad: ActiveDownload) {
         });
       }
 
-      const destMatch = line.match(/\[download\] Destination: (.*)/);
+      const destMatch = cleanLine.match(/\[download\] Destination: (.*)/);
       if (destMatch) {
         const filePath = destMatch[1].trim();
         ad.record.filePath = filePath;
