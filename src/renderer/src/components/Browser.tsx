@@ -176,39 +176,50 @@ const Browser: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [tabs, activeTabId]);
 
-  // Hook up webview listeners (did-start-loading, did-stop-loading, etc)
   const setupWebviewEvents = (id: string, el: any) => {
     if (!el) return;
     
+    const updateState = () => {
+      try {
+        const url = el.getURL();
+        const title = el.getTitle() || 'AYNX Browser';
+        const canGoBack = el.canGoBack();
+        const canGoForward = el.canGoForward();
+        
+        setTabs(prev => prev.map(t => t.id === id ? { 
+          ...t, 
+          url, 
+          title,
+          canGoBack,
+          canGoForward
+        } : t));
+      } catch (err) {
+        console.error('Failed to update webview state:', err);
+      }
+    };
+
     const onStartLoading = () => {
       setTabs(prev => prev.map(t => t.id === id ? { ...t, loading: true } : t));
     };
 
     const onStopLoading = () => {
-      setTabs(prev => prev.map(t => {
-        if (t.id === id) {
-          const url = el.getURL();
-          return {
-            ...t,
-            loading: false,
-            url,
-            title: el.getTitle() || t.title,
-            canGoBack: el.canGoBack(),
-            canGoForward: el.canGoForward()
-          };
-        }
-        return t;
-      }));
+      setTabs(prev => prev.map(t => t.id === id ? { ...t, loading: false } : t));
+      updateState();
     };
 
-    const onNavigate = (e: any) => {
-      setTabs(prev => prev.map(t => t.id === id ? { ...t, url: e.url } : t));
+    const onNavigate = () => {
+      updateState();
+    };
+
+    const onTitleUpdate = () => {
+      updateState();
     };
 
     el.addEventListener('did-start-loading', onStartLoading);
     el.addEventListener('did-stop-loading', onStopLoading);
     el.addEventListener('did-navigate', onNavigate);
     el.addEventListener('did-navigate-in-page', onNavigate);
+    el.addEventListener('page-title-updated', onTitleUpdate);
 
     // Clean up
     return () => {
@@ -216,6 +227,7 @@ const Browser: React.FC = () => {
       el.removeEventListener('did-stop-loading', onStopLoading);
       el.removeEventListener('did-navigate', onNavigate);
       el.removeEventListener('did-navigate-in-page', onNavigate);
+      el.removeEventListener('page-title-updated', onTitleUpdate);
     };
   };
 
